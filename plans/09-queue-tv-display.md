@@ -24,7 +24,7 @@ Status: **outline** (revised 2026-11-20 with the owner's priority and resolution
   - daily reload and watchdog.
 - **Display management** (Settings → Displays, clinic admin): pair a display by code, name it, choose branch/rooms, choose the name format (number only or first name + last initial), chime on/off, see last seen, revoke.
 - **Priority lanes** (Q11, decided):
-  - **Per-clinic setting**, off by default: priority for seniors, PWD and pregnant patients, and how strictly they go ahead (always first, or one in every *N* calls).
+  - **Per-clinic setting**, off by default: priority for seniors, PWD and pregnant patients, and how strictly they go ahead (always first, or one in every _N_ calls).
   - Reception marks priority at check-in. The category is shown to authorised staff only, because it is health-related information.
   - **The TV never reveals it:** no "PWD"/"Senior"/"Priority" label, no special prefix, colour or icon, and the same number series as everyone else.
   - A priority ticket being called earlier is the only visible effect.
@@ -34,6 +34,7 @@ Status: **outline** (revised 2026-11-20 with the owner's priority and resolution
 ## Backend endpoints
 
 All needed, none exist and none are planned:
+
 - D-18 queue domain and actions;
 - D-19 rooms;
 - D-20 display device pairing and credential;
@@ -49,10 +50,11 @@ All needed, none exist and none are planned:
   - reconnect, and the stale state after 2 minutes;
   - chime fires once per call;
   - revoked display returns to the pairing screen;
-  - full layout at 1920×1080 and 3840×2160, in English and Filipino;
+  - full layout at 1920×1080 (43" target) and 3840×2160, readable from 3–5 m; the `clamp()` sizes hold on 32" to 65";
+  - tested on **Chrome in kiosk mode** on an Android TV box or mini PC, never a TV's built-in browser;
   - with priority on: priority tickets are called in the configured order, and nothing on the TV (text, number format, colour, data received) differs from a normal ticket;
   - readability check from 5 m on a real TV (manual).
 
 ## Open questions
 
-Q8b TV screen size; Q11b legal basis for priority lanes (with clinic owners); queue number format and daily reset; voice announcements in English and Filipino.
+Q8b real TV hardware (owner to confirm; design target 43" 1080p); Q11b legal basis for priority lanes (with clinic owners); queue number format and daily reset; voice announcements (English first; Filipino with Phase 14).

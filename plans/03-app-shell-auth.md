@@ -4,7 +4,7 @@ Status: **outline** (revised 2026-11-20). Depends on Phases 1–2 (design system
 
 ## Objectives
 
-Full session lifecycle, the clinic picker and switcher, the permission-aware app shell for every role, all email-link pages, global error and rate-limit handling, the shared-device inactivity sign-out, and English/Filipino switching.
+Full session lifecycle, the clinic picker and switcher, the permission-aware app shell for every role, all email-link pages, global error and rate-limit handling, and the shared-computer inactivity sign-out. All text comes from the English catalogue; Filipino is Phase 14.
 
 ## Deliverables
 
@@ -30,21 +30,22 @@ Full session lifecycle, the clinic picker and switcher, the permission-aware app
   - "Coming soon" items **not** shown (no menu entries for unavailable features).
 - **Global handling:** the error map in plan.md §5.7, offline banner, route error boundary, `requestId` support details, 403 → refresh permissions.
 - **Landing per role:** chosen from permissions (integration guide §5). Role `name`s (now `{ key, name }`) label people in the clinic picker and user menu. Doctor- or reception-specific homes also need D-9.
-- **Shared-device sign-out** (plan.md §5.3.1):
-  - the "This is a shared computer" option on sign-in;
-  - activity is tracked across tabs (`BroadcastChannel`), so an active tab keeps the others alive;
-  - after a 60-second warning, the app signs out and comes back to the same page after sign-in;
-  - fixed 10 minutes until D-26.
-- **Language:** LanguageSwitcher on the sign-in page and in the user menu; the choice is stored on the device until D-25.
+- **Shared-computer sign-out** (plan.md §5.3.1; decided Q16):
+  - the "This is a shared computer" option on sign-in; personal devices are never timed out by the client;
+  - 10 minutes without input, counted across tabs (`BroadcastChannel`), so an active tab keeps the others alive;
+  - a warning 60 seconds before, with a large "Stay signed in";
+  - at timeout: `POST /api/v1/auth/logout` (server-side revoke), then clear the token from memory, the cache and the screen;
+  - unsaved form input is kept **in memory** and restored only for the same user signing in again on that tab; it is discarded if another user signs in;
+  - a shorter **server-side** idle lifetime for shared-computer sessions is backend request D-26.
 
 ## Backend endpoints
 
-| Endpoint | Exists |
-|---|---|
-| `POST /auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/logout-all`, `/auth/switch-tenant` | yes |
-| `POST /auth/password/forgot`, `/auth/password/reset`, `/auth/account/setup`, `/invitations/accept` | yes |
-| `GET /me`, `GET /me/memberships` | yes |
-| Expected-tenant header (D-1), branch assignment/practitioner (D-9), per-user language (D-25), clinic inactivity setting (D-26) | **no**: dependencies (role keys, D-5, are now available) |
+| Endpoint                                                                                                        | Exists                                                   |
+| --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `POST /auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/logout-all`, `/auth/switch-tenant`                  | yes                                                      |
+| `POST /auth/password/forgot`, `/auth/password/reset`, `/auth/account/setup`, `/invitations/accept`              | yes                                                      |
+| `GET /me`, `GET /me/memberships`                                                                                | yes                                                      |
+| Expected-tenant header (D-1), branch assignment/practitioner (D-9), shared-computer server idle lifetime (D-26) | **no**: dependencies (role keys, D-5, are now available) |
 
 ## Tests (to be detailed before implementation)
 
@@ -54,15 +55,20 @@ Full session lifecycle, the clinic picker and switcher, the permission-aware app
   - owner signs in, sees settings items;
   - receptionist does not, and a direct URL shows "no access";
   - reload keeps the session;
-  - an expired token refreshes transparently (short-lived token config, or waiting with a test clock: *how is to be decided with the backend*);
+  - an expired token refreshes transparently (short-lived token config, or waiting with a test clock: _how is to be decided with the backend_);
   - **two tabs refreshing at once do not sign out**;
   - sign-out in one tab signs out the other;
   - a clinic switch in tab A shows the notice in tab B;
   - wrong password 5× → rate-limit message;
-  - reset password via the link from the API log or file transport (needs a way to read emails in e2e: `MAIL_TRANSPORT=file` and read `var/mail`; *to confirm with the backend*);
+  - reset password via the link from the API log or file transport (needs a way to read emails in e2e: `MAIL_TRANSPORT=file` and read `var/mail`; _to confirm with the backend_);
   - invitation acceptance for new and existing users;
-  - shared-computer mode: the warning appears, "Stay signed in" keeps the session, no response signs out and clears the screen, and after sign-in the same page returns (using a shortened timeout in tests);
-  - switching to Filipino changes every visible string and date on the sign-in and picker pages;
+  - shared-computer mode (timeout shortened in tests):
+    - the warning appears, and "Stay signed in" keeps the session;
+    - with no response, `POST /auth/logout` is called and **a later refresh with the old cookie answers `401`** (the server really revoked it);
+    - the token and screen are cleared;
+    - after the same user signs in, the same page and the unsaved input return;
+    - **a different user signing in sees none of it**;
+    - a personal device (option off) is never timed out;
   - keyboard-only sign-in; axe on every page.
 - Cross-tenant: after switching clinic, no data from the previous clinic is visible (seed a second clinic: **the dev seed has only one; backend seed change needed**).
 
@@ -74,4 +80,4 @@ All flows in the integration guide §4–§7 work against the local API. No toke
 
 - A second seeded clinic and a multi-clinic user for e2e (backend seed).
 - Reading emails in e2e (file transport path).
-- Q16 inactivity time (default 10 minutes).
+- Q16a: may unsaved input use `sessionStorage` (survives a reload) instead of memory only? Default: memory only.

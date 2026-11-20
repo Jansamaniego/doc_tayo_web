@@ -1,0 +1,228 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-20 04:25+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#: src/app/HomePage.tsx
+msgid "API not reachable"
+msgstr "API not reachable"
+
+#: src/app/HomePage.tsx
+#: src/i18n/i18n.spec.ts
+msgid "API reachable"
+msgstr "API reachable"
+
+#: src/app/HomePage.tsx
+msgid "Checking the connection…"
+msgstr "Checking the connection…"
+
+#: src/app/HomePage.tsx
+#: src/app/RouteErrorPage.tsx
+msgid "Details for support"
+msgstr "Details for support"
+
+#: src/app/HomePage.tsx
+msgid "DocTayo"
+msgstr "DocTayo"
+
+#: src/app/NotFoundPage.tsx
+msgid "Go to the home page"
+msgstr "Go to the home page"
+
+#: src/app/NotFoundPage.tsx
+msgid "Page not found"
+msgstr "Page not found"
+
+#: src/api/error-messages.ts
+msgid "Please choose a clinic to continue."
+msgstr "Please choose a clinic to continue."
+
+#: src/api/error-messages.ts
+msgid "Please fill in this field."
+msgstr "Please fill in this field."
+
+#: src/api/error-messages.ts
+msgid "Please sign in to continue."
+msgstr "Please sign in to continue."
+
+#: src/app/RouteErrorPage.tsx
+msgid "Please try again."
+msgstr "Please try again."
+
+#: src/app/HomePage.tsx
+#: src/app/RouteErrorPage.tsx
+msgid "Reference: {requestId}"
+msgstr "Reference: {requestId}"
+
+#: src/app/RootLayout.tsx
+msgid "Skip to main content"
+msgstr "Skip to main content"
+
+#: src/api/error-messages.ts
+msgid "Some fields need attention."
+msgstr "Some fields need attention."
+
+#: src/app/RouteErrorPage.tsx
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+#: src/api/error-messages.ts
+msgid "Something went wrong on our side. Please try again."
+msgstr "Something went wrong on our side. Please try again."
+
+#: src/api/error-messages.ts
+msgid "That is too large to send. Please send less information."
+msgstr "That is too large to send. Please send less information."
+
+#: src/api/error-messages.ts
+msgid "That kind of file is not supported."
+msgstr "That kind of file is not supported."
+
+#: src/app/NotFoundPage.tsx
+msgid "The address may be wrong, or the page may have moved."
+msgstr "The address may be wrong, or the page may have moved."
+
+#: src/api/error-messages.ts
+msgid "The email or password is incorrect."
+msgstr "The email or password is incorrect."
+
+#: src/api/error-messages.ts
+msgid "The information could not be read. Please try again."
+msgstr "The information could not be read. Please try again."
+
+#: src/api/error-messages.ts
+msgid "The password is incorrect."
+msgstr "The password is incorrect."
+
+#: src/api/error-messages.ts
+msgid "The password must not contain your email address."
+msgstr "The password must not contain your email address."
+
+#: src/api/error-messages.ts
+msgid "The service is not available right now. Please try again shortly."
+msgstr "The service is not available right now. Please try again shortly."
+
+#: src/api/error-messages.ts
+msgid "The service is starting up. Please try again in a moment."
+msgstr "The service is starting up. Please try again in a moment."
+
+#: src/app/MisconfiguredPage.tsx
+msgid "The settings below are missing or not valid. Ask the person who installed the app to fix them."
+msgstr "The settings below are missing or not valid. Ask the person who installed the app to fix them."
+
+#: src/api/error-messages.ts
+msgid "This action is not allowed here."
+msgstr "This action is not allowed here."
+
+#: src/api/error-messages.ts
+msgid "This already exists."
+msgstr "This already exists."
+
+#: src/app/MisconfiguredPage.tsx
+msgid "This app is misconfigured"
+msgstr "This app is misconfigured"
+
+#: src/api/error-messages.ts
+msgid "This cannot be done while the record is in its current state."
+msgstr "This cannot be done while the record is in its current state."
+
+#: src/api/error-messages.ts
+msgid "This clinic is no longer active."
+msgstr "This clinic is no longer active."
+
+#: src/api/error-messages.ts
+msgid "This clinic's access is suspended for now."
+msgstr "This clinic's access is suspended for now."
+
+#: src/api/error-messages.ts
+msgid "This field is not accepted."
+msgstr "This field is not accepted."
+
+#: src/api/error-messages.ts
+msgid "This is linked to other information, so it cannot be changed this way."
+msgstr "This is linked to other information, so it cannot be changed this way."
+
+#: src/api/error-messages.ts
+msgid "This is not in the expected format."
+msgstr "This is not in the expected format."
+
+#: src/api/error-messages.ts
+msgid "This is not the right kind of value."
+msgstr "This is not the right kind of value."
+
+#: src/api/error-messages.ts
+msgid "This is outside the allowed range."
+msgstr "This is outside the allowed range."
+
+#: src/api/error-messages.ts
+msgid "This is too long."
+msgstr "This is too long."
+
+#: src/api/error-messages.ts
+msgid "This is too short."
+msgstr "This is too short."
+
+#: src/api/error-messages.ts
+msgid "This link is not valid or has expired. Please ask for a new one."
+msgstr "This link is not valid or has expired. Please ask for a new one."
+
+#: src/api/error-messages.ts
+msgid "This password is too easy to guess. Please choose another."
+msgstr "This password is too easy to guess. Please choose another."
+
+#: src/api/error-messages.ts
+msgid "This role cannot be given through an invitation."
+msgstr "This role cannot be given through an invitation."
+
+#: src/api/error-messages.ts
+msgid "This value is not allowed."
+msgstr "This value is not allowed."
+
+#: src/api/error-messages.ts
+msgid "Too many attempts. Please wait a moment and try again."
+msgstr "Too many attempts. Please wait a moment and try again."
+
+#: src/app/HomePage.tsx
+#: src/app/RouteErrorPage.tsx
+msgid "Try again"
+msgstr "Try again"
+
+#: src/api/error-messages.ts
+msgid "We could not connect. Check your internet connection and try again."
+msgstr "We could not connect. Check your internet connection and try again."
+
+#: src/api/error-messages.ts
+msgid "We could not find that page."
+msgstr "We could not find that page."
+
+#: src/app/NotFoundPage.tsx
+msgid "We could not find this page"
+msgstr "We could not find this page"
+
+#: src/api/error-messages.ts
+msgid "We could not find what you were looking for."
+msgstr "We could not find what you were looking for."
+
+#: src/app/HomePage.tsx
+msgid "We could not reach the DocTayo service. Please try again."
+msgstr "We could not reach the DocTayo service. Please try again."
+
+#: src/api/error-messages.ts
+msgid "We could not understand that request. Please try again."
+msgstr "We could not understand that request. Please try again."
+
+#: src/api/error-messages.ts
+msgid "You do not have access to this clinic."
+msgstr "You do not have access to this clinic."
+
+#: src/api/error-messages.ts
+msgid "You do not have permission to do this."
+msgstr "You do not have permission to do this."
+
+#: src/api/error-messages.ts
+msgid "Your session needs to be renewed. Please try again."
+msgstr "Your session needs to be renewed. Please try again."

@@ -1,6 +1,6 @@
 # Phase 2: Design system and UX foundations
 
-Status: **planned** (draft for approval; revised 2026-11-20 with the owner's answers: shadcn/ui, warm coral and the keywords confirmed, Filipino, TV at 1080p and 2160p, queue-priority privacy). Depends on Phase 1. Backend: none.
+Status: **planned** (draft for approval; revised twice on 2026-11-20 with the owner's answers: shadcn/ui, warm coral and the keywords confirmed, English at launch with Filipino later, TV sized for 43" 1080p, queue-priority privacy, and how to verify the open technical points). Depends on Phase 1. Backend: none.
 
 **Approval gate:** no feature screen (Phase 3 onwards) is built until the product owner approves this phase's tokens, components, patterns and TV layout in the living style guide. Ideally two or three real users also try it, including at least one senior.
 
@@ -13,7 +13,7 @@ The owner has **confirmed** the third colour (warm coral, Q7) and the look-and-f
 1. A small set of design principles the whole team designs against.
 2. Design tokens (colour, type, spacing, radius, elevation, layout, motion) in **one source file** that generates CSS variables and the Tailwind theme.
 3. An accessible component library built from **shadcn/ui** (Radix primitives), resized and restyled for older users, with every state.
-4. Every component and pattern works in **English and Filipino**, tested with a stretched pseudo-locale.
+4. Every component and pattern is ready for a second language: all text from the message catalogue, tested with a stretched pseudo-locale. English ships at launch; Filipino follows in Phase 14.
 5. UX patterns for forms, feedback, confirmation, search, pagination and permissions.
 6. Responsive rules for desktop, tablet and mobile, and a separate **TV display mode**.
 7. A living style guide (Storybook) showing every token and component, with automated accessibility checks.
@@ -41,63 +41,63 @@ Look-and-feel keywords (confirmed, Q13): **calm, clean, trustworthy, warm, unhur
 
 **Primary: fresh green** (hue ≈ 145°). `green-300` is the brand's light, fresh green. `green-700` is the same hue darkened for text and controls.
 
-| Token | Hex | Contrast on bg `#F9FAF7` | Contrast on white | Allowed use |
-|---|---|---|---|---|
-| green-50 | `#F0FAF3` | 1.02 | 1.07 | Tinted page sections, selected-row background |
-| green-100 | `#DCF3E3` | 1.12 | 1.17 | Selected/active backgrounds, success-ish highlights |
-| green-200 | `#BCE8CA` | 1.29 | 1.35 | Decorative fills, hover background on light items |
-| **green-300** | **`#8FD9A8`** | 1.58 | 1.66 | **Brand light green**: illustrations, header accent bar, badges *with `green-950` text* (9.31:1). Never text, borders or controls. |
-| green-400 | `#5EC385` | 2.08 | 2.18 | Decorative only (charts with labels) |
-| green-500 | `#38A865` | 2.88 | 3.02 | Decorative; on white only, as a non-text indicator ≥ 3:1 |
-| green-600 | `#25884F` | 4.25 | 4.46 | Large text only (≥ 24 px, or ≥ 18.66 px bold) |
-| **green-700** | **`#1D6E41`** | **5.97** | **6.25** | **Primary controls and green text**: primary button fill (white text 6.25:1), links, focus ring, selected-state borders |
-| green-800 | `#175836` | 8.06 | 8.45 | Primary hover; AAA green text; TV "Now serving" panel |
-| green-900 | `#12452B` | 10.48 | 10.98 | Primary pressed; text on green-100 (9.40:1) |
-| green-950 | `#0A2A1A` | 14.75 | 15.45 | Text on brand light green |
+| Token         | Hex           | Contrast on bg `#F9FAF7` | Contrast on white | Allowed use                                                                                                                        |
+| ------------- | ------------- | ------------------------ | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| green-50      | `#F0FAF3`     | 1.02                     | 1.07              | Tinted page sections, selected-row background                                                                                      |
+| green-100     | `#DCF3E3`     | 1.12                     | 1.17              | Selected/active backgrounds, success-ish highlights                                                                                |
+| green-200     | `#BCE8CA`     | 1.29                     | 1.35              | Decorative fills, hover background on light items                                                                                  |
+| **green-300** | **`#8FD9A8`** | 1.58                     | 1.66              | **Brand light green**: illustrations, header accent bar, badges _with `green-950` text_ (9.31:1). Never text, borders or controls. |
+| green-400     | `#5EC385`     | 2.08                     | 2.18              | Decorative only (charts with labels)                                                                                               |
+| green-500     | `#38A865`     | 2.88                     | 3.02              | Decorative; on white only, as a non-text indicator ≥ 3:1                                                                           |
+| green-600     | `#25884F`     | 4.25                     | 4.46              | Large text only (≥ 24 px, or ≥ 18.66 px bold)                                                                                      |
+| **green-700** | **`#1D6E41`** | **5.97**                 | **6.25**          | **Primary controls and green text**: primary button fill (white text 6.25:1), links, focus ring, selected-state borders            |
+| green-800     | `#175836`     | 8.06                     | 8.45              | Primary hover; AAA green text; TV "Now serving" panel                                                                              |
+| green-900     | `#12452B`     | 10.48                    | 10.98             | Primary pressed; text on green-100 (9.40:1)                                                                                        |
+| green-950     | `#0A2A1A`     | 14.75                    | 15.45             | Text on brand light green                                                                                                          |
 
 **Background and neutrals** (slightly green-tinted greys)
 
-| Token | Hex | On bg | Use |
-|---|---|---|---|
-| neutral-0 | `#FFFFFF` | | Surfaces: cards, inputs, dialogs |
-| **neutral-25** | **`#F9FAF7`** | | **Off-white page background** |
-| neutral-50 | `#F2F4F0` | 1.06 | Subtle sections, table header |
-| neutral-100 | `#E5E9E4` | 1.17 | Disabled fills, dividers on white |
-| neutral-200 | `#CED5CF` | 1.43 | Decorative dividers (never the only boundary of a control) |
-| neutral-300 | `#AFB9B2` | 1.93 | Decorative only |
-| neutral-400 | `#87938B` | 3.05 | Placeholder icons, decorative only (placeholder *text* is not used; see §6.1) |
-| neutral-500 | `#68746C` | 4.66 | **Input and control borders** (4.88:1 on white, ≥ 3:1 non-text), disabled text on neutral-100 (3.98:1; disabled text is exempt but kept readable) |
-| neutral-600 | `#515C55` | 6.66 | Muted/supporting text (hints, metadata): AA |
-| neutral-700 | `#3D4741` | 9.21 | Secondary text: AAA |
-| neutral-800 | `#2A322E` | 12.57 | Headings alternative |
-| **neutral-900** | **`#1B211E`** | **15.63** | **Body text and headings**: AAA (16.37 on white) |
+| Token           | Hex           | On bg     | Use                                                                                                                                               |
+| --------------- | ------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| neutral-0       | `#FFFFFF`     |           | Surfaces: cards, inputs, dialogs                                                                                                                  |
+| **neutral-25**  | **`#F9FAF7`** |           | **Off-white page background**                                                                                                                     |
+| neutral-50      | `#F2F4F0`     | 1.06      | Subtle sections, table header                                                                                                                     |
+| neutral-100     | `#E5E9E4`     | 1.17      | Disabled fills, dividers on white                                                                                                                 |
+| neutral-200     | `#CED5CF`     | 1.43      | Decorative dividers (never the only boundary of a control)                                                                                        |
+| neutral-300     | `#AFB9B2`     | 1.93      | Decorative only                                                                                                                                   |
+| neutral-400     | `#87938B`     | 3.05      | Placeholder icons, decorative only (placeholder _text_ is not used; see §6.1)                                                                     |
+| neutral-500     | `#68746C`     | 4.66      | **Input and control borders** (4.88:1 on white, ≥ 3:1 non-text), disabled text on neutral-100 (3.98:1; disabled text is exempt but kept readable) |
+| neutral-600     | `#515C55`     | 6.66      | Muted/supporting text (hints, metadata): AA                                                                                                       |
+| neutral-700     | `#3D4741`     | 9.21      | Secondary text: AAA                                                                                                                               |
+| neutral-800     | `#2A322E`     | 12.57     | Headings alternative                                                                                                                              |
+| **neutral-900** | **`#1B211E`** | **15.63** | **Body text and headings**: AAA (16.37 on white)                                                                                                  |
 
 **Third colour: warm coral (confirmed, Q7)**
 
-| Token | Hex | On bg | Use |
-|---|---|---|---|
-| coral-50 | `#FFF4F1` | 1.03 | Accent section background |
-| coral-100 | `#FFE4DD` | 1.15 | Accent badge background (text coral-900, 8.95:1) |
-| coral-200 | `#FFC7B8` | 1.42 | Illustrations; text on green-900 (7.38:1, TV accent) |
-| coral-300 | `#FFA28C` | 1.86 | Illustrations |
-| **coral-400** | **`#FA7F62`** | 2.42 | **Brand accent fill** (with `neutral-900` text, 6.45:1): highlights such as "New", onboarding, empty-state illustrations. Never a control boundary on its own. |
-| coral-500 | `#EE6142` | 3.12 | Decorative |
-| coral-600 | `#D0482B` | 4.32 | Large text only |
-| coral-700 | `#A93A22` | 6.05 | Accent text if needed (white on it 6.33:1) |
-| coral-800 | `#86301E` | 8.16 | AAA accent text |
-| coral-900 | `#6A2919` | 10.31 | Text on coral tints |
+| Token         | Hex           | On bg | Use                                                                                                                                                            |
+| ------------- | ------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| coral-50      | `#FFF4F1`     | 1.03  | Accent section background                                                                                                                                      |
+| coral-100     | `#FFE4DD`     | 1.15  | Accent badge background (text coral-900, 8.95:1)                                                                                                               |
+| coral-200     | `#FFC7B8`     | 1.42  | Illustrations; text on green-900 (7.38:1, TV accent)                                                                                                           |
+| coral-300     | `#FFA28C`     | 1.86  | Illustrations                                                                                                                                                  |
+| **coral-400** | **`#FA7F62`** | 2.42  | **Brand accent fill** (with `neutral-900` text, 6.45:1): highlights such as "New", onboarding, empty-state illustrations. Never a control boundary on its own. |
+| coral-500     | `#EE6142`     | 3.12  | Decorative                                                                                                                                                     |
+| coral-600     | `#D0482B`     | 4.32  | Large text only                                                                                                                                                |
+| coral-700     | `#A93A22`     | 6.05  | Accent text if needed (white on it 6.33:1)                                                                                                                     |
+| coral-800     | `#86301E`     | 8.16  | AAA accent text                                                                                                                                                |
+| coral-900     | `#6A2919`     | 10.31 | Text on coral tints                                                                                                                                            |
 
-**Rule: coral is never used to mean "error".** Coral is close to the danger red, so coral is reserved for warm, positive accents and danger always uses its own red *plus* an icon *plus* a word ("Error", "Cannot be undone"). If the owner picks another third colour, the same rule applies to any colour close to a semantic one.
+**Rule: coral is never used to mean "error".** Coral is close to the danger red, so coral is reserved for warm, positive accents and danger always uses its own red _plus_ an icon _plus_ a word ("Error", "Cannot be undone"). If the owner picks another third colour, the same rule applies to any colour close to a semantic one.
 
 **Semantic colours** (each pair passes AA; always shown with an icon and text)
 
-| Meaning | Text / icon | Background | Border | Text on bg | Text on page bg |
-|---|---|---|---|---|---|
-| Success | `#1D6E41` (green-700) | `#E8F6EC` | green-700 | 5.60 | 5.97 |
-| Warning | `#7A4A00` | `#FFF4D6` | `#B07400` (3.59 on its bg) | 6.83 | 7.14 |
-| Danger | `#B3261E` | `#FDEDEB` | danger | 5.76 | 6.24 |
-| Info | `#1F5FA6` | `#EAF2FC` | info | 5.73 | 6.18 |
-| Danger button | white on `#B3261E` | | | 6.54 | |
+| Meaning       | Text / icon           | Background | Border                     | Text on bg | Text on page bg |
+| ------------- | --------------------- | ---------- | -------------------------- | ---------- | --------------- |
+| Success       | `#1D6E41` (green-700) | `#E8F6EC`  | green-700                  | 5.60       | 5.97            |
+| Warning       | `#7A4A00`             | `#FFF4D6`  | `#B07400` (3.59 on its bg) | 6.83       | 7.14            |
+| Danger        | `#B3261E`             | `#FDEDEB`  | danger                     | 5.76       | 6.24            |
+| Info          | `#1F5FA6`             | `#EAF2FC`  | info                       | 5.73       | 6.18            |
+| Danger button | white on `#B3261E`    |            |                            | 6.54       |                 |
 
 ### 3.2 Semantic tokens (what components use)
 
@@ -115,7 +115,8 @@ Components never use palette names directly. They use role tokens, so a palette 
 
 ### 3.4 Automated contrast test
 
-`tokens.contrast.test.ts` reads `tokens.json` and a list of **declared pairings**: every text/background and control/background combination used by components. It asserts:
+`tokens.contrast.spec.ts` reads `tokens.json` and a list of **declared pairings**: every text/background and control/background combination used by components. It asserts:
+
 - body text ≥ 7:1;
 - other text ≥ 4.5:1 (large text ≥ 3:1 where declared large);
 - control boundaries and focus ring ≥ 3:1 against adjacent colours.
@@ -143,16 +144,16 @@ Not in scope (not requested). The semantic-token layer leaves room for it later.
 - Weights: 400 regular, 700 bold (600 if the font provides it, for labels). No light weights.
 - All sizes in `rem`, so browser zoom and font-size settings work.
 
-| Token | Size (px / rem) | Line height | Weight | Use |
-|---|---|---|---|---|
-| `text.display` | 40 / 2.5 | 1.2 | 700 | Rare: sign-in welcome, big numbers on dashboards |
-| `text.h1` | 32 / 2.0 | 1.25 | 700 | Page title (one per page) |
-| `text.h2` | 26 / 1.625 | 1.3 | 700 | Section |
-| `text.h3` | 22 / 1.375 | 1.35 | 700 | Card title, dialog title |
-| `text.bodyLarge` | 20 / 1.25 | 1.5 | 400 | Key values, important sentences |
-| `text.body` | **18 / 1.125** | 1.5 | 400 | Default text, inputs, buttons |
-| `text.label` | 18 / 1.125 | 1.4 | 600/700 | Form labels, table headers |
-| `text.small` | 16 / 1.0 | 1.5 | 400 | Hints, metadata, dense tables. **Floor.** |
+| Token            | Size (px / rem) | Line height | Weight  | Use                                              |
+| ---------------- | --------------- | ----------- | ------- | ------------------------------------------------ |
+| `text.display`   | 40 / 2.5        | 1.2         | 700     | Rare: sign-in welcome, big numbers on dashboards |
+| `text.h1`        | 32 / 2.0        | 1.25        | 700     | Page title (one per page)                        |
+| `text.h2`        | 26 / 1.625      | 1.3         | 700     | Section                                          |
+| `text.h3`        | 22 / 1.375      | 1.35        | 700     | Card title, dialog title                         |
+| `text.bodyLarge` | 20 / 1.25       | 1.5         | 400     | Key values, important sentences                  |
+| `text.body`      | **18 / 1.125**  | 1.5         | 400     | Default text, inputs, buttons                    |
+| `text.label`     | 18 / 1.125      | 1.4         | 600/700 | Form labels, table headers                       |
+| `text.small`     | 16 / 1.0        | 1.5         | 400     | Hints, metadata, dense tables. **Floor.**        |
 
 TV sizes are separate (§9).
 
@@ -161,6 +162,7 @@ TV sizes are separate (§9).
 ## 5. Spacing, radius, elevation, layout, motion
 
 **Spacing** (4 px base, in rem): `0`, `1`=4, `2`=8, `3`=12, `4`=16, `5`=20, `6`=24, `8`=32, `10`=40, `12`=48, `16`=64, `20`=80.
+
 - Default gap between form fields: 24 px.
 - Default gap between controls side by side: at least 12 px. With 44 px targets this avoids mis-taps, beyond WCAG 2.5.8.
 
@@ -170,26 +172,27 @@ TV sizes are separate (§9).
 
 **Elevation** (soft, low, green-tinted shadows; borders still carry the boundary so nothing relies on shadow):
 
-| Token | Value | Use |
-|---|---|---|
-| `elevation.0` | none + 1 px neutral-200 border | Cards on page |
-| `elevation.1` | `0 1px 2px rgb(27 33 30 / 0.08), 0 1px 3px rgb(27 33 30 / 0.06)` | Raised cards, sticky headers |
-| `elevation.2` | `0 4px 12px rgb(27 33 30 / 0.12)` | Popovers, menus, toasts |
-| `elevation.3` | `0 12px 32px rgb(27 33 30 / 0.18)` | Dialogs (plus a backdrop `rgb(27 33 30 / 0.5)`) |
+| Token         | Value                                                            | Use                                             |
+| ------------- | ---------------------------------------------------------------- | ----------------------------------------------- |
+| `elevation.0` | none + 1 px neutral-200 border                                   | Cards on page                                   |
+| `elevation.1` | `0 1px 2px rgb(27 33 30 / 0.08), 0 1px 3px rgb(27 33 30 / 0.06)` | Raised cards, sticky headers                    |
+| `elevation.2` | `0 4px 12px rgb(27 33 30 / 0.12)`                                | Popovers, menus, toasts                         |
+| `elevation.3` | `0 12px 32px rgb(27 33 30 / 0.18)`                               | Dialogs (plus a backdrop `rgb(27 33 30 / 0.5)`) |
 
 **Layout grid and breakpoints** (in `em`, so zooming triggers the smaller layout, which supports WCAG reflow):
 
-| Name | Min width | Columns / gutter / margin | Typical device |
-|---|---|---|---|
-| `base` | 0 | 4 / 16 px / 16 px | phone |
-| `sm` | 40em (640 px) | 8 / 16 / 24 | large phone, small tablet portrait |
-| `md` | 48em (768 px) | 8 / 24 / 24 | tablet portrait |
-| `lg` | 64em (1024 px) | 12 / 24 / 32 | tablet landscape, small laptop |
-| `xl` | 80em (1280 px) | 12 / 32 / 40 | desktop |
+| Name   | Min width      | Columns / gutter / margin | Typical device                     |
+| ------ | -------------- | ------------------------- | ---------------------------------- |
+| `base` | 0              | 4 / 16 px / 16 px         | phone                              |
+| `sm`   | 40em (640 px)  | 8 / 16 / 24               | large phone, small tablet portrait |
+| `md`   | 48em (768 px)  | 8 / 24 / 24               | tablet portrait                    |
+| `lg`   | 64em (1024 px) | 12 / 24 / 32              | tablet landscape, small laptop     |
+| `xl`   | 80em (1280 px) | 12 / 32 / 40              | desktop                            |
 
 The maximum content width is 1280 px (reading content 720 px).
 
 **Motion:**
+
 - Short (150–200 ms) and only to show cause and effect.
 - `prefers-reduced-motion` turns transitions off.
 - Nothing flashes.
@@ -219,48 +222,48 @@ Components come from **shadcn/ui** (built on Radix UI primitives), added with th
 - **Focus ring:** the stronger focus ring below replaces shadcn's default `ring-[3px]` at 50% opacity.
 
 **Common states:**
+
 - default, hover, **focus-visible**, pressed/active, disabled, read-only, invalid/error, loading (where it applies).
 - **Focus ring:** 3 px `green-700` outline with a 2 px offset and a 2 px white inner ring, so it is visible on both light and green backgrounds (≥ 3:1 on both). Never removed. Shown for keyboard focus (`:focus-visible`).
 - **Disabled:** neutral-100 fill, neutral-500 text and border, `cursor: not-allowed`. A disabled action that the user might wonder about **always has visible text explaining why** (§7.6). Prefer `aria-disabled` on buttons so they stay focusable and the reason can be announced.
 
-| Component | Variants / notes | States beyond the common ones |
-|---|---|---|
-| **Button** | `primary` (green-700, white text), `secondary` (white, green-700 border and text), `tertiary` (text style, underlined on hover), `danger` (danger red), `danger-secondary`. Sizes md/lg. Icon + label (icon optional, **label mandatory**). Full-width on mobile. | loading (spinner + "Saving…" text, keeps its width, ignores repeat presses), success flash is **not** on the button (toast instead) |
-| **Link** | Inline (underlined), standalone (with arrow icon) | visited not styled differently |
-| **TextField** | label above (always visible), optional hint under the label, error under the field, optional "Optional" marker (we mark optional fields, not required ones) | invalid (danger border + icon + message), read-only (no border, value as text) |
-| **TextArea** | auto-grow, character counter when there is a limit ("120 of 500 characters") | same as TextField |
-| **PasswordField** | "Show password" toggle **with text**; rules shown as a hint list (10–128 characters, not a common password, does not contain your email), each rule checked live where the client can know it | invalid with server codes mapped to plain words |
-| **NumberField / MoneyField** | Own build on shadcn `Input`. ₱ prefix, `inputmode="decimal"`, formats on blur, never changes the value while typing | invalid, out of range |
-| **Select** | shadcn `Select` (Radix) for ≤ ~15 options. **Combobox** (shadcn's Popover + Command) with filtering for longer lists (branches, doctors, ICD-10 later). *To verify with NVDA and VoiceOver in Phase 2:* that the combobox announces options and result counts; if not, it is fixed in our copy before approval. | open, option hover/selected, empty results |
-| **Checkbox / CheckboxGroup, Radio / RadioGroup, Switch** | large 24 px box inside a 44 px target, the label is clickable; Switch only for settings that apply immediately | indeterminate (checkbox) |
-| **DateField / DatePicker** | **DateField** (own build): three labelled parts, Month (select with month names), Day and Year (number inputs), grouped in a `fieldset` with one legend; typing always works. **DatePicker**: DateField plus an optional "Choose on calendar" button opening shadcn's `Calendar` (react-day-picker) in a Popover. The **time zone is fixed to the branch/clinic** (react-day-picker `timeZone` + `@date-fns/tz`; behaviour to verify in Phase 2). | invalid (out of range, unavailable dates), min/max |
-| **TimeField** | Own build: Hour and Minute selects plus an AM/PM choice, all labelled. A list of quick time slots for scheduling (Phase 7). | invalid |
-| **DateRangePicker** | Two DateFields (From, To) plus the Calendar in range mode; for reports (Phase 11) | |
-| **SearchField** | label + magnifier icon, "Clear" text button, results announced ("12 patients found") | searching, no results |
-| **Table** | shadcn `Table` (semantic HTML table) + **TanStack Table** for sorting state: column headers, sortable columns (sort state as text + arrow, `aria-sort`), row actions as labelled buttons (no hover-only actions); sticky header | loading (skeleton rows), empty, error, selected row |
-| **List / Card list** | below `md` breakpoint tables become stacked cards showing the key fields | same as Table |
-| **Pagination** | "Previous" / "Next" with text, "Page 2 of 7", page-size select; uses the API's `meta` (page, pageSize, totalItems, totalPages) | first/last page disabled with reason not needed (self-evident) |
-| **Card** | header (title + optional action), body, footer | interactive card (whole card is a link) has a focus ring |
-| **Dialog / Modal** | shadcn `Dialog` (Radix): title, body, footer buttons (primary on the right on desktop, stacked full width on mobile, primary first); focus trapped; `Esc` closes **unless** there are unsaved changes (then ask); returns focus to the trigger | |
-| **ConfirmDialog** | shadcn `AlertDialog` (Radix) for destructive confirmation (§7.3); initial focus set explicitly on "Cancel" | danger variant |
-| **Drawer / Sheet** | shadcn `Sheet` / `Drawer`: side panel on desktop, bottom sheet on mobile, for quick edits | |
-| **Toast** | **Sonner** (shadcn's toast) configured: icon + text, `closeButton` on, `duration` ≥ 8 s, **errors `duration: Infinity`** (never auto-dismiss), pauses on hover. *To verify:* it also pauses on keyboard focus and announces through a polite live region; if not, our wrapper fixes it. | success, info, warning, error |
-| **Alert / InlineMessage** | in-page banner for page-level states (offline, rate limit, permission note) | success, info, warning, danger |
-| **Badge / StatusPill** | icon + word, used for statuses | each semantic status, neutral |
-| **EmptyState** | illustration (decorative, `alt=""`), plain sentence ("No branches yet"), one primary action if the user may act | with/without action (permission-aware) |
-| **LoadingState** | skeletons for lists/cards; spinner with text ("Loading branches…") for short waits; text shown after 1 s to avoid flicker | |
-| **ErrorState** | plain message, "Try again" button, "Details for support" disclosure with `requestId` and a "Copy" button | |
-| **PageHeader** | breadcrumb (from `md`), `h1`, one primary action, secondary actions in an overflow **with labels** | |
-| **AppShell / Navigation** | shadcn `Sidebar` with its **icon-only collapse mode turned off**: side navigation on `lg+` (icons **and** labels, never collapsed to icons only), top bar with clinic switcher + user menu; bottom tab bar (≤ 5 items, labelled) on mobile; "More" sheet for the rest; current page shown by colour **and** a bar **and** `aria-current="page"` | active, hover, focus, permission-hidden |
-| **ClinicSwitcher / BranchSelector** | shows current clinic and branch names in full; opens a list with statuses ("Suspended" shown and not selectable) | loading, single clinic (no dropdown, just the name) |
-| **UserMenu** | name, "My account", language ("English / Filipino"), "Sign out", "Sign out on all devices" | |
-| **LanguageSwitcher** | Two clearly labelled choices, each written in its own language ("English", "Filipino"); also on the sign-in page | current language marked with `aria-current` and a check icon + text |
-| **InactivityWarning** | Dialog for shared devices (plan.md §5.3.1): "For privacy, you will be signed out in 60 seconds", a countdown in text, one large "Stay signed in" button, a note when a form has unsaved changes | counting down, unsaved-changes variant |
-| **Tabs** | for sibling views only (Day / Week), not for steps | |
-| **Stepper** | multi-step forms (rare): "Step 2 of 3: Contact details" | |
-| **Tooltip** | shadcn `Tooltip` (Radix); only for *extra* information on hover/focus; never the only place essential information lives; never on disabled elements | |
-| **Avatar** | initials (no photos at first) | |
-| **Print layout primitives** | `PrintPage` (paper size per template), header/footer, hides the app chrome. Printed documents are **templates**, never labelled as official receipts (plan.md §15.1, Q15). | |
+| Component                                                | Variants / notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | States beyond the common ones                                                                                                       |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Button**                                               | `primary` (green-700, white text), `secondary` (white, green-700 border and text), `tertiary` (text style, underlined on hover), `danger` (danger red), `danger-secondary`. Sizes md/lg. Icon + label (icon optional, **label mandatory**). Full-width on mobile.                                                                                                                                                                                                                                                                                                               | loading (spinner + "Saving…" text, keeps its width, ignores repeat presses), success flash is **not** on the button (toast instead) |
+| **Link**                                                 | Inline (underlined), standalone (with arrow icon)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | visited not styled differently                                                                                                      |
+| **TextField**                                            | label above (always visible), optional hint under the label, error under the field, optional "Optional" marker (we mark optional fields, not required ones)                                                                                                                                                                                                                                                                                                                                                                                                                     | invalid (danger border + icon + message), read-only (no border, value as text)                                                      |
+| **TextArea**                                             | auto-grow, character counter when there is a limit ("120 of 500 characters")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | same as TextField                                                                                                                   |
+| **PasswordField**                                        | "Show password" toggle **with text**; rules shown as a hint list (10–128 characters, not a common password, does not contain your email), each rule checked live where the client can know it                                                                                                                                                                                                                                                                                                                                                                                   | invalid with server codes mapped to plain words                                                                                     |
+| **NumberField / MoneyField**                             | Own build on shadcn `Input`. ₱ prefix, `inputmode="decimal"`, formats on blur, never changes the value while typing                                                                                                                                                                                                                                                                                                                                                                                                                                                             | invalid, out of range                                                                                                               |
+| **Select**                                               | **Under about 15 options: a plain select** (a styled native `<select>`). It is the easiest for older users and opens the phone's own picker. **Longer lists** (branches, doctors, ICD-10 later): a **Combobox** (shadcn's Popover + Command) with filtering. The Combobox must pass a manual check with **NVDA + Chrome** and **VoiceOver + Safari** (options, the active option and the result count are announced) before approval; axe alone does not prove this (§15a).                                                                                                     | open, option hover/selected, empty results                                                                                          |
+| **Checkbox / CheckboxGroup, Radio / RadioGroup, Switch** | large 24 px box inside a 44 px target, the label is clickable; Switch only for settings that apply immediately                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | indeterminate (checkbox)                                                                                                            |
+| **DateField / DatePicker**                               | **DateField** (own build): three labelled parts, Month (select with month names), Day and Year (number inputs), grouped in a `fieldset` with one legend; typing always works. **DatePicker**: DateField plus an optional "Choose on calendar" button opening shadcn's `Calendar` (react-day-picker) in a Popover. The field and the calendar handle **plain calendar dates only, with no time zone**. The picker's own time-zone option is **not used**. Conversion to and from UTC happens only in `lib/datetime` (Phase 1 §2.8), whose specs run under a foreign `TZ` (§15a). | invalid (out of range, unavailable dates), min/max                                                                                  |
+| **TimeField**                                            | Own build: Hour and Minute selects plus an AM/PM choice, all labelled. A list of quick time slots for scheduling (Phase 7).                                                                                                                                                                                                                                                                                                                                                                                                                                                     | invalid                                                                                                                             |
+| **DateRangePicker**                                      | Two DateFields (From, To) plus the Calendar in range mode; for reports (Phase 11)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                                                                                                                                     |
+| **SearchField**                                          | label + magnifier icon, "Clear" text button, results announced ("12 patients found")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | searching, no results                                                                                                               |
+| **Table**                                                | shadcn `Table` (semantic HTML table) + **TanStack Table** for sorting state: column headers, sortable columns (sort state as text + arrow, `aria-sort`), row actions as labelled buttons (no hover-only actions); sticky header                                                                                                                                                                                                                                                                                                                                                 | loading (skeleton rows), empty, error, selected row                                                                                 |
+| **List / Card list**                                     | below `md` breakpoint tables become stacked cards showing the key fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | same as Table                                                                                                                       |
+| **Pagination**                                           | "Previous" / "Next" with text, "Page 2 of 7", page-size select; uses the API's `meta` (page, pageSize, totalItems, totalPages)                                                                                                                                                                                                                                                                                                                                                                                                                                                  | first/last page disabled with reason not needed (self-evident)                                                                      |
+| **Card**                                                 | header (title + optional action), body, footer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | interactive card (whole card is a link) has a focus ring                                                                            |
+| **Dialog / Modal**                                       | shadcn `Dialog` (Radix): title, body, footer buttons (primary on the right on desktop, stacked full width on mobile, primary first); focus trapped; `Esc` closes **unless** there are unsaved changes (then ask); returns focus to the trigger                                                                                                                                                                                                                                                                                                                                  |                                                                                                                                     |
+| **ConfirmDialog**                                        | shadcn `AlertDialog` (Radix) for destructive confirmation (§7.3); initial focus set explicitly on "Cancel"                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | danger variant                                                                                                                      |
+| **Drawer / Sheet**                                       | shadcn `Sheet` / `Drawer`: side panel on desktop, bottom sheet on mobile, for quick edits                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |                                                                                                                                     |
+| **Toast**                                                | **Sonner** (shadcn's toast), **for confirmations only** ("Branch saved"). **Never** an error, and **never** an action (no buttons in toasts, not even "Undo"): anything the user must read or act on is on the page. Icon + text, `closeButton` on, `duration` ≥ 8 s, pauses on hover. Whether it pauses on keyboard focus and announces through a polite live region is checked (§15a); if not, our wrapper fixes it. Either way no important message depends on it.                                                                                                           | success, info (no error or action variant exists)                                                                                   |
+| **Alert / InlineMessage**                                | in-page banner for page-level states (offline, rate limit, permission note) and **every error message that is not tied to a field**. Errors **stay on the page until the user dismisses them** or the problem is fixed.                                                                                                                                                                                                                                                                                                                                                         | success, info, warning, danger                                                                                                      |
+| **Badge / StatusPill**                                   | icon + word, used for statuses                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | each semantic status, neutral                                                                                                       |
+| **EmptyState**                                           | illustration (decorative, `alt=""`), plain sentence ("No branches yet"), one primary action if the user may act                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | with/without action (permission-aware)                                                                                              |
+| **LoadingState**                                         | skeletons for lists/cards; spinner with text ("Loading branches…") for short waits; text shown after 1 s to avoid flicker                                                                                                                                                                                                                                                                                                                                                                                                                                                       |                                                                                                                                     |
+| **ErrorState**                                           | plain message, "Try again" button, "Details for support" disclosure with `requestId` and a "Copy" button                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |                                                                                                                                     |
+| **PageHeader**                                           | breadcrumb (from `md`), `h1`, one primary action, secondary actions in an overflow **with labels**                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                     |
+| **AppShell / Navigation**                                | shadcn `Sidebar` with its **icon-only collapse mode turned off**: side navigation on `lg+` (icons **and** labels, never collapsed to icons only), top bar with clinic switcher + user menu; bottom tab bar (≤ 5 items, labelled) on mobile; "More" sheet for the rest; current page shown by colour **and** a bar **and** `aria-current="page"`                                                                                                                                                                                                                                 | active, hover, focus, permission-hidden                                                                                             |
+| **ClinicSwitcher / BranchSelector**                      | shows current clinic and branch names in full; opens a list with statuses ("Suspended" shown and not selectable)                                                                                                                                                                                                                                                                                                                                                                                                                                                                | loading, single clinic (no dropdown, just the name)                                                                                 |
+| **UserMenu**                                             | name, "My account", "Sign out", "Sign out on all devices" (a language item is added in Phase 14)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |                                                                                                                                     |
+| **InactivityWarning**                                    | Dialog for shared computers (plan.md §5.3.1): "For privacy, you will be signed out in 60 seconds", a countdown in text, one large "Stay signed in" button. Tells the user that unsaved form input will be kept for them if they sign back in.                                                                                                                                                                                                                                                                                                                                   | counting down                                                                                                                       |
+| **Tabs**                                                 | for sibling views only (Day / Week), not for steps                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                     |
+| **Stepper**                                              | multi-step forms (rare): "Step 2 of 3: Contact details"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                     |
+| **Tooltip**                                              | shadcn `Tooltip` (Radix); only for _extra_ information on hover/focus; never the only place essential information lives; never on disabled elements                                                                                                                                                                                                                                                                                                                                                                                                                             |                                                                                                                                     |
+| **Avatar**                                               | initials (no photos at first)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |                                                                                                                                     |
+| **Print layout primitives**                              | `PrintPage` (paper size per template), header/footer, hides the app chrome. Printed documents are **templates**, never labelled as official receipts (plan.md §15.1, Q15).                                                                                                                                                                                                                                                                                                                                                                                                      |                                                                                                                                     |
 
 ---
 
@@ -283,20 +286,20 @@ Components come from **shadcn/ui** (built on Radix UI primitives), added with th
 
 ### 7.2 Feedback after every action
 
-| Action result | Feedback |
-|---|---|
-| Saved / created | Toast "Branch saved" + the screen shows the new state; a create returns to the item or list with the item highlighted |
-| Background work (email sent) | Toast with what happens next: "Invitation sent to ana@example.com. The link works for 7 days." |
-| Failed (recoverable) | Inline error at the place of action + keep input |
-| Failed (server/network) | ErrorState or Alert with "Try again" and support details |
-| Long action (> 1 s) | Button loading text ("Saving…"); > 5 s adds "Still working…" |
+| Action result                | Feedback                                                                                                              |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Saved / created              | Toast "Branch saved" + the screen shows the new state; a create returns to the item or list with the item highlighted |
+| Background work (email sent) | Toast with what happens next: "Invitation sent to ana@example.com. The link works for 7 days."                        |
+| Failed (recoverable)         | Inline error at the place of action + keep input                                                                      |
+| Failed (server/network)      | ErrorState or Alert with "Try again" and support details                                                              |
+| Long action (> 1 s)          | Button loading text ("Saving…"); > 5 s adds "Still working…"                                                          |
 
 ### 7.3 Destructive actions
 
 - Confirmation dialog that names the thing and the consequence: "Remove Dr. Santos from Sunrise Clinic? They will lose access immediately."
 - The confirm button repeats the verb ("Remove") in the danger style; **"Cancel" receives initial focus**.
 - High-impact, irreversible actions (sign out on all devices, archive patient, finalise a record) also state "This cannot be undone" or what can be undone and how.
-- Prefer **undo** (toast with "Undo", 10 s) for low-impact reversible actions where the API supports it.
+- Prefer **undo** for low-impact reversible actions where the API supports it. It is offered as an **Undo button in an inline message on the page** (staying until the user leaves or dismisses it), never only in a toast.
 - No typed-confirmation ("type DELETE") for clinic users. It is hard for older users; we reserve it for platform-admin actions.
 
 ### 7.4 Search
@@ -317,13 +320,13 @@ Components come from **shadcn/ui** (built on Radix UI primitives), added with th
 
 ### 7.6 Permissions: hide or disable
 
-| Situation | Pattern |
-|---|---|
-| No read permission for a whole area | **Hide** the navigation item; a direct URL shows "You don't have access to this page. Ask your clinic admin if you need it." |
+| Situation                                                                       | Pattern                                                                                                                                |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| No read permission for a whole area                                             | **Hide** the navigation item; a direct URL shows "You don't have access to this page. Ask your clinic admin if you need it."           |
 | Can view, cannot change (for example a receptionist viewing the clinic profile) | Show the data **read-only** (values as text, not disabled inputs) with a one-line note: "Only clinic admins can change these details." |
-| Action the role never performs (for example "Add branch" for reception) | **Hide** the button |
-| Action temporarily unavailable (for example a rate limit or a state rule) | Show it with `aria-disabled` **and visible reason text** next to it |
-| Server says `403` anyway | Inline message + refresh permissions; never a blank screen |
+| Action the role never performs (for example "Add branch" for reception)         | **Hide** the button                                                                                                                    |
+| Action temporarily unavailable (for example a rate limit or a state rule)       | Show it with `aria-disabled` **and visible reason text** next to it                                                                    |
+| Server says `403` anyway                                                        | Inline message + refresh permissions; never a blank screen                                                                             |
 
 ### 7.7 Waiting, empty and error screens
 
@@ -336,38 +339,38 @@ Every data view designs its **loading, empty, error, and no-permission** states 
 - Dates written out (`Nov 20, 2026`), times in 12-hour with AM/PM.
 - Numbers with separators. Money `₱1,234.50`.
 - A **wording list** in the style guide: the preferred words ("Sign in", not "Log in" or "Login"; "Clinic", not "Tenant"; "Patient record", not "Encounter"). "Tenant" never appears in the UI.
-- A **Filipino glossary** next to it, agreed with the translator (Q4a): the Filipino term for each key word, and which terms stay in English because clinics use them that way.
-- Labels and buttons are written so they still work when the Filipino text is 30–50% longer. Components wrap rather than truncate, and buttons never rely on fixed widths.
+- Labels and buttons are written so they still work when a translation is 30–50% longer (the pseudo-locale checks this). Components wrap rather than truncate, and buttons never rely on fixed widths.
+- The Filipino glossary and wording are Phase 14 work, with the translator and reviewer (Q4a).
 
 ---
 
 ## 8. Accessibility for older users (requirements and how they are checked)
 
-| Requirement | Rule | Checked by |
-|---|---|---|
-| Touch targets | ≥ 44×44 px, spacing ≥ 12 px between adjacent targets | Story visual review; a Playwright test that measures interactive element boxes on key screens |
-| Focus | Visible focus ring on everything; logical order; focus never trapped except in dialogs; focus moves to the `h1` on navigation and to the error summary on failed submit | Component keyboard tests; e2e keyboard-only flow |
-| Keyboard | Everything usable without a mouse; no keyboard traps; shortcuts (if any) optional and never single-key | Component tests (`userEvent.keyboard`) |
-| Zoom | 200% zoom with no loss or overlap; reflow at 320 CSS px wide; text spacing override (WCAG 1.4.12) does not break layout | Playwright screenshots at 200% and at 320 px width for every story / key screen |
-| Icons | No icon-only buttons. Icons are `aria-hidden` next to a visible label. | Lint rule plus a component API that requires `children` text |
-| Wording | Plain language, short sentences | Review checklist |
-| Timeouts | No surprise timeouts; the access token refreshes silently; any future time limit warns ahead and offers more time | Review; the session design (plan.md §5.3) |
-| Spacing | Generous, from tokens only | Lint (no raw px in classes) |
-| One primary action | One `primary` button per view | Review; a story-level test that counts primary buttons per page story |
-| Motion | Respects reduced motion | Story with reduced-motion emulation |
-| Screen readers | Labels, landmarks, live regions for toasts and results, `aria-current`, table semantics | axe + manual NVDA/VoiceOver pass per phase |
-| Colour | Contrast via token test; never colour alone | Contrast unit test + review |
+| Requirement        | Rule                                                                                                                                                                    | Checked by                                                                                    |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Touch targets      | ≥ 44×44 px, spacing ≥ 12 px between adjacent targets                                                                                                                    | Story visual review; a Playwright test that measures interactive element boxes on key screens |
+| Focus              | Visible focus ring on everything; logical order; focus never trapped except in dialogs; focus moves to the `h1` on navigation and to the error summary on failed submit | Component keyboard tests; e2e keyboard-only flow                                              |
+| Keyboard           | Everything usable without a mouse; no keyboard traps; shortcuts (if any) optional and never single-key                                                                  | Component tests (`userEvent.keyboard`)                                                        |
+| Zoom               | 200% zoom with no loss or overlap; reflow at 320 CSS px wide; text spacing override (WCAG 1.4.12) does not break layout                                                 | Playwright screenshots at 200% and at 320 px width for every story / key screen               |
+| Icons              | No icon-only buttons. Icons are `aria-hidden` next to a visible label.                                                                                                  | Lint rule plus a component API that requires `children` text                                  |
+| Wording            | Plain language, short sentences                                                                                                                                         | Review checklist                                                                              |
+| Timeouts           | No surprise timeouts; the access token refreshes silently; any future time limit warns ahead and offers more time                                                       | Review; the session design (plan.md §5.3)                                                     |
+| Spacing            | Generous, from tokens only                                                                                                                                              | Lint (no raw px in classes)                                                                   |
+| One primary action | One `primary` button per view                                                                                                                                           | Review; a story-level test that counts primary buttons per page story                         |
+| Motion             | Respects reduced motion                                                                                                                                                 | Story with reduced-motion emulation                                                           |
+| Screen readers     | Labels, landmarks, live regions for toasts and results, `aria-current`, table semantics                                                                                 | axe + manual NVDA/VoiceOver pass per phase                                                    |
+| Colour             | Contrast via token test; never colour alone                                                                                                                             | Contrast unit test + review                                                                   |
 
 ---
 
 ## 9. Responsive rules
 
-| Context | Breakpoint | Layout rules |
-|---|---|---|
-| **Desktop** (clinic admin, doctor's desk) | `xl` | Side nav (labelled, ~260 px) + content; tables with full columns; side-by-side detail panes allowed |
-| **Tablet landscape** (reception desk) | `lg` | Side nav stays labelled (it may become a top bar plus drawer if space is tight, never icons only); large controls (`control.height.lg` for primary actions); tables keep key columns, the rest in row detail |
-| **Tablet portrait** | `md` | Top bar + navigation drawer (labelled "Menu" button); forms one column; tables → cards where more than 4 columns |
-| **Mobile** (doctor on the move, patient portal later) | `base`–`sm` | Bottom tab bar (≤ 5 labelled items) + "More"; cards instead of tables; sticky bottom primary action; dialogs become full-screen sheets |
+| Context                                               | Breakpoint  | Layout rules                                                                                                                                                                                                 |
+| ----------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Desktop** (clinic admin, doctor's desk)             | `xl`        | Side nav (labelled, ~260 px) + content; tables with full columns; side-by-side detail panes allowed                                                                                                          |
+| **Tablet landscape** (reception desk)                 | `lg`        | Side nav stays labelled (it may become a top bar plus drawer if space is tight, never icons only); large controls (`control.height.lg` for primary actions); tables keep key columns, the rest in row detail |
+| **Tablet portrait**                                   | `md`        | Top bar + navigation drawer (labelled "Menu" button); forms one column; tables → cards where more than 4 columns                                                                                             |
+| **Mobile** (doctor on the move, patient portal later) | `base`–`sm` | Bottom tab bar (≤ 5 labelled items) + "More"; cards instead of tables; sticky bottom primary action; dialogs become full-screen sheets                                                                       |
 
 Touch is assumed on every breakpoint (tablets are common at reception), so hover is never required.
 
@@ -379,18 +382,19 @@ A separate layout and route (`/display`), not a responsive variant of the staff 
 
 ### 10.1 Requirements
 
-- **Resolutions (owner's answer, Q8): landscape 1920×1080 and 3840×2160.** The layout uses viewport units, so both look the same. Whether a 4K TV's browser reports 3840×2160 CSS px or 1920×1080 at device-pixel-ratio 2 makes no difference to the layout.
+- **Design target (Q8b): a 43" screen at 1920×1080, viewed from 3–5 m.** All TV text sizes use `clamp()` with `vw`/`vh`, so **32" to 65"** screens and 3840×2160 (Q8) work without layout changes. A 4K browser may report 3840×2160 CSS px or 1920×1080 at device-pixel-ratio 2; viewport units give the same layout either way.
+- **Physical size changes with the screen, not the layout.** On a 32" screen everything is about 25% smaller physically than on 43", so the same text reads well to about 3.7 m instead of 5 m; on 65" it reads beyond 5 m. The real hardware is still to be confirmed (Q8b).
 - **Viewing distance 3–5 m.** Sizing rule used: character height of about 1 inch per 10 feet (≈ 4.2 cm at 5 m). On a 43" 1080p screen one CSS px ≈ 0.5 mm, so readable names need about 85 px cap height. Hence:
 
-| Element | Size (viewport-based, values at 1080p) |
-|---|---|
-| "Now serving" queue number | `clamp(…)` ≈ **26 vh (~280 px)**, bold, tabular figures |
-| "Now serving" display name / room | ≈ **11 vh (~120 px)** |
-| "Next" list entries (number + room) | ≈ **8 vh (~86 px)** |
-| Section labels ("Now serving", "Next") | ≈ **6 vh (~65 px)**, bold |
-| Clock, clinic name, branch | ≈ **4.5 vh (~48 px)** |
+| Element                                | Size (viewport-based, values at 1080p)                  |
+| -------------------------------------- | ------------------------------------------------------- |
+| "Now serving" queue number             | `clamp(…)` ≈ **26 vh (~280 px)**, bold, tabular figures |
+| "Now serving" display name / room      | ≈ **11 vh (~120 px)**                                   |
+| "Next" list entries (number + room)    | ≈ **8 vh (~86 px)**                                     |
+| Section labels ("Now serving", "Next") | ≈ **6 vh (~65 px)**, bold                               |
+| Clock, clinic name, branch             | ≈ **4.5 vh (~48 px)**                                   |
 
-*Assumption (Q8b, screen size not yet given): screen ≥ 43". On a smaller screen the readable distance shrinks.*
+Each size is written as `clamp(min, vh-based value, max)` with the min and max chosen so that text stays inside its panel from 1280×720 up to 3840×2160 browser windows.
 
 ### 10.2 Layout (1080p landscape)
 
@@ -413,7 +417,7 @@ A separate layout and route (`/display`), not a responsive variant of the staff 
 
 - **Now serving:** the most recent call is large, in a `green-800` panel with white text (8.45:1). Other rooms' current calls are listed under it at "Next" size.
 - **Next:** grouped **per doctor or room**, up to 3–4 entries each. Overflow shows "+3 more" (no scrolling text, no carousel).
-- **Background:** off-white `neutral-25` with `neutral-900`/`green-950` text (15.63 / 14.75:1). Proposed over a dark theme because it matches the brand. *Open for review:* a dark variant (white on `green-900`, 10.98:1) may be easier on the eyes in a dim waiting room, and both are in the story set.
+- **Background:** off-white `neutral-25` with `neutral-900`/`green-950` text (15.63 / 14.75:1). Proposed over a dark theme because it matches the brand. _Open for review:_ a dark variant (white on `green-900`, 10.98:1) may be easier on the eyes in a dim waiting room, and both are in the story set.
 - **When a call happens:** the new number gets a gentle highlight for 10 s (a thick coral-200 border on green-900, 7.38:1, or a pulse with reduced-motion fallback) plus an **optional chime**. Text announces, colour only supports.
 
 ### 10.3 Privacy (Data Privacy Act of 2012)
@@ -424,7 +428,7 @@ A separate layout and route (`/display`), not a responsive variant of the staff 
   - the TV shows **no label** (no "PWD", "Senior", "Priority");
   - it uses **no special prefix, colour or icon**;
   - priority tickets come from the **same number series** as everyone else.
-  The display data has no priority field at all (D-21).
+    The display data has no priority field at all (D-21).
 - Mock data in stories uses obviously fake names.
 
 ### 10.4 Unattended operation
@@ -439,8 +443,8 @@ A separate layout and route (`/display`), not a responsive variant of the staff 
   - Pixel shift of the clock region by a few px every few minutes, to reduce burn-in on OLED/plasma screens.
   - Wake Lock API (where supported) to stop the screen sleeping.
 - **Chime:** optional, set per display. Browsers block audio until there is a user gesture, so the pairing screen ends with "Tap to enable sound" (or a kiosk browser flag that allows autoplay, documented in the setup guide). Soft two-tone chime, ≤ 1 s, at most once per call, no voice by default (spoken announcements in Filipino/English could be added later).
-- **Language:** each display has its own language setting (English or Filipino) for its fixed labels ("Now serving" / "Kasalukuyang tinatawag", final wording from the translator).
-- **Hardware recommendation:** a Chromium-based kiosk (Android TV box or mini PC with Chrome in kiosk mode) rather than the TV's built-in browser.
+- **Language:** English at launch. A per-display language setting comes with Filipino in Phase 14.
+- **Hardware and testing:** **Chrome in kiosk mode** on an Android TV box or mini PC. It is tested there, **never on a TV's built-in browser**. The actual hardware is still to be confirmed by the owner (Q8b).
 
 ### 10.5 TV tokens
 
@@ -450,7 +454,7 @@ A separate layout and route (`/display`), not a responsive variant of the staff 
 
 ## 11. Living style guide
 
-- **Storybook**, built in CI and published as a static site (where to host it is part of Q2b) so the owner can review and approve it by link. A toolbar switch shows every story in English, Filipino or the stretched pseudo-locale.
+- **Storybook**, built in CI and published as a static site (the same S3 + CloudFront approach as the app, with restricted access; mock data only) so the owner can review and approve it by link. A toolbar switch shows every story in English or the stretched pseudo-locale.
 - **Pages:**
   - Introduction (principles, keywords, wording list).
   - **Tokens:** colour swatches with hex values and contrast ratios against their declared backgrounds; type scale; spacing; radius; elevation; breakpoints.
@@ -473,28 +477,29 @@ None. (TV display data and pairing are backend dependencies D-18 to D-22, used i
 
 ## 13. Tests (written first)
 
-| Test | What |
-|---|---|
-| `tokens.contrast.test.ts` | every declared pairing meets its threshold (body ≥ 7, text ≥ 4.5, large ≥ 3, non-text ≥ 3) |
-| `tokens.build.test.ts` | the generated CSS and TS match `tokens.json`; no orphan tokens |
-| Component tests (one per component) | renders each state; keyboard interaction (Tab, Enter/Space, arrows, Esc); the label is associated; the error is announced (`aria-describedby`, `aria-invalid`); **axe has no violations**; the Button cannot be rendered without text (type test); the Toast error variant does not auto-dismiss; the Dialog returns focus |
-| Form pattern test | server `VALIDATION_FAILED` with dotted `details[].field` puts each message under the right field, keeps all values, focuses the summary |
-| Storybook test runner | every story passes axe (WCAG 2.2 AA) |
-| Visual regression (Playwright on stories) | 100%, 200% zoom, 320 px width: no clipping or overlap on key components |
-| Target size test | interactive elements on the AppShell and form stories have boxes ≥ 44×44 px |
-| TV stories | readable at 1920×1080 and 3840×2160 (no overflow), in English and Filipino; privacy: the TV components' props type only accepts display-safe fields (no full-name field and no priority field exists) |
-| Language | every component story renders in `en`, `fil` and the pseudo-locale without clipping (visual test); the LanguageSwitcher changes all text and date formats |
-| Font | a test renders `₱1,234.50 Ñiño` with the subset font file and checks that no fallback glyph is used |
+| Test                                                          | What                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tokens.contrast.spec.ts`                                     | every declared pairing meets its threshold (body ≥ 7, text ≥ 4.5, large ≥ 3, non-text ≥ 3)                                                                                                                                                                                                                                                                                                      |
+| `tokens.build.spec.ts`                                        | the generated CSS and TS match `tokens.json`; no orphan tokens                                                                                                                                                                                                                                                                                                                                  |
+| Component specs (`*.spec.tsx`, one per component, axe inside) | renders each state; keyboard interaction (Tab, Enter/Space, arrows, Esc); the label is associated; the error is announced (`aria-describedby`, `aria-invalid`); **axe has no violations**; the Button cannot be rendered without text (type test); Toast has no error variant and accepts no action (type test); errors render as an Alert that stays until dismissed; the Dialog returns focus |
+| Form pattern test                                             | server `VALIDATION_FAILED` with dotted `details[].field` puts each message under the right field, keeps all values, focuses the summary                                                                                                                                                                                                                                                         |
+| Storybook test runner                                         | every story passes axe (WCAG 2.2 AA)                                                                                                                                                                                                                                                                                                                                                            |
+| Visual regression (Playwright on stories)                     | 100%, 200% zoom, 320 px width: no clipping or overlap on key components                                                                                                                                                                                                                                                                                                                         |
+| Target size test                                              | interactive elements on the AppShell and form stories have boxes ≥ 44×44 px                                                                                                                                                                                                                                                                                                                     |
+| TV stories                                                    | readable at 1920×1080 (target) and 3840×2160, plus 1280×720 as the small edge of the `clamp()` range, with no overflow; privacy: the TV components' props type only accepts display-safe fields (no full-name field and no priority field exists)                                                                                                                                               |
+| Language readiness                                            | every component story renders in `en` and the pseudo-locale without clipping (visual test); a lint rule and an extraction check find hard-coded strings                                                                                                                                                                                                                                         |
+| Font                                                          | a test renders `₱1,234.50 Ñiño` with the subset font file and checks that no fallback glyph is used                                                                                                                                                                                                                                                                                             |
 
 ## 14. Acceptance criteria
 
 - [ ] `tokens.json` contains the palette, semantic tokens, type scale, spacing, radius, elevation, breakpoints, motion and TV tokens above. The contrast test passes.
 - [ ] Inter is self-hosted and subset; ₱, ñ and Ñ render from it (font test passes; screenshots in the style guide).
 - [ ] Every component in §6 exists with stories for every state, and component tests pass with axe clean.
-- [ ] Every story renders in English, Filipino and the pseudo-locale without clipping.
+- [ ] Every story renders in English and the pseudo-locale without clipping.
 - [ ] The patterns in §7 are demonstrated as stories.
 - [ ] The app shell is shown at all breakpoints for two permission sets.
-- [ ] The TV display stories cover all states in §11, at 1920×1080 and 3840×2160, in both languages.
+- [ ] The TV display stories cover all states in §10, at 1920×1080 and 3840×2160, and stay readable down to the 1280×720 edge.
+- [ ] The checks in §15a are done and their results recorded in §16 (As Built).
 - [ ] Keyboard-only and 200% zoom pass on all stories (automated plus a manual spot check).
 - [ ] At least one manual screen-reader pass (NVDA or VoiceOver) on the form, dialog, table and navigation stories.
 - [ ] **The product owner has approved the style guide** (recorded with a date in this file), ideally after trying it with 2–3 real users including a senior.
@@ -502,11 +507,20 @@ None. (TV display data and pairing are backend dependencies D-18 to D-22, used i
 
 ## 15. Open questions
 
-- **Q8b TV screen size**: sets the minimum type size (assumed ≥ 43").
+- **Q8b real TV hardware**: the owner will confirm. Design target 43" 1080p.
 - Light or dark TV theme (§10.2): both prepared; choose at review.
-- **Q4a translator and reviewer** for the Filipino catalogue and glossary.
 - Inter character variants (§4): chosen visually at review.
 - Print sizes for prescriptions and receipts wait for the clinic's doctor and accountant (Q15b); only the print primitives are built in this phase.
+- **Q17**, only if the CSP check in §15a finds a component that inserts `<style>` elements and cannot be changed.
+
+## 15a. How the open technical points are verified (owner's methods)
+
+| Point                                   | Method                                                                                                                                                                                                                                                                                                                                                                                   | Pass condition                                                                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Dates and time zones                    | Do not rely on the date picker's time-zone option. All conversion is in `lib/datetime` (UTC from the API ↔ clinic time in the UI). Its specs and the DateField/DatePicker specs run with the test runner's `TZ=America/New_York`.                                                                                                                                                        | Specs pass under `America/New_York` and `Asia/Manila`; a deliberately local-time implementation fails them                        |
+| Searchable dropdown with screen readers | Manual test with **NVDA + Chrome** and **VoiceOver + Safari** on the Combobox stories (axe alone does not prove it). Under about 15 options, use the plain select instead.                                                                                                                                                                                                               | Label, expanded state, active option and result count are announced; selection works with keyboard only. Results recorded in §16. |
+| Toasts pausing on focus                 | Check Sonner with keyboard focus and a screen reader. Regardless of the result, toasts carry confirmations only; errors and actions are on the page and stay until dismissed.                                                                                                                                                                                                            | Result recorded; no error or action in any toast (type test)                                                                      |
+| `<style>` elements and the CSP          | Run the dev server and the e2e tests with the planned policy in **report-only** mode; the e2e fixture fails on any violation report (Phase 1 §2.12). For components, a **test-only route** listing every design-system component in every state is built into the preview build used by e2e (excluded from production builds), so each component is checked under the production policy. | Zero violation reports. If a component inserts styles: change it, or decide Q17 (per-request nonce; **never `'unsafe-inline'`**)  |
 
 ## 16. As Built
 

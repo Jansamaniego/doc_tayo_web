@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+/*
+ * PLACEHOLDER theme so Phase 1 is readable. Phase 2 replaces this block with values generated
+ * from src/design-system/tokens/tokens.json (plan.md §6, plans/02-design-system.md §3-§5).
+ * Do not add colours or sizes here: add them to the tokens in Phase 2.
+ */
+@theme {
+  --color-page: #f9faf7;
+  --color-surface: #ffffff;
+  --color-text: #1b211e;
+  --color-text-muted: #515c55;
+  --color-primary: #1d6e41;
+  --color-primary-hover: #175836;
+  --color-on-primary: #ffffff;
+  --color-border-control: #68746c;
+  --color-danger: #b3261e;
+  --color-danger-bg: #fdedeb;
+  --color-success: #1d6e41;
+  --color-focus: #1d6e41;
+}
+
+@layer base {
+  html {
+    font-size: 112.5%; /* 18 px body text; rem keeps the browser's font-size setting working */
+  }
+  body {
+    background-color: var(--color-page);
+    color: var(--color-text);
+    line-height: 1.5;
+    font-family:
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Noto Sans',
+      sans-serif;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}

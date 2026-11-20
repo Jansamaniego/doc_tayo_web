@@ -9,6 +9,7 @@ Users manage their own account. Clinic admins manage the clinic profile, branche
 ## Deliverables
 
 **4a: build now**
+
 - **My account:**
   - profile (read-only: name, email; `PATCH /me` does not exist);
   - change password (`POST /me/password`; explains that other devices are signed out; 5 attempts / 15 min);
@@ -20,22 +21,22 @@ Users manage their own account. Clinic admins manage the clinic profile, branche
   - `409` on a duplicate name → field error.
 
 **4b: waits for backend Phase 4**
+
 - Staff list.
 - Invite staff with a role (needs `GET /roles`; integration guide §8 says do not build the form before it exists).
 - Resend and revoke invitations.
 - Change a member's role, remove a member.
-- Edit own profile, including the language preference (D-8, D-25).
+- Edit own profile (D-8). The language preference is added in Phase 14 (D-25).
 - Branch assignment.
-- Clinic setting for the shared-device inactivity time (D-26).
 
 ## Backend endpoints
 
-| Endpoint | Exists |
-|---|---|
-| `GET /me`, `POST /me/password`, `GET /me/sessions`, `DELETE /me/sessions/{id}`, `POST /auth/logout-all` | yes |
-| `GET/PATCH /tenant`, `GET/POST /branches`, `GET/PATCH /branches/{id}` | yes |
-| `POST /invitations`, `POST /invitations/{id}/resend` | yes, but unusable without `GET /roles` |
-| `GET /roles` (D-6), members/invitations list and management (D-7), `PATCH /me` (D-8), branch assignment (D-9), language preference (D-25), inactivity setting (D-26) | **no** |
+| Endpoint                                                                                                      | Exists                                 |
+| ------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `GET /me`, `POST /me/password`, `GET /me/sessions`, `DELETE /me/sessions/{id}`, `POST /auth/logout-all`       | yes                                    |
+| `GET/PATCH /tenant`, `GET/POST /branches`, `GET/PATCH /branches/{id}`                                         | yes                                    |
+| `POST /invitations`, `POST /invitations/{id}/resend`                                                          | yes, but unusable without `GET /roles` |
+| `GET /roles` (D-6), members/invitations list and management (D-7), `PATCH /me` (D-8), branch assignment (D-9) | **no**                                 |
 
 ## Tests (outline)
 

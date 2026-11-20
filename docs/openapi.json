@@ -47,7 +47,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": []
       }
     },
@@ -87,7 +89,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": []
       }
     },
@@ -110,7 +114,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "bearer": []
@@ -137,7 +143,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "bearer": []
@@ -181,7 +189,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "bearer": []
@@ -225,7 +235,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": []
       }
     },
@@ -268,7 +280,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": []
       }
     },
@@ -311,7 +325,9 @@
             }
           }
         },
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": []
       }
     },
@@ -354,7 +370,9 @@
             }
           }
         },
-        "tags": ["invitations"],
+        "tags": [
+          "invitations"
+        ],
         "security": []
       }
     },
@@ -394,7 +412,9 @@
             }
           }
         },
-        "tags": ["tenant"],
+        "tags": [
+          "tenant"
+        ],
         "security": [
           {
             "bearer": []
@@ -446,7 +466,9 @@
             }
           }
         },
-        "tags": ["tenant"],
+        "tags": [
+          "tenant"
+        ],
         "security": [
           {
             "bearer": []
@@ -520,7 +542,9 @@
             }
           }
         },
-        "tags": ["branches"],
+        "tags": [
+          "branches"
+        ],
         "security": [
           {
             "bearer": []
@@ -582,7 +606,9 @@
             }
           }
         },
-        "tags": ["branches"],
+        "tags": [
+          "branches"
+        ],
         "security": [
           {
             "bearer": []
@@ -636,7 +662,9 @@
             }
           }
         },
-        "tags": ["branches"],
+        "tags": [
+          "branches"
+        ],
         "security": [
           {
             "bearer": []
@@ -708,7 +736,9 @@
             }
           }
         },
-        "tags": ["branches"],
+        "tags": [
+          "branches"
+        ],
         "security": [
           {
             "bearer": []
@@ -742,7 +772,9 @@
             }
           }
         },
-        "tags": ["me"],
+        "tags": [
+          "me"
+        ],
         "security": [
           {
             "bearer": []
@@ -779,7 +811,9 @@
             }
           }
         },
-        "tags": ["me"],
+        "tags": [
+          "me"
+        ],
         "security": [
           {
             "bearer": []
@@ -813,7 +847,9 @@
             }
           }
         },
-        "tags": ["me"],
+        "tags": [
+          "me"
+        ],
         "security": [
           {
             "bearer": []
@@ -847,7 +883,9 @@
             }
           }
         },
-        "tags": ["me"],
+        "tags": [
+          "me"
+        ],
         "security": [
           {
             "bearer": []
@@ -884,7 +922,9 @@
             }
           }
         },
-        "tags": ["me"],
+        "tags": [
+          "me"
+        ],
         "security": [
           {
             "bearer": []
@@ -968,7 +1008,9 @@
             }
           }
         },
-        "tags": ["invitations"],
+        "tags": [
+          "invitations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1032,7 +1074,9 @@
             }
           }
         },
-        "tags": ["invitations"],
+        "tags": [
+          "invitations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1058,7 +1102,9 @@
             }
           }
         },
-        "tags": ["health"],
+        "tags": [
+          "health"
+        ],
         "security": []
       }
     },
@@ -1076,7 +1122,10 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok", "degraded"],
+                      "enum": [
+                        "ok",
+                        "degraded"
+                      ],
                       "example": "ok"
                     },
                     "info": {
@@ -1089,11 +1138,17 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string",
-                            "enum": ["up", "degraded", "down"]
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
                           },
                           "responseTime": {
                             "type": "number",
@@ -1109,11 +1164,17 @@
                       "example": {},
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string",
-                            "enum": ["up", "degraded", "down"]
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
                           },
                           "responseTime": {
                             "type": "number",
@@ -1134,11 +1195,17 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string",
-                            "enum": ["up", "degraded", "down"]
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
                           },
                           "responseTime": {
                             "type": "number",
@@ -1164,7 +1231,9 @@
             }
           }
         },
-        "tags": ["health"],
+        "tags": [
+          "health"
+        ],
         "security": []
       }
     }
@@ -1198,7 +1267,10 @@
             "writeOnly": true
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "UserSummary": {
         "type": "object",
@@ -1215,7 +1287,11 @@
             "type": "string"
           }
         },
-        "required": ["id", "email", "fullName"]
+        "required": [
+          "id",
+          "email",
+          "fullName"
+        ]
       },
       "RoleSummaryResponse": {
         "type": "object",
@@ -1231,7 +1307,10 @@
             "description": "Display name for the UI."
           }
         },
-        "required": ["key", "name"]
+        "required": [
+          "key",
+          "name"
+        ]
       },
       "MembershipResponse": {
         "type": "object",
@@ -1246,11 +1325,20 @@
           },
           "tenantStatus": {
             "type": "string",
-            "enum": ["active", "suspended", "deactivated"]
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
           },
           "membershipStatus": {
             "type": "string",
-            "enum": ["invited", "active", "suspended", "removed"]
+            "enum": [
+              "invited",
+              "active",
+              "suspended",
+              "removed"
+            ]
           },
           "roles": {
             "description": "Roles held in that clinic.",
@@ -1311,7 +1399,9 @@
             "$ref": "#/components/schemas/LoginData"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "RefreshData": {
         "type": "object",
@@ -1324,7 +1414,10 @@
             "example": 900
           }
         },
-        "required": ["accessToken", "expiresIn"]
+        "required": [
+          "accessToken",
+          "expiresIn"
+        ]
       },
       "RefreshEnvelope": {
         "type": "object",
@@ -1333,7 +1426,9 @@
             "$ref": "#/components/schemas/RefreshData"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "SwitchTenantDto": {
         "type": "object",
@@ -1343,7 +1438,9 @@
             "format": "uuid"
           }
         },
-        "required": ["tenantId"]
+        "required": [
+          "tenantId"
+        ]
       },
       "TenantSummary": {
         "type": "object",
@@ -1357,10 +1454,18 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "suspended", "deactivated"]
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
           }
         },
-        "required": ["id", "name", "status"]
+        "required": [
+          "id",
+          "name",
+          "status"
+        ]
       },
       "SwitchTenantData": {
         "type": "object",
@@ -1373,7 +1478,10 @@
             "$ref": "#/components/schemas/TenantSummary"
           },
           "permissions": {
-            "example": ["branches.read", "tenant.read"],
+            "example": [
+              "branches.read",
+              "tenant.read"
+            ],
             "description": "Effective permission keys in that clinic.",
             "type": "array",
             "items": {
@@ -1381,7 +1489,11 @@
             }
           }
         },
-        "required": ["activeTenantId", "tenant", "permissions"]
+        "required": [
+          "activeTenantId",
+          "tenant",
+          "permissions"
+        ]
       },
       "SwitchTenantEnvelope": {
         "type": "object",
@@ -1390,7 +1502,9 @@
             "$ref": "#/components/schemas/SwitchTenantData"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "ForgotPasswordDto": {
         "type": "object",
@@ -1400,7 +1514,9 @@
             "example": "doctor@clinic.example"
           }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
       "AcceptedData": {
         "type": "object",
@@ -1410,7 +1526,9 @@
             "example": true
           }
         },
-        "required": ["accepted"]
+        "required": [
+          "accepted"
+        ]
       },
       "AcceptedEnvelope": {
         "type": "object",
@@ -1419,7 +1537,9 @@
             "$ref": "#/components/schemas/AcceptedData"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "ResetPasswordDto": {
         "type": "object",
@@ -1433,7 +1553,10 @@
             "writeOnly": true
           }
         },
-        "required": ["token", "newPassword"]
+        "required": [
+          "token",
+          "newPassword"
+        ]
       },
       "AccountSetupDto": {
         "type": "object",
@@ -1450,7 +1573,10 @@
             "type": "string"
           }
         },
-        "required": ["token", "newPassword"]
+        "required": [
+          "token",
+          "newPassword"
+        ]
       },
       "AcceptInvitationDto": {
         "type": "object",
@@ -1467,7 +1593,9 @@
             "writeOnly": true
           }
         },
-        "required": ["token"]
+        "required": [
+          "token"
+        ]
       },
       "TenantResponse": {
         "type": "object",
@@ -1483,7 +1611,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "suspended", "deactivated"]
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
           },
           "timezone": {
             "type": "string",
@@ -1525,7 +1657,9 @@
             "$ref": "#/components/schemas/TenantResponse"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "UpdateTenantDto": {
         "type": "object",
@@ -1615,7 +1749,12 @@
             "type": "number"
           }
         },
-        "required": ["page", "pageSize", "totalItems", "totalPages"]
+        "required": [
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
+        ]
       },
       "BranchListEnvelope": {
         "type": "object",
@@ -1630,7 +1769,10 @@
             "$ref": "#/components/schemas/PageMetaResponse"
           }
         },
-        "required": ["data", "meta"]
+        "required": [
+          "data",
+          "meta"
+        ]
       },
       "CreateBranchDto": {
         "type": "object",
@@ -1661,7 +1803,9 @@
             "default": true
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "BranchEnvelope": {
         "type": "object",
@@ -1670,7 +1814,9 @@
             "$ref": "#/components/schemas/BranchResponse"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "UpdateBranchDto": {
         "type": "object",
@@ -1733,7 +1879,10 @@
             "nullable": true
           },
           "permissions": {
-            "example": ["branches.read", "tenant.read"],
+            "example": [
+              "branches.read",
+              "tenant.read"
+            ],
             "description": "Effective permissions in the active clinic (empty when none is selected or the membership is not active). Use them to build menus; the server enforces them regardless.",
             "type": "array",
             "items": {
@@ -1758,7 +1907,9 @@
             "$ref": "#/components/schemas/MeProfileData"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "ChangePasswordDto": {
         "type": "object",
@@ -1772,7 +1923,10 @@
             "writeOnly": true
           }
         },
-        "required": ["currentPassword", "newPassword"]
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
       },
       "MembershipListEnvelope": {
         "type": "object",
@@ -1784,7 +1938,9 @@
             }
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "SessionResponse": {
         "type": "object",
@@ -1833,7 +1989,9 @@
             }
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "CreateInvitationDto": {
         "type": "object",
@@ -1848,7 +2006,10 @@
             "description": "A role of this clinic (not owner)."
           }
         },
-        "required": ["email", "roleId"]
+        "required": [
+          "email",
+          "roleId"
+        ]
       },
       "InvitationResponse": {
         "type": "object",
@@ -1866,7 +2027,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending", "accepted", "revoked", "expired"]
+            "enum": [
+              "pending",
+              "accepted",
+              "revoked",
+              "expired"
+            ]
           },
           "expiresAt": {
             "format": "date-time",
@@ -1893,7 +2059,9 @@
             "$ref": "#/components/schemas/InvitationResponse"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "ErrorCode": {
         "type": "string",
@@ -1960,7 +2128,11 @@
             "description": "Static, user-safe text; never echoes input."
           }
         },
-        "required": ["field", "code", "message"]
+        "required": [
+          "field",
+          "code",
+          "message"
+        ]
       },
       "ErrorBody": {
         "type": "object",
@@ -1994,7 +2166,12 @@
             "description": "Also the X-Request-Id response header; quote it to support."
           }
         },
-        "required": ["status", "code", "message", "requestId"]
+        "required": [
+          "status",
+          "code",
+          "message",
+          "requestId"
+        ]
       },
       "ErrorResponse": {
         "type": "object",
@@ -2003,7 +2180,9 @@
             "$ref": "#/components/schemas/ErrorBody"
           }
         },
-        "required": ["error"]
+        "required": [
+          "error"
+        ]
       }
     }
   }

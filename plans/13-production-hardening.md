@@ -20,13 +20,22 @@ Full accessibility audit (including older users), performance budgets confirmed 
   - Subresource Integrity where applicable;
   - checking that email-link fragments are removed;
   - TV display credential scope.
-- **Error monitoring:** per Q14, with PII scrubbing (no request bodies, no names, ids only) and release tagging; the `requestId` is attached to reports.
-- **Support matrix:** final browsers, devices, the TV device, minimum screen sizes (Q9, Q8b), and tested combinations.
-- **Operational (AWS EC2, decided Q2):**
-  - web server config for `app.doctayo.<tld>` (nginx proposed): TLS, SPA fallback, caching, security headers;
-  - deployment pipeline from CI to the instance (Q2b);
-  - environment configs, rollback, status page link;
+- **Error monitoring (Q14, decided):** **Sentry or an equivalent**, added in this phase, not before.
+  - **Never send:** request or response bodies, form values, URLs with query strings, user names or emails.
+  - **Send:** the **user id only**, the release tag, and the API's **`requestId`** from error responses, so a frontend error can be matched to the backend logs.
+  - **Session replay off**, or fully masked, because screens show patient data.
+  - Wired through the `reportError` seam from Phase 1.
+  - First check whether **NestJS Observe** (the backend's monitoring) offers a browser SDK and compare it with Sentry. _Unverified._
+  - A spec feeds a fake error carrying a body, query string, name and email through the scrubber and asserts that only the allowed fields leave.
+- **Support matrix (Q9, decided):** run the full suite on the device and browser list in plan.md §11 (desktop Chrome/Edge/Firefox/Safari; iPad and Android tablet in both orientations; Android mid-range phone and iPhone; TV in Chrome kiosk mode at 1920×1080). Record the tested combinations.
+- **Operational (S3 + CloudFront, decided Q2b):**
+  - production domain once decided (Q2c), with the same-registrable-domain check: `CORS_ALLOWED_ORIGINS` and `APP_PUBLIC_URL` on the API match the app;
+  - CloudFront: TLS certificate, `index.html` for app routes, caching, and the response headers policy with the **enforced** CSP;
+  - the deploy workflow from Phase 1 on a merge to `main`;
+  - rollback (redeploy a previous build's files);
+  - staging;
   - the admin console's separate host (Phase 5).
+  - EC2 + nginx is used only if ever required, never the API container.
 
 ## Backend endpoints
 
@@ -38,4 +47,4 @@ Full e2e suite on the support matrix, Lighthouse/Web Vitals in CI on staging, CS
 
 ## Open questions
 
-Q2b CI and the deploy step to EC2, Q9 devices, Q14 monitoring provider.
+Q2c production domain; the NestJS Observe vs. Sentry comparison (Q14); Q17 if a per-request nonce is ever needed.

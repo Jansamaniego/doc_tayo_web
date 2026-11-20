@@ -20,7 +20,7 @@ Status: **outline**. Backend: **backend Phase 6, not available** (D-17).
 
 ## Backend endpoints
 
-All needed, none exist (D-17): reminder settings, report endpoints, audit log read endpoint. The backend already *writes* audit events (`auth.login`, `invitation.created`, …; see docs/authentication.md), but has no read endpoint.
+All needed, none exist (D-17): reminder settings, report endpoints, audit log read endpoint. The backend already _writes_ audit events (`auth.login`, `invitation.created`, …; see docs/authentication.md), but has no read endpoint.
 
 ## Tests (outline)
 

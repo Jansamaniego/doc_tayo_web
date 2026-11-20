@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+package-lock.json
+docs/openapi.json
+src/api/schema.d.ts
+src/routeTree.gen.ts
+src/i18n/locales
+docs
+plan.md
+plans
+CLAUDE.md
+AGENTS.md

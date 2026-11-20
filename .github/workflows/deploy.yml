@@ -1,0 +1,58 @@
+name: Deploy
+
+# Static build -> S3 + CloudFront, independent of the backend's deployment (plan.md Q2b).
+# Does nothing until the AWS resources and the production domain exist (plan.md Q2c): set the
+# repository variable DEPLOY_ENABLED=true and the variables below. See docs/deployment.md.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write # GitHub OIDC -> AWS role (no long-lived keys)
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build (production .env)
+        run: npm run build
+
+      - name: Bundle size budget
+        run: npm run size
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Upload hashed assets (cached for a year)
+        run: >
+          aws s3 sync dist "s3://${{ vars.S3_BUCKET }}" --delete --exclude index.html
+          --cache-control "public, max-age=31536000, immutable"
+
+      - name: Upload index.html (never cached)
+        run: >
+          aws s3 cp dist/index.html "s3://${{ vars.S3_BUCKET }}/index.html"
+          --cache-control "no-cache"
+
+      - name: Invalidate index.html in CloudFront
+        run: >
+          aws cloudfront create-invalidation
+          --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/index.html"

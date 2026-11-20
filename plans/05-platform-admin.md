@@ -5,6 +5,7 @@ Status: **outline**. Backend: **backend Phase 4, not available** (D-10). Moved e
 ## Objectives
 
 An internal console for DocTayo operators:
+
 - create clinics (with the owner setup invite);
 - list and search clinics;
 - suspend or reactivate clinics;

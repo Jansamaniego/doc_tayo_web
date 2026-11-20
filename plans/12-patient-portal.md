@@ -9,11 +9,12 @@ Patients and guardians view their appointments and own records. One account may 
 ## Input for the Q3 decision (to be taken at the start of this phase)
 
 A **separate app (separate build and deployment) in the same repository**, sharing the design system and API layer:
+
 - different audience and threat model (public sign-up, more account-recovery traffic);
 - a different token type (D-24);
 - mobile-first layouts;
 - no staff code or staff routes shipped to patients;
-- it can have its own language defaults (Filipino is needed, Q4).
+- it can have its own language defaults (Filipino is needed, Q4; delivered in Phase 14).
 
 ## Deliverables (outline)
 
