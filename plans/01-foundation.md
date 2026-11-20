@@ -277,7 +277,7 @@ Checked on 2026-11-20. `[x]` = verified by a command run in this session; `[~]` 
 - [x] `npm run api:sync` copies the backend's `openapi.json` from `../doc-tayo-api` and regenerates the types (run; the result is content-identical to the committed contract, only whitespace differs); a missing source fails with a clear message. Editing the JSON without regenerating makes `api:check` exit 1 (run; restored afterwards).
 - [x] An injected `<style>` makes the CSP detector record a violation (`tests/e2e/csp-fixture.spec.ts`, passes in 3 browsers). The fixture also failed a real run once, on an `eval` probe from Zod (fixed, see §7).
 - [x] Date specs pass under `TZ=America/New_York` (default) and `TEST_TZ=Asia/Manila`.
-- [~] `npm run test:e2e` passes locally against the real API from the backend's docker compose: **15 of 15 on Chromium, Firefox and the 360x800 mobile project**. **WebKit could not be run** on this machine (missing system libraries); the dev seed could not be run (backend outbox-schema error, §7), but Phase 1 needs no seeded account.
+- [~] `npm run test:e2e` passes locally against the real API from the backend's docker compose: **15 of 15 on Chromium, Firefox and the 360x800 mobile project**. WebKit could not be run on the host (missing system libraries), but **runs in the Docker e2e image (2026-11-21)**; the seed works in Docker on a freshly migrated database (the earlier failure was specific to the old host database, §7).
 - [x] Calling `fetch`, `localStorage`, `sessionStorage`, `@date-fns/tz`, `zod`, `dangerouslySetInnerHTML` or hard-coded JSX text, or importing the API from the design system, fails lint (verified with a probe file, then removed).
 - [x] A bad `VITE_API_ORIGIN` shows the misconfiguration page listing the key name and no value (verified in Chromium against a deliberately broken build, then removed).
 - [x] One example of each test type passes: unit, component, component-axe, e2e, e2e-axe.
@@ -307,7 +307,7 @@ Built 2026-11-20. Test files: 19 spec files with 146 specs (Vitest), plus `tests
 7. **Scripts are TypeScript** run by Node 24's type stripping (`scripts/openapi.ts`, `api-sync.ts`, `api-check.ts`), not `.mjs`. Their spec lives in `scripts/openapi.spec.ts`, so Vitest also includes `scripts/**/*.spec.ts`.
 8. **Files differ from the sketch:** the boot sequence is in `src/main.tsx` (no `boot.ts`); `RootErrorBoundary` is `RouteErrorPage`, used as the router's `errorComponent`; not-found is the router's `notFoundComponent` (no `$.tsx`); the health hook is `src/app/useApiHealth.ts`; the placeholder pages are in `src/app/`. `reportError` is inside `RouteErrorPage` (a single user; no separate file until a second one exists). `tests/e2e/fixtures/accounts.ts` exists but is unused until Phase 3. `src/features/` does not exist yet (no empty folders).
 9. **The shadcn CLI was not run.** `components.json` and `src/design-system/components/button.tsx` were written by hand in shadcn's pattern (and already changed to our sizes: 48 px high, 18 px text, no icon-only size). `src/index.css` holds a **placeholder** theme; Phase 2 replaces it with generated tokens.
-10. **Bundle budget** counts all JavaScript in `dist/assets/*.js` (153.4 kB of 170 kB gzip), because the entry chunk alone (66.6 kB) hides the chunks it loads at startup. **90% of the budget is already used by a page that shows one sentence**: React, TanStack Router and Query, Zod, Lingui and the icon set. Phase 2 and 3 must watch it.
+10. **Bundle budget** (replaced in Phase 2 by `scripts/bundle-size.ts`, see plans/02-design-system.md §16) counted all JavaScript in `dist/assets/*.js` (153.4 kB of 170 kB gzip), because the entry chunk alone (66.6 kB) hides the chunks it loads at startup. **90% of the budget is already used by a page that shows one sentence**: React, TanStack Router and Query, Zod, Lingui and the icon set. Phase 2 and 3 must watch it.
 11. **Prettier ignores prose:** `docs/`, `plan.md`, `plans/`, `CLAUDE.md`, `AGENTS.md`. (The first run reformatted the backend's contract copies in `docs/`; they were restored from git.) `docs/openapi.json` was re-copied by `api:sync` from the backend checkout; the content is identical, the whitespace differs.
 12. **Storybook is not set up in Phase 1** (no `.storybook/`, no `storybook` scripts, no Storybook CI job): it is introduced with the first stories in Phase 2, where plans/02-design-system.md §11 already describes it.
 13. **CI:** triggers on pull requests and pushes to `main` and `develop`. The `e2e` job runs only when the repository variable `E2E_BACKEND_REPOSITORY` and secret `E2E_BACKEND_TOKEN` exist (D-14), starts Postgres and the backend with `CORS_ALLOW_CREDENTIALS=true`, and runs all four projects. `deploy.yml` is inert until `DEPLOY_ENABLED=true`. Neither workflow has run on GitHub.
@@ -316,12 +316,15 @@ Built 2026-11-20. Test files: 19 spec files with 146 specs (Vitest), plus `tests
 ### Not verified
 
 - GitHub Actions: the workflow files were only formatted and read, never executed.
-- WebKit e2e (not runnable here). The `e2e` CI job installs it with `--with-deps`.
+- ~~WebKit e2e (not runnable here)~~ Now verified: it runs in the Docker e2e image (108 tests pass on 4 projects, 2026-11-21).
 - That Vite's `html.cspNonce` lets the dev server's injected styles through the dev policy: the dev server was not tested with the CSP header. (The production policy is tested on every e2e run.)
 - `npm run i18n:check` cannot detect stale catalogues until the `.po` files are committed (it compares with git).
 - The 15-minute README claim.
 
 ### Found in the backend (not a frontend problem)
 
-- `npm run db:seed:dev` in `../doc-tayo-api` fails here with `OutboxSchemaError: schema "nest_outbox" is at version 0 ... needs version 1`, although `docker compose run --rm migrate` reports no pending migrations. The seeded accounts are therefore not available on this machine yet. Needed from Phase 3. To report to the backend.
+- `npm run db:seed:dev` in `../doc-tayo-api` failed against the **old host database** with `OutboxSchemaError: schema "nest_outbox" is at version 0 ...`. On a fresh database created by the Docker stack (`docker compose up`, then `docker compose run --rm seed`, 2026-11-21) the same seed succeeds, so the problem was that database's state, not the backend code.
 
+### Added after Phase 1: Docker (2026-11-21)
+
+Everything now runs in Docker: `compose.yaml` (database, migrations, API from `../doc-tayo-api`, dev server, and profiles for e2e, Storybook, seed and the production image), a multi-stage `Dockerfile` (`dev`, `e2e`, `build`, `prod`), `docker/nginx/` and `docs/docker.md`. `scripts/docker-files.spec.ts` pins the facts the files must keep. The containers found a real bug: the app moved focus to `<main>` on load, so the skip link was not the first Tab stop (fixed in `RootLayout`: focus moves only after a real navigation). The GitHub Actions `e2e` job still checks out the backend by hand; it could call `docker compose run --rm e2e` instead (not changed: it cannot be tested here).

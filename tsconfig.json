@@ -23,5 +23,5 @@
     "paths": { "@/*": ["./src/*"] },
     "baseUrl": "."
   },
-  "include": ["src", "tests", "scripts", "*.config.ts"]
+  "include": ["src", "tests", "scripts", ".storybook/**/*", "*.config.ts"]
 }

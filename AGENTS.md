@@ -18,7 +18,18 @@ written as a backend dependency in `plan.md` §12.
 | `npm run api:sync`                      | Copy `openapi.json` from `../doc-tayo-api` and regenerate `src/api/schema.d.ts` |
 | `npm run api:check`                     | Fails if the generated types differ from `docs/openapi.json`                |
 | `npm run i18n:extract`                  | Update `src/i18n/locales/*.po` after adding or changing messages            |
-| `npm run build` / `size`                | Type-check + build; the gzip budget (170 kB of initial JavaScript)          |
+| `npm run build` / `size`                | Type-check + build; the startup JavaScript budget (170 kB gzip, from the build manifest) and 100 kB per lazy chunk |
+| `npm run storybook` / `storybook:build` | The style guide: every token and component in every state                   |
+| `npm run tokens:build` / `tokens:check` | Generate `tokens.css` and `tokens.ts` from `tokens.json` / verify they match |
+| `npm run font:build`                    | Rebuild the Inter subset (needs `INTER_SOURCE`, see `scripts/build-fonts.ts`) |
+
+## Running things in Docker
+
+The project runs entirely in Docker (docs/docker.md): `docker compose up --build` starts the database, the API and
+the dev server; `docker compose run --rm web <command>` runs any npm script above in the dev image (use
+`--no-deps` for tools that need no API); `docker compose run --rm e2e` runs Playwright (Chromium, Firefox, WebKit)
+against the real API. Never run the backend's own compose stack at the same time (same ports). If you change the
+Dockerfile, compose file or nginx config, `scripts/docker-files.spec.ts` must stay green.
 
 ## Layout
 
@@ -26,7 +37,7 @@ written as a backend dependency in `plan.md` §12.
 src/app/            providers, router, root layout, boot, global pages
 src/routes/         TanStack Router file routes: thin (guard + compose); logic lives in features/
 src/features/<x>/   one folder per product area: api/ (query hooks), components/, then folders by concern
-src/design-system/  tokens, shadcn/ui components, patterns. Imports nothing from features/api/routes/app
+src/design-system/  tokens/ (tokens.json is the source), components/, patterns/ (app shell, forms, permissions), tv/ (waiting-room display). Imports nothing from features/api/routes/app
 src/api/            the ONLY place that calls the API: client, errors, session/, generated schema.d.ts
 src/lib/            datetime/ (the only UTC<->clinic-time code), money.ts, preferences.ts, zod.ts, small helpers
 src/i18n/           Lingui setup and catalogues (en + pseudo; fil arrives in Phase 14)
@@ -61,8 +72,18 @@ tests/e2e/          Playwright, <feature>.spec.ts
   them anyway. Hide what a role can never do; show read-only with a reason; never a bare disabled button.
 - **Tokens:** the access token lives in `src/api/session/token-store.ts` (memory). No patient data, token or
   typed form value goes in browser storage, a URL, a log or an error report.
-- **shadcn/ui:** add components with the CLI into `src/design-system/components/`, then change them to our tokens
-  and sizes (48 px controls, 18 px text, no icon-only buttons). Once copied they are our code.
+- **Design tokens:** colours, type, spacing, radius and shadows come from `tokens.json` only. Use role classes
+  (`bg-primary`, `text-ink-muted`, `border-control`); Tailwind's default colours do not exist. A new colour
+  combination needs a line in `tokens/pairings.ts`; `tokens.contrast.spec.ts` must stay green.
+- **Components:** shadcn/ui style (Radix), in `src/design-system/components/`: 48 px controls, 18 px text, no
+  icon-only buttons (a visible label is required), 44 px targets. Every component has a `*.spec.tsx` (with axe) and
+  a `*.stories.tsx` showing every state; `stories.spec.tsx` runs axe over every story. Merge classes with `cn()` from
+  `@/lib/cn.ts` (it knows our type scale: plain `twMerge` drops colours next to `text-body-lg`).
+- **Nothing may inject styles at runtime** (the CSP has no `'unsafe-inline'`): no Sonner, no CSS-in-JS. Toasts are
+  `notify.success/info` only, for confirmations; errors and actions stay on the page until dismissed.
+- **Dialogs** use `useReturnFocus` (Radix returns focus only to its own Trigger). Forms: `FormErrorSummary` +
+  `applyApiErrors` (maps the API's dotted `details[].field` onto fields, keeps what was typed).
+- **TV display:** `TvDisplay` accepts display-safe fields only (no full name, no priority). Never add one.
 - **Accessibility:** WCAG 2.2 AA. Labels always visible, no icon-only buttons, 44x44 px targets, visible focus,
   one primary action per screen. Errors stay on the page until dismissed; toasts are for confirmations only.
 

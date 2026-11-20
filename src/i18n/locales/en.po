@@ -7,6 +7,48 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+#. placeholder {0}: shown.length
+#: src/design-system/components/select-fields.tsx
+msgid "{0} results"
+msgstr "{0} results"
+
+#: src/design-system/patterns/form-error-summary.tsx
+msgid "{count, plural, one {# thing needs fixing} other {# things need fixing}}"
+msgstr "{count, plural, one {# thing needs fixing} other {# things need fixing}}"
+
+#: src/design-system/components/text-fields.tsx
+msgid "{length} of {maxLength} characters"
+msgstr "{length} of {maxLength} characters"
+
+#: src/design-system/components/inactivity-warning.tsx
+msgid "{secondsLeft, plural, one {# second} other {# seconds}}"
+msgstr "{secondsLeft, plural, one {# second} other {# seconds}}"
+
+#. placeholder {0}: next.length - MAX_GROUPS
+#: src/design-system/tv/tv-display.tsx
+msgid "+{0} more"
+msgstr "+{0} more"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "+{more} more"
+msgstr "+{more} more"
+
+#: src/design-system/components/data-table.tsx
+msgid "Actions"
+msgstr "Actions"
+
+#: src/design-system/components/date-fields.tsx
+msgid "AM"
+msgstr "AM"
+
+#: src/design-system/components/date-fields.tsx
+msgid "AM or PM"
+msgstr "AM or PM"
+
+#: src/design-system/components/inactivity-warning.tsx
+msgid "Anything you have not saved will be kept for you if you sign back in."
+msgstr "Anything you have not saved will be kept for you if you sign back in."
+
 #: src/app/HomePage.tsx
 msgid "API not reachable"
 msgstr "API not reachable"
@@ -16,26 +58,241 @@ msgstr "API not reachable"
 msgid "API reachable"
 msgstr "API reachable"
 
+#: src/design-system/components/inactivity-warning.tsx
+msgid "Are you still there?"
+msgstr "Are you still there?"
+
+#: src/design-system/patterns/permission.tsx
+msgid "Ask your clinic admin if you need it."
+msgstr "Ask your clinic admin if you need it."
+
+#: src/design-system/patterns/clinic-switcher.tsx
+msgid "Branch"
+msgstr "Branch"
+
+#: src/design-system/patterns/page-header.tsx
+msgid "Breadcrumb"
+msgstr "Breadcrumb"
+
+#: src/design-system/components/confirm-dialog.tsx
+msgid "Cancel"
+msgstr "Cancel"
+
 #: src/app/HomePage.tsx
 msgid "Checking the connection…"
 msgstr "Checking the connection…"
 
-#: src/app/HomePage.tsx
-#: src/app/RouteErrorPage.tsx
+#: src/design-system/components/date-fields.tsx
+msgid "Choose a date"
+msgstr "Choose a date"
+
+#: src/design-system/components/date-fields.tsx
+msgid "Choose a date on or after {limit}."
+msgstr "Choose a date on or after {limit}."
+
+#: src/design-system/components/date-fields.tsx
+msgid "Choose a date on or before {limit}."
+msgstr "Choose a date on or before {limit}."
+
+#: src/design-system/components/select-fields.tsx
+msgid "Choose an option"
+msgstr "Choose an option"
+
+#: src/design-system/components/date-fields.tsx
+msgid "Choose on calendar"
+msgstr "Choose on calendar"
+
+#: src/design-system/components/text-fields.tsx
+msgid "Clear"
+msgstr "Clear"
+
+#: src/design-system/components/alert.tsx
+#: src/design-system/components/dialog.tsx
+#: src/design-system/components/sheet.tsx
+#: src/design-system/components/toast.tsx
+msgid "Close"
+msgstr "Close"
+
+#: src/design-system/tv/tv-pairing.tsx
+msgid "Connect this display"
+msgstr "Connect this display"
+
+#: src/design-system/components/state-views.tsx
+msgid "Copied"
+msgstr "Copied"
+
+#: src/design-system/components/state-views.tsx
+msgid "Copy"
+msgstr "Copy"
+
+#: src/design-system/components/stepper.tsx
+msgid "Current"
+msgstr "Current"
+
+#: src/design-system/components/date-fields.tsx
+msgid "Day"
+msgstr "Day"
+
+#: src/design-system/components/state-views.tsx
 msgid "Details for support"
 msgstr "Details for support"
 
-#: src/app/HomePage.tsx
-msgid "DocTayo"
-msgstr "DocTayo"
+#: src/design-system/components/stepper.tsx
+#: src/design-system/components/text-fields.tsx
+msgid "Done"
+msgstr "Done"
+
+#: src/design-system/components/text-fields.tsx
+msgid "Enter an amount, for example 1,250.50."
+msgstr "Enter an amount, for example 1,250.50."
+
+#: src/design-system/tv/tv-pairing.tsx
+msgid "Enter this code in DocTayo → Settings → Displays:"
+msgstr "Enter this code in DocTayo → Settings → Displays:"
+
+#: src/design-system/components/alert.tsx
+msgid "Error"
+msgstr "Error"
+
+#: src/design-system/components/inactivity-warning.tsx
+msgid "For privacy, you will be signed out in {seconds}."
+msgstr "For privacy, you will be signed out in {seconds}."
+
+#: src/design-system/components/date-fields.tsx
+msgid "From"
+msgstr "From"
 
 #: src/app/NotFoundPage.tsx
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/design-system/components/text-fields.tsx
+msgid "Hide password"
+msgstr "Hide password"
+
+#: src/design-system/components/date-fields.tsx
+msgid "Hour"
+msgstr "Hour"
+
+#: src/design-system/components/alert.tsx
+#: src/design-system/components/toast.tsx
+msgid "Information"
+msgstr "Information"
+
+#: src/design-system/components/dialog.tsx
+msgid "Leave"
+msgstr "Leave"
+
+#: src/design-system/components/dialog.tsx
+msgid "Leave without saving?"
+msgstr "Leave without saving?"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "Live"
+msgstr "Live"
+
+#: src/design-system/patterns/app-shell.tsx
+msgid "Main"
+msgstr "Main"
+
+#: src/design-system/patterns/app-shell.tsx
+msgid "Menu"
+msgstr "Menu"
+
+#: src/design-system/components/date-fields.tsx
+msgid "Minute"
+msgstr "Minute"
+
+#: src/design-system/components/date-fields.tsx
+msgid "Month"
+msgstr "Month"
+
+#: src/design-system/patterns/app-shell.tsx
+msgid "More"
+msgstr "More"
+
+#: src/design-system/patterns/page-header.tsx
+msgid "More actions"
+msgstr "More actions"
+
+#: src/design-system/patterns/user-menu.tsx
+msgid "My account"
+msgstr "My account"
+
+#: src/design-system/components/pagination.tsx
+#: src/design-system/tv/tv-display.tsx
+msgid "Next"
+msgstr "Next"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "Next call coming up"
+msgstr "Next call coming up"
+
+#: src/design-system/patterns/clinic-switcher.tsx
+msgid "No longer active"
+msgstr "No longer active"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "No one waiting"
+msgstr "No one waiting"
+
+#: src/design-system/components/select-fields.tsx
+msgid "No results"
+msgstr "No results"
+
+#: src/design-system/patterns/permission.tsx
+msgid "Not set"
+msgstr "Not set"
+
+#: src/design-system/components/stepper.tsx
+#: src/design-system/components/text-fields.tsx
+msgid "Not yet"
+msgstr "Not yet"
+
+#: src/design-system/components/data-table.tsx
+msgid "Nothing to show yet"
+msgstr "Nothing to show yet"
+
+#: src/design-system/components/toast.tsx
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "Now serving"
+msgstr "Now serving"
+
+#: src/design-system/components/choice-fields.tsx
+msgid "Off"
+msgstr "Off"
+
+#: src/design-system/components/choice-fields.tsx
+msgid "On"
+msgstr "On"
+
+#: src/design-system/components/date-fields.tsx
+#: src/design-system/components/field.tsx
+msgid "Optional"
+msgstr "Optional"
+
+#: src/design-system/components/pagination.tsx
+msgid "Page {page} of {totalPages}"
+msgstr "Page {page} of {totalPages}"
+
 #: src/app/NotFoundPage.tsx
 msgid "Page not found"
 msgstr "Page not found"
+
+#: src/design-system/components/pagination.tsx
+msgid "Pagination"
+msgstr "Pagination"
+
+#: src/design-system/components/pagination.tsx
+msgid "Per page"
+msgstr "Per page"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "Please check with reception."
+msgstr "Please check with reception."
 
 #: src/api/error-messages.ts
 msgid "Please choose a clinic to continue."
@@ -45,6 +302,10 @@ msgstr "Please choose a clinic to continue."
 msgid "Please fill in this field."
 msgstr "Please fill in this field."
 
+#: src/design-system/tv/tv-display.tsx
+msgid "Please have your queue number ready."
+msgstr "Please have your queue number ready."
+
 #: src/api/error-messages.ts
 msgid "Please sign in to continue."
 msgstr "Please sign in to continue."
@@ -53,10 +314,45 @@ msgstr "Please sign in to continue."
 msgid "Please try again."
 msgstr "Please try again."
 
-#: src/app/HomePage.tsx
-#: src/app/RouteErrorPage.tsx
+#: src/design-system/components/date-fields.tsx
+msgid "PM"
+msgstr "PM"
+
+#: src/design-system/components/pagination.tsx
+msgid "Previous"
+msgstr "Previous"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "Reconnecting… last updated {lastUpdated}"
+msgstr "Reconnecting… last updated {lastUpdated}"
+
+#: src/design-system/components/state-views.tsx
 msgid "Reference: {requestId}"
 msgstr "Reference: {requestId}"
+
+#: src/design-system/components/select-fields.tsx
+msgid "Search"
+msgstr "Search"
+
+#: src/design-system/components/data-table.tsx
+msgid "Selected"
+msgstr "Selected"
+
+#: src/design-system/components/text-fields.tsx
+msgid "Show password"
+msgstr "Show password"
+
+#: src/design-system/components/pagination.tsx
+msgid "Showing {from} to {to} of {totalItems}"
+msgstr "Showing {from} to {to} of {totalItems}"
+
+#: src/design-system/patterns/user-menu.tsx
+msgid "Sign out"
+msgstr "Sign out"
+
+#: src/design-system/patterns/user-menu.tsx
+msgid "Sign out on all devices"
+msgstr "Sign out on all devices"
 
 #: src/app/RootLayout.tsx
 msgid "Skip to main content"
@@ -66,6 +362,10 @@ msgstr "Skip to main content"
 msgid "Some fields need attention."
 msgstr "Some fields need attention."
 
+#: src/lib/api-form-errors.ts
+msgid "Something else"
+msgstr "Something else"
+
 #: src/app/RouteErrorPage.tsx
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -73,6 +373,47 @@ msgstr "Something went wrong"
 #: src/api/error-messages.ts
 msgid "Something went wrong on our side. Please try again."
 msgstr "Something went wrong on our side. Please try again."
+
+#: src/design-system/components/data-table.tsx
+msgid "Sorted ascending"
+msgstr "Sorted ascending"
+
+#: src/design-system/components/data-table.tsx
+msgid "Sorted descending"
+msgstr "Sorted descending"
+
+#: src/design-system/components/dialog.tsx
+msgid "Stay"
+msgstr "Stay"
+
+#: src/design-system/components/inactivity-warning.tsx
+msgid "Stay signed in"
+msgstr "Stay signed in"
+
+#: src/design-system/components/stepper.tsx
+msgid "Step {position} of {total}: {name}"
+msgstr "Step {position} of {total}: {name}"
+
+#: src/design-system/components/alert.tsx
+#: src/design-system/components/toast.tsx
+msgid "Success"
+msgstr "Success"
+
+#: src/design-system/patterns/clinic-switcher.tsx
+msgid "Suspended"
+msgstr "Suspended"
+
+#: src/design-system/patterns/clinic-switcher.tsx
+msgid "Switch clinic"
+msgstr "Switch clinic"
+
+#: src/design-system/tv/tv-pairing.tsx
+msgid "Tap to enable sound"
+msgstr "Tap to enable sound"
+
+#: src/design-system/components/date-fields.tsx
+msgid "That date does not exist."
+msgstr "That date does not exist."
 
 #: src/api/error-messages.ts
 msgid "That is too large to send. Please send less information."
@@ -89,6 +430,10 @@ msgstr "The address may be wrong, or the page may have moved."
 #: src/api/error-messages.ts
 msgid "The email or password is incorrect."
 msgstr "The email or password is incorrect."
+
+#: src/design-system/components/date-fields.tsx
+msgid "The end date must be on or after the start date."
+msgstr "The end date must be on or after the start date."
 
 #: src/api/error-messages.ts
 msgid "The information could not be read. Please try again."
@@ -129,6 +474,10 @@ msgstr "This app is misconfigured"
 #: src/api/error-messages.ts
 msgid "This cannot be done while the record is in its current state."
 msgstr "This cannot be done while the record is in its current state."
+
+#: src/design-system/components/confirm-dialog.tsx
+msgid "This cannot be undone."
+msgstr "This cannot be undone."
 
 #: src/api/error-messages.ts
 msgid "This clinic is no longer active."
@@ -182,14 +531,25 @@ msgstr "This role cannot be given through an invitation."
 msgid "This value is not allowed."
 msgstr "This value is not allowed."
 
+#: src/design-system/components/date-fields.tsx
+msgid "To"
+msgstr "To"
+
 #: src/api/error-messages.ts
 msgid "Too many attempts. Please wait a moment and try again."
 msgstr "Too many attempts. Please wait a moment and try again."
 
-#: src/app/HomePage.tsx
-#: src/app/RouteErrorPage.tsx
+#: src/design-system/components/state-views.tsx
 msgid "Try again"
 msgstr "Try again"
+
+#: src/design-system/tv/tv-display.tsx
+msgid "Updated {lastUpdated}"
+msgstr "Updated {lastUpdated}"
+
+#: src/design-system/components/alert.tsx
+msgid "Warning"
+msgstr "Warning"
 
 #: src/api/error-messages.ts
 msgid "We could not connect. Check your internet connection and try again."
@@ -207,13 +567,13 @@ msgstr "We could not find this page"
 msgid "We could not find what you were looking for."
 msgstr "We could not find what you were looking for."
 
-#: src/app/HomePage.tsx
-msgid "We could not reach the DocTayo service. Please try again."
-msgstr "We could not reach the DocTayo service. Please try again."
-
 #: src/api/error-messages.ts
 msgid "We could not understand that request. Please try again."
 msgstr "We could not understand that request. Please try again."
+
+#: src/design-system/components/date-fields.tsx
+msgid "Year"
+msgstr "Year"
 
 #: src/api/error-messages.ts
 msgid "You do not have access to this clinic."
@@ -222,6 +582,14 @@ msgstr "You do not have access to this clinic."
 #: src/api/error-messages.ts
 msgid "You do not have permission to do this."
 msgstr "You do not have permission to do this."
+
+#: src/design-system/patterns/permission.tsx
+msgid "You don't have access to this page"
+msgstr "You don't have access to this page"
+
+#: src/design-system/components/dialog.tsx
+msgid "Your changes will be lost."
+msgstr "Your changes will be lost."
 
 #: src/api/error-messages.ts
 msgid "Your session needs to be renewed. Please try again."

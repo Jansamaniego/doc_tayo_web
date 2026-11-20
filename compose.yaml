@@ -1,0 +1,178 @@
+# Everything you need to work on DocTayo Web, in Docker. Guide: docs/docker.md
+#
+#   docker compose up --build            # database + migrations + API + dev server (http://localhost:5173)
+#   docker compose run --rm seed         # dev clinic and users (owner@sunrise.test ...)
+#   docker compose run --rm web npm test # any command in the dev image (lint, typecheck, test, ...)
+#   docker compose run --rm e2e          # Playwright: Chromium, Firefox and WebKit, against the real API
+#   docker compose up storybook          # the style guide (http://localhost:6006)
+#   docker compose up --build web-prod   # the production image (nginx) on http://localhost:8080
+#   docker compose down                  # stop (the database is kept); `down -v` also deletes it
+#
+# The API and its database are built from the backend checkout next to this
+# repository (BACKEND_DIR, default ../doc-tayo-api). Every port is published on
+# this machine only (127.0.0.1). Do not run this stack and the backend's own
+# docker-compose.yml at the same time: they use the same ports.
+
+name: doc-tayo-web
+
+x-api-env: &api-env
+  NODE_ENV: development
+  PORT: '3000'
+  DATABASE_URL: postgresql://doctayo_app:${DB_APP_PASSWORD:-doctayo_app_dev}@postgres:5432/doc_tayo
+  DATABASE_SSL: disable
+  # The dev server, the e2e preview server and the production image (nginx).
+  CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:8080
+  # Without it the refresh cookie is never sent.
+  CORS_ALLOW_CREDENTIALS: 'true'
+  APP_PUBLIC_URL: http://localhost:5173
+  LOG_FORMAT: json
+  LOG_LEVEL: log
+  SWAGGER_ENABLED: 'true'
+  OBSERVE_ENABLED: 'false'
+  MAIL_TRANSPORT: log
+  # Development-only secret (never reuse outside this file).
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-only-jwt-secret-change-me-0123456789abcdef}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-postgres}
+      DB_OWNER_PASSWORD: ${DB_OWNER_PASSWORD:-doctayo_owner_dev}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-doctayo_app_dev}
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5434}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ${BACKEND_DIR:-../doc-tayo-api}/scripts/db:/scripts/db:ro
+      - ${BACKEND_DIR:-../doc-tayo-api}/scripts/docker/postgres-init.sh:/docker-entrypoint-initdb.d/10-bootstrap.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Applies the database migrations, then exits. Runs on every `up` (it is safe to repeat).
+  migrate:
+    build:
+      context: ${BACKEND_DIR:-../doc-tayo-api}
+      target: migrate
+    image: doc-tayo-migrate
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_MIGRATION_URL: postgresql://doctayo_owner:${DB_OWNER_PASSWORD:-doctayo_owner_dev}@postgres:5432/doc_tayo
+
+  api:
+    build:
+      context: ${BACKEND_DIR:-../doc-tayo-api}
+      target: runtime
+    image: doc-tayo-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - '127.0.0.1:${API_PORT:-3000}:3000'
+    environment: *api-env
+
+  # The development server with hot reload, the dev image's default command.
+  web:
+    build:
+      context: .
+      target: dev
+    image: doc-tayo-web-dev
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:${WEB_PORT:-5173}:5173'
+    environment:
+      # The browser (on your machine) talks to the API through the published port.
+      VITE_API_ORIGIN: http://localhost:${API_PORT:-3000}
+    volumes:
+      - .:/app
+      # Dependencies are installed for Linux inside the image, never shared with the host's node_modules.
+      - web_node_modules:/app/node_modules
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:5173/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  # Dev clinic and users: docker compose run --rm seed
+  seed:
+    build:
+      context: ${BACKEND_DIR:-../doc-tayo-api}
+      target: runtime
+    image: doc-tayo-api
+    profiles: ['tools']
+    depends_on:
+      api:
+        condition: service_healthy
+    environment: *api-env
+    volumes:
+      - ${BACKEND_DIR:-../doc-tayo-api}/scripts:/app/scripts:ro
+    command: ['node', 'scripts/db/seed-dev.mjs']
+
+  # Playwright against the real API. It shares the API's network, so "localhost" IS the API:
+  # the same origin names as on your machine, and the refresh cookie stays same-site.
+  e2e:
+    build:
+      context: .
+      target: e2e
+    image: doc-tayo-web-e2e
+    profiles: ['e2e']
+    network_mode: 'service:api'
+    depends_on:
+      api:
+        condition: service_healthy
+    shm_size: 1gb
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+
+  storybook:
+    image: doc-tayo-web-dev
+    build:
+      context: .
+      target: dev
+    profiles: ['storybook']
+    command: ['npm', 'run', 'storybook', '--', '--host', '0.0.0.0', '--ci', '--no-open']
+    ports:
+      - '127.0.0.1:${STORYBOOK_PORT:-6006}:6006'
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+
+  # The production image: the static build behind nginx, with the production headers.
+  web-prod:
+    build:
+      context: .
+      target: prod
+      args:
+        VITE_API_ORIGIN: http://localhost:${API_PORT:-3000}
+    image: doc-tayo-web
+    profiles: ['prod']
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:${PROD_PORT:-8080}:8080'
+    environment:
+      API_ORIGIN: http://localhost:${API_PORT:-3000}
+
+volumes:
+  pgdata:
+  web_node_modules:

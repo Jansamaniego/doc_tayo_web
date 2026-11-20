@@ -1,8 +1,0 @@
-[
-  {
-    "name": "initial JavaScript, all chunks (plan.md §11: 170 kB gzip)",
-    "path": "dist/assets/*.js",
-    "gzip": true,
-    "limit": "170 kB"
-  }
-]

@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
       lingui({ macroTransform: true }),
     ],
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+    build: { manifest: true },
     html: { cspNonce: DEV_STYLE_NONCE },
     server: {
       port: 5173,

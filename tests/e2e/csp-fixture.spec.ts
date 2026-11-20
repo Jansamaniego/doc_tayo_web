@@ -6,7 +6,12 @@ test.describe('CSP violation detector', () => {
 
   test('records an injected inline style as a violation', async ({ page, cspViolations }) => {
     await page.goto('/');
-    await page.addStyleTag({ content: 'body { outline: 1px solid red; }' });
+    // Created in the page: WebKit makes Playwright's own addStyleTag throw on a report-only violation.
+    await page.evaluate(() => {
+      const style = document.createElement('style');
+      style.textContent = 'body { outline: 1px solid red; }';
+      document.head.appendChild(style);
+    });
     expect((await cspViolations()).join('\n')).toContain('style-src');
   });
 });

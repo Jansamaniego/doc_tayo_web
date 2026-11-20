@@ -42,6 +42,9 @@ jobs:
       - name: Message catalogues are up to date
         run: npm run i18n:check
 
+      - name: Design token files match tokens.json
+        run: npm run tokens:check
+
       - name: Unit and component tests (runner in America/New_York)
         run: npm test
 
@@ -55,6 +58,9 @@ jobs:
 
       - name: Bundle size budget
         run: npm run size
+
+      - name: Storybook (the style guide) builds
+        run: npm run storybook:build
 
   e2e:
     # Real-API end-to-end tests (plan.md §8, backend dependency D-14). The job needs read access

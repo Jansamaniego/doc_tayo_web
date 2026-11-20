@@ -1,0 +1,10 @@
+/*
+ * Length stress for layouts (plans/02-design-system.md §11): Lingui's pseudo-locale accents text but
+ * cannot lengthen it. Widening the letters and words by about 40% mimics a longer translation
+ * (Filipino is often longer than English), so overflow and clipping show up before it ships.
+ * Used only by Storybook and the e2e component gallery, never by the app.
+ */
+[data-stretch='on'] {
+  letter-spacing: 0.12em;
+  word-spacing: 0.35em;
+}

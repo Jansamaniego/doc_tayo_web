@@ -1,0 +1,45 @@
+# Production web server for the DocTayo single-page app (docs/deployment.md).
+# The nginx image fills ${API_ORIGIN} in at start (the other $names are nginx variables).
+server {
+  listen 8080;
+  server_name _;
+  server_tokens off;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  gzip on;
+  gzip_types text/css application/javascript application/json image/svg+xml;
+
+  # The Content-Security-Policy: the same string as src/config/csp.ts (a spec checks it).
+  # Report-only until Phase 13 enforces it.
+  set $csp "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self' ${API_ORIGIN}; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'";
+
+  location = /healthz {
+    access_log off;
+    default_type text/plain;
+    return 200 "ok\n";
+  }
+
+  # The entry file is never cached: a new release is picked up at once.
+  location = /index.html {
+    add_header Cache-Control "no-cache" always;
+    add_header Content-Security-Policy-Report-Only $csp always;
+    include /etc/nginx/snippets/security-headers.conf;
+  }
+
+  # Hashed files never change.
+  location /assets/ {
+    try_files $uri =404;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    add_header Content-Security-Policy-Report-Only $csp always;
+    include /etc/nginx/snippets/security-headers.conf;
+  }
+
+  # App routes (/login, /patients/...) are answered by the single-page app.
+  location / {
+    try_files $uri /index.html;
+    add_header Cache-Control "no-cache" always;
+    add_header Content-Security-Policy-Report-Only $csp always;
+    include /etc/nginx/snippets/security-headers.conf;
+  }
+}

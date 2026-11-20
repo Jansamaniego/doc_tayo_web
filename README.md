@@ -6,23 +6,45 @@ Single-page app: React 19, TypeScript, Vite, TanStack Router/Query, shadcn/ui, T
 - Plan: [plan.md](plan.md) and [plans/](plans/). Conventions: [AGENTS.md](AGENTS.md).
 - Backend contract: [docs/](docs/) (start with [frontend-integration.md](docs/frontend-integration.md)).
 
-**Status:** Phase 1 (foundation) is built. There are no product screens yet; the home page only shows
-whether the API is reachable.
+**Status:** Phases 1 (foundation) and 2 (design system) are built; the style guide awaits the product owner's
+approval before any feature screen is built. There are no product screens yet; the home page only shows whether
+the API is reachable. Run `npm run storybook` to see the design system.
 
-## Prerequisites
+## Run it with Docker (recommended)
 
-- **Node 24** (`.nvmrc`; with nvm: `nvm use`).
-- Docker, to run the API locally.
-- The backend repository checked out next to this one: `../doc-tayo-api`.
+You need Docker (Compose v2) and the backend repository checked out next to this one (`../doc-tayo-api`).
 
-## Run it locally
+```bash
+docker compose up --build         # database + migrations + API + dev server
+docker compose run --rm seed      # dev clinic and users (needed from Phase 3)
+```
 
-1. **Start the API** (in `../doc-tayo-api`). The API must allow this app's origins and cookies:
+Open http://localhost:5173 (hot reload). Seeded accounts (password `dev-password-change-me-123`):
+`owner@sunrise.test` (Owner) and `reception@sunrise.test` (Receptionist). Emails (reset, setup, invitation links)
+are printed in the API's logs: `docker compose logs -f api`.
+
+Everything else runs in Docker too:
+
+| Command                                | What it does                                                                       |
+| -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `docker compose run --rm web npm test` | unit and component specs (also `lint`, `typecheck`, `format:check`, ...)           |
+| `docker compose run --rm e2e`          | Playwright on Chromium, Firefox, WebKit and a phone viewport, against the real API |
+| `docker compose up storybook`          | the style guide, http://localhost:6006                                             |
+| `docker compose up --build web-prod`   | the production image (nginx), http://localhost:8080                                |
+| `docker compose down`                  | stop (add `-v` to also delete the database)                                        |
+
+The full guide, with how it works and troubleshooting, is [docs/docker.md](docs/docker.md). Do not run this stack
+and the backend's own `docker-compose.yml` together: they use the same ports.
+
+## Run it without Docker
+
+Prerequisites: **Node 24** (`.nvmrc`; with nvm: `nvm use`), and the API running somewhere.
+
+1. **Start the API** (in `../doc-tayo-api`). It must allow this app's origins and cookies:
 
    ```bash
    export CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173
    docker compose up --build -d            # API on :3000 and Postgres
-   docker compose run --rm --build migrate # apply migrations
    npm run db:seed:dev                     # development clinic and users (needed from Phase 3)
    ```
 
@@ -36,24 +58,22 @@ whether the API is reachable.
    npm run dev        # http://localhost:5173
    ```
 
-Seeded accounts (password `dev-password-change-me-123`): `owner@sunrise.test` (Owner) and
-`reception@sunrise.test` (Receptionist). Emails (reset, setup, invitation links) are printed in the API's
-console at `LOG_LEVEL=debug`; see [docs/frontend-integration.md](docs/frontend-integration.md) §2.
-
 Settings are documented in [docs/environment.md](docs/environment.md) and validated at startup.
 
 ## Scripts
 
-| Script                                                   | Purpose                                                    |
-| -------------------------------------------------------- | ---------------------------------------------------------- |
-| `npm run dev` / `build` / `preview`                      | Dev server, type-check + production build, preview         |
-| `npm run lint` / `format` / `format:check` / `typecheck` | Quality gates                                              |
-| `npm test`                                               | Unit and component specs (Vitest, axe inside)              |
-| `npm run test:e2e`                                       | Playwright, real API (below)                               |
-| `npm run api:sync`                                       | Copy the contract from `../doc-tayo-api`, regenerate types |
-| `npm run api:generate` / `api:check`                     | Regenerate / verify `src/api/schema.d.ts`                  |
-| `npm run i18n:extract` / `i18n:check`                    | Update / verify the message catalogues                     |
-| `npm run size`                                           | Bundle-size budget (after `npm run build`)                 |
+| Script                                                   | Purpose                                                      |
+| -------------------------------------------------------- | ------------------------------------------------------------ |
+| `npm run dev` / `build` / `preview`                      | Dev server, type-check + production build, preview           |
+| `npm run lint` / `format` / `format:check` / `typecheck` | Quality gates                                                |
+| `npm test`                                               | Unit and component specs (Vitest, axe inside)                |
+| `npm run test:e2e`                                       | Playwright, real API (below)                                 |
+| `npm run api:sync`                                       | Copy the contract from `../doc-tayo-api`, regenerate types   |
+| `npm run api:generate` / `api:check`                     | Regenerate / verify `src/api/schema.d.ts`                    |
+| `npm run i18n:extract` / `i18n:check`                    | Update / verify the message catalogues                       |
+| `npm run size`                                           | Startup and per-chunk bundle budgets (after `npm run build`) |
+| `npm run storybook` / `storybook:build`                  | The style guide: every token and component, every state      |
+| `npm run tokens:build` / `tokens:check`                  | Generate / verify the design token files                     |
 
 ## When the backend changes its contract
 

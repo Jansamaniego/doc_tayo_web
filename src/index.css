@@ -1,43 +1,80 @@
 @import 'tailwindcss';
+@import './design-system/tokens/tokens.css';
 
-/*
- * PLACEHOLDER theme so Phase 1 is readable. Phase 2 replaces this block with values generated
- * from src/design-system/tokens/tokens.json (plan.md §6, plans/02-design-system.md §3-§5).
- * Do not add colours or sizes here: add them to the tokens in Phase 2.
- */
-@theme {
-  --color-page: #f9faf7;
-  --color-surface: #ffffff;
-  --color-text: #1b211e;
-  --color-text-muted: #515c55;
-  --color-primary: #1d6e41;
-  --color-primary-hover: #175836;
-  --color-on-primary: #ffffff;
-  --color-border-control: #68746c;
-  --color-danger: #b3261e;
-  --color-danger-bg: #fdedeb;
-  --color-success: #1d6e41;
-  --color-focus: #1d6e41;
+/* Inter, self-hosted and subset (₱, ñ, tabular figures; weights 400-700). */
+@font-face {
+  font-family: 'Inter';
+  src: url('./design-system/fonts/inter-subset.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @layer base {
-  html {
-    font-size: 112.5%; /* 18 px body text; rem keeps the browser's font-size setting working */
-  }
+  /* 1rem stays 16 px so the user's browser font-size setting scales everything; body text is 18 px. */
   body {
     background-color: var(--color-page);
-    color: var(--color-text);
-    line-height: 1.5;
-    font-family:
-      system-ui,
-      -apple-system,
-      'Segoe UI',
-      Roboto,
-      'Noto Sans',
-      sans-serif;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
   }
+  h1 {
+    font-size: var(--text-h1);
+    line-height: var(--text-h1--line-height);
+    font-weight: 700;
+  }
+  h2 {
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    font-weight: 700;
+  }
+  h3 {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    font-weight: 700;
+  }
+
+  /* Focus ring: 3 px green outline, 2 px offset, plus a white inner ring so it shows on every background. */
   :focus-visible {
     outline: 3px solid var(--color-focus);
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-surface);
+  }
+  a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Printing: named pages per paper size, so each template picks its own (plan.md Q15). */
+@page a4 {
+  size: A4;
+  margin: 15mm;
+}
+@page half-letter {
+  size: 5.5in 8.5in;
+  margin: 12mm;
+}
+.print-a4 {
+  page: a4;
+}
+.print-half-letter {
+  page: half-letter;
+}
+@media print {
+  body {
+    background: white;
   }
 }

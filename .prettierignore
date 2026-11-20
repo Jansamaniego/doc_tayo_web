@@ -13,3 +13,9 @@ plan.md
 plans
 CLAUDE.md
 AGENTS.md
+src/design-system/tokens/tokens.css
+src/design-system/tokens/tokens.ts
+src/design-system/tokens/tokens.json
+storybook-static
+.agents
+docker/nginx

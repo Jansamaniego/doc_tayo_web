@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# DocTayo design system
+
+Calm, clean, trustworthy, warm, unhurried. Built for clinic staff of every age, including people who are not
+comfortable with technology. Approved by the product owner before any feature screen is built.
+
+## Principles
+
+1. **Readable from arm's length.** Large text, strong contrast, generous spacing. When in doubt, make it bigger.
+2. **One clear next step.** Each screen has one primary action.
+3. **Say it plainly.** Short sentences, everyday words, no jargon or codes. "Save patient", not "Submit".
+4. **Words with every icon.** Icons support labels; they never replace them.
+5. **Always tell people what happened.** Every action gets visible feedback.
+6. **Never lose someone's work.** Errors keep what was typed. Destructive actions ask first. Nothing times out without warning.
+7. **Calm, not clinical.** Colour supports meaning but never carries it alone.
+8. **Private by default.** Show only the personal data the task needs, especially on shared screens.
+
+## Wording
+
+| Say                            | Not           |
+| ------------------------------ | ------------- |
+| Sign in                        | Log in, Login |
+| Clinic                         | Tenant        |
+| Patient record                 | Encounter     |
+| Save branch (names the action) | Submit        |
+| Try again                      | Retry         |
+
+Dates are written out (`Nov 21, 2026`), times use 12 hours with AM/PM, money is `₱1,234.50`.
+
+## Use the toolbar
+
+- **Language**: English, or the pseudo-locale, which accents every translated string so hard-coded text stands out.
+- **Text**: stretches text about 40% to mimic longer translations (Filipino). Components must wrap, not clip.
+- **Accessibility panel**: axe runs on every story.
+- **Viewport**: phone, tablet and TV sizes.

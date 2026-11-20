@@ -7,6 +7,15 @@ The build is static files, so they are served from **S3 + CloudFront**. The depl
 the backend's production deployment (backend Phase 7, not designed yet). If EC2 is ever required,
 serve the same `dist/` with nginx and the same headers, **never from the API container**.
 
+## The nginx image (fallback, and the production build on your machine)
+
+`docker compose up --build web-prod` builds the `prod` stage of the Dockerfile: the production build behind
+`nginx-unprivileged` (about 90 MB, user `nginx`, port 8080, `/healthz`). It sends the same caching and security
+headers as this document describes (a spec keeps its Content-Security-Policy identical to `src/config/csp.ts`),
+falls back to `index.html` for app routes, and reads the API origin from `API_ORIGIN` at start. It is the
+**EC2 + nginx fallback** if S3 + CloudFront is ever not an option, never a reason to serve the app from the API
+container. Details: [docker.md](docker.md).
+
 ## Resources to create
 
 | Resource                  | Notes                                                                                                             |

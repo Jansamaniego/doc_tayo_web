@@ -45,5 +45,12 @@ export async function expectNoAxeViolations(page: Page): Promise<void> {
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze();
-  expect(results.violations).toEqual([]);
+  // A short, readable list (rule, how serious, where, why) instead of axe's full report.
+  const summary = results.violations.flatMap((violation) =>
+    violation.nodes.map(
+      (node) =>
+        `${violation.id} (${violation.impact ?? 'n/a'}): ${node.target.join(' ')} - ${(node.any[0]?.message ?? node.failureSummary ?? '').slice(0, 160)}`,
+    ),
+  );
+  expect(summary, 'accessibility violations').toEqual([]);
 }

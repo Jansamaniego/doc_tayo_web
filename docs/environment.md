@@ -43,3 +43,10 @@ Backend settings that must match:
 
 See the README. In short, the API's `CORS_ALLOWED_ORIGINS` needs `http://localhost:5173` (dev server)
 and `http://localhost:4173` (the preview server the e2e tests use).
+
+## In Docker
+
+`compose.yaml` sets `VITE_API_ORIGIN` for the dev server from `API_PORT` (default `http://localhost:3000`: the
+browser on your machine reaches the API through the published port). The e2e container shares the API's network,
+so it uses `.env.e2e` unchanged. The production image bakes `VITE_API_ORIGIN` in at build time (`--build-arg`) and
+reads `API_ORIGIN` at start for the Content-Security-Policy `connect-src`. See [docker.md](docker.md).

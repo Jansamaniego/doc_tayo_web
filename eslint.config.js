@@ -29,9 +29,11 @@ export default tseslint.config(
       'coverage',
       'playwright-report',
       'test-results',
+      'storybook-static',
       'node_modules',
       'src/api/schema.d.ts',
       'src/routeTree.gen.ts',
+      'src/design-system/tokens/tokens.ts',
       'src/i18n/locales',
     ],
   },
@@ -114,6 +116,9 @@ export default tseslint.config(
   {
     files: [
       '**/*.spec.{ts,tsx}',
+      '**/*.stories.{ts,tsx}',
+      'src/app/ComponentGallery.tsx',
+      '.storybook/**',
       'src/test/**',
       'tests/**',
       'scripts/**',

@@ -1,0 +1,14 @@
+# Keep the build context small and keep local secrets out of images.
+node_modules
+dist
+storybook-static
+test-results
+playwright-report
+coverage
+.git
+.env.local
+.env.*.local
+*.log
+*.tsbuildinfo
+.DS_Store
+.agents
