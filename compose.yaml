@@ -29,7 +29,8 @@ x-api-env: &api-env
   LOG_LEVEL: log
   SWAGGER_ENABLED: 'true'
   OBSERVE_ENABLED: 'false'
-  MAIL_TRANSPORT: log
+  # `log` prints each email (and its link) in the API console. The e2e run uses `file`: MAIL_TRANSPORT=file docker compose up -d api
+  MAIL_TRANSPORT: ${MAIL_TRANSPORT:-log}
   # Development-only secret (never reuse outside this file).
   JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-only-jwt-secret-change-me-0123456789abcdef}
 
@@ -79,6 +80,9 @@ services:
     ports:
       - '127.0.0.1:${API_PORT:-3000}:3000'
     environment: *api-env
+    volumes:
+      # Where MAIL_TRANSPORT=file writes the emails; the e2e container reads them from here.
+      - mail:/app/var/mail
 
   # The development server with hot reload, the dev image's default command.
   web:
@@ -139,9 +143,13 @@ services:
       api:
         condition: service_healthy
     shm_size: 1gb
+    environment:
+      # The platform admin spec opens the setup link from the owner's email (needs MAIL_TRANSPORT=file).
+      E2E_MAIL_DIR: /mail
     volumes:
       - .:/app
       - web_node_modules:/app/node_modules
+      - mail:/mail:ro
 
   storybook:
     image: doc-tayo-web-dev
@@ -175,4 +183,5 @@ services:
 
 volumes:
   pgdata:
+  mail:
   web_node_modules:

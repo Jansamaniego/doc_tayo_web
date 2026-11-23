@@ -17,4 +17,7 @@ the single-flight helper (`src/api/session/`).
   `POST /auth/logout` revokes the session on the server, then the token and screen are cleared. Unsaved form
   input is kept in memory only and returned to the same user. Server-side enforcement is backend request D-26.
 
+- **The session also holds `platformRole`** (`none` or `platform_admin`, from `GET /me`). It decides whether the Clinics and Users tabs exist and grants no clinic data. A `FORBIDDEN` on any request refreshes `GET /me`, so a removed role or permission shows up without a reload.
+- **Every page load restores the session** with one `POST /auth/refresh` (limited to 30 a minute per address). Tests that are not about signing in must stub it (`realSession` in `tests/e2e/fixtures/test.ts`).
+
 See plan.md §5.3 and §5.3.1 for the details.

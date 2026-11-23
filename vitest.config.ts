@@ -10,12 +10,23 @@ process.env.TZ = process.env.TEST_TZ ?? 'America/New_York';
 
 export default defineConfig({
   plugins: [react(), lingui({ macroTransform: true })],
-  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  resolve: {
+    alias: [
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+      // Radix's scroll lock inserts a <style> element, which the production CSP forbids.
+      {
+        find: /^react-remove-scroll$/,
+        replacement: fileURLToPath(new URL('./src/design-system/scroll-lock.tsx', import.meta.url)),
+      },
+    ],
+  },
   test: {
     environment: 'jsdom',
     globals: false,
     include: ['src/**/*.spec.{ts,tsx}', 'scripts/**/*.spec.ts'],
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Radix must go through Vite for the alias above to reach it.
+    server: { deps: { inline: [/radix-ui/] } },
   },
 });

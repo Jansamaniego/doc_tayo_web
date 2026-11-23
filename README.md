@@ -20,7 +20,7 @@ docker compose run --rm seed      # dev clinic and users (needed from Phase 3)
 ```
 
 Open http://localhost:5173 (hot reload). Seeded accounts (password `dev-password-change-me-123`):
-`owner@sunrise.test` (Owner) and `reception@sunrise.test` (Receptionist). Emails (reset, setup, invitation links)
+`owner@sunrise.test` (Owner), `clinic-admin@sunrise.test` (Clinic admin), `doctor@sunrise.test` (Doctor) and `reception@sunrise.test` (Receptionist). Emails (reset, setup, invitation links)
 are printed in the API's logs: `docker compose logs -f api`.
 
 Everything else runs in Docker too:
@@ -45,7 +45,7 @@ Prerequisites: **Node 24** (`.nvmrc`; with nvm: `nvm use`), and the API running 
    ```bash
    export CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173
    docker compose up --build -d            # API on :3000 and Postgres
-   npm run db:seed:dev                     # development clinic and users (needed from Phase 3)
+   npm run db:seed:dev                     # development clinic and users (needed from Phase 3); also admin@doctayo.test, the platform admin
    ```
 
    Or put `CORS_ALLOWED_ORIGINS=...` and `CORS_ALLOW_CREDENTIALS=true` in the API's `.env`. `4173` is the
@@ -95,6 +95,27 @@ npm run test:e2e -- --project=chromium           # one project
 
 Projects: Chromium, WebKit, Firefox, and a 360x800 mobile viewport. Every spec fails on any
 Content-Security-Policy violation and runs axe.
+
+**The staff and account specs** (`tests/e2e/staff.spec.ts`, `tests/e2e/account-email.spec.ts`) use the seeded
+Sunrise accounts (`owner@`, `clinic-admin@`, `doctor@`, `reception@sunrise.test`). `staff.spec.ts` changes the
+seeded doctor and puts everything back; `account-email.spec.ts` invites a NEW person and reads that person's
+invitation and email-change links from the API's emails, so it needs `MAIL_TRANSPORT=file` and the same
+`CORS_ALLOWED_ORIGINS` / `APP_PUBLIC_URL` as below. Each run leaves a revoked invitation and one new
+`e2e-acct-...@example.test` account behind (neither can be deleted). Running several specs back to back may
+hit the API's limit of 30 page refreshes a minute per address; if the last spec fails, run it again alone.
+
+**The clinic settings spec** (`tests/e2e/clinic-settings.spec.ts`) creates a clinic and its owner the same way as the platform admin spec below (so it needs the same API setup and `admin@doctayo.test`), changes only that new clinic, and reads Sunrise Clinic as the seeded receptionist and owner. It runs in Chromium only and leaves a new "E2E Clinic ..." with its branches behind.
+
+**The platform admin spec** (`tests/e2e/platform-admin.spec.ts`) creates a clinic and an owner, then reads
+the owner's setup link from the API's emails. So the API must run with `MAIL_TRANSPORT=file` (it writes to
+its `var/mail`; with Docker: `MAIL_TRANSPORT=file docker compose up -d api`, and the e2e container reads the
+same volume), its `CORS_ALLOWED_ORIGINS` and `APP_PUBLIC_URL` must be `http://localhost:4173`, and the
+backend's dev seed must have run (it creates `admin@doctayo.test`). It runs in Chromium only, and each run
+leaves a deactivated "E2E Clinic ..." behind. Without Docker, point the app at your API with
+`VITE_API_ORIGIN=http://localhost:<port> npx playwright test --project=chromium`; Firefox and WebKit need the
+Docker e2e image (their system libraries are missing on most machines). The API limits sign-ins to 5 per 15
+minutes per account: restart the API (it keeps the counts in memory) if you run the suite several times.
+After pulling backend changes, **restart your API**: `nest start` without `--watch` keeps running the old build, and an API that predates `platformRole` on `GET /me` makes the app treat a platform admin as a clinic user with no clinic (the clinic picker's "You don't have a clinic you can open right now").
 
 **CI:** the `verify` job (lint, format, types, contract check, catalogues, unit tests in two time zones,
 build, size) runs on every push. The real-API `e2e` job is skipped until the repository variable

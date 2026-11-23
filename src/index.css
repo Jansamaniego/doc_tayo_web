@@ -78,3 +78,8 @@
     background: white;
   }
 }
+
+/* While a modal is open the page behind does not scroll (src/design-system/scroll-lock.tsx). */
+body[data-scroll-locked] {
+  overflow: hidden;
+}

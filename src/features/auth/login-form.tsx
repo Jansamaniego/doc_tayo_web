@@ -50,6 +50,7 @@ export function LoginForm({ notice, onSignedIn }: LoginFormProps) {
     expired: t`Your session ended. Please sign in again.`,
     'signed-out-elsewhere': t`You signed out in another window.`,
     'password-changed': t`Your password was changed. For your safety, every device was signed out.`,
+    'email-changed': t`Your email was changed. Sign in with your new address.`,
     'password-reset': t`Your password was saved. Sign in with your new password.`,
     'account-ready': t`Your account is ready. Sign in to start.`,
     'invitation-accepted': t`You have joined the clinic. Sign in to open it.`,

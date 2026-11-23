@@ -13,7 +13,17 @@ const config: StorybookConfig = {
   viteFinal: (viteConfig) =>
     mergeConfig(viteConfig, {
       plugins: [tailwindcss(), lingui({ macroTransform: true })],
-      resolve: { alias: { '@': fileURLToPath(new URL('../src', import.meta.url)) } },
+      resolve: {
+        alias: [
+          { find: '@', replacement: fileURLToPath(new URL('../src', import.meta.url)) },
+          {
+            find: /^react-remove-scroll$/,
+            replacement: fileURLToPath(
+              new URL('../src/design-system/scroll-lock.tsx', import.meta.url),
+            ),
+          },
+        ],
+      },
     }),
 };
 

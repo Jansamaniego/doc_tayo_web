@@ -74,6 +74,45 @@ describe('SelectClinic', () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
+  it('says which clinic the person lost access to, when the app sent them here for that', () => {
+    renderWithProviders(
+      <SelectClinic
+        memberships={[HARBOR]}
+        lostClinicName="Sunrise Clinic"
+        onSelect={() => Promise.resolve()}
+        onSignOut={() => undefined}
+      />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'You no longer have access to Sunrise Clinic.',
+    );
+    expect(screen.getByRole('button', { name: /Harbor Clinic/ })).toBeInTheDocument();
+  });
+
+  it('says it above the empty state too, when no other clinic is left', () => {
+    renderWithProviders(
+      <SelectClinic
+        memberships={[]}
+        lostClinicName="Sunrise Clinic"
+        onSelect={() => Promise.resolve()}
+        onSignOut={() => undefined}
+      />,
+    );
+    expect(screen.getByText('You no longer have access to Sunrise Clinic.')).toBeInTheDocument();
+    expect(screen.getByText("You don't have a clinic you can open right now.")).toBeInTheDocument();
+  });
+
+  it('shows no notice when the person simply has to choose', () => {
+    renderWithProviders(
+      <SelectClinic
+        memberships={[SUNRISE]}
+        onSelect={() => Promise.resolve()}
+        onSignOut={() => undefined}
+      />,
+    );
+    expect(screen.queryByText(/You no longer have access to/)).not.toBeInTheDocument();
+  });
+
   it('says what to do when there is no usable clinic, and offers to sign out', async () => {
     const onSignOut = vi.fn();
     renderWithProviders(
@@ -133,6 +172,25 @@ describe('SelectClinic', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       "This clinic's access is suspended for now.",
     );
+  });
+
+  it('offers a platform admin a way to the Clinics tab, and nobody else', () => {
+    const { rerender } = renderWithProviders(
+      <SelectClinic
+        memberships={[]}
+        onSelect={vi.fn()}
+        onSignOut={() => undefined}
+        showAdminLink
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Go to the platform overview' })).toHaveAttribute(
+      'href',
+      '/admin',
+    );
+    rerender(<SelectClinic memberships={[]} onSelect={vi.fn()} onSignOut={() => undefined} />);
+    expect(
+      screen.queryByRole('link', { name: 'Go to the platform overview' }),
+    ).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

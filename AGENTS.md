@@ -36,7 +36,7 @@ Dockerfile, compose file or nginx config, `scripts/docker-files.spec.ts` must st
 ```
 src/app/            providers, router, root layout, boot, global pages
 src/routes/         TanStack Router file routes: thin (guard + compose); logic lives in features/
-src/features/<x>/   one folder per product area: api/ (query hooks), components/, then folders by concern
+src/features/<x>/   one folder per product area (auth, account, home, shell, admin, staff): api/ (query hooks), components/, then folders by concern
 src/design-system/  tokens/ (tokens.json is the source), components/, patterns/ (app shell, forms, permissions), tv/ (waiting-room display). Imports nothing from features/api/routes/app
 src/api/            the ONLY place that calls the API: client, errors, session/, generated schema.d.ts
 src/lib/            datetime/ (the only UTC<->clinic-time code), money.ts, preferences.ts, zod.ts, small helpers
@@ -64,12 +64,12 @@ tests/e2e/          Playwright, <feature>.spec.ts
   argument take **one object** with named fields. Two arguments of different types, none optional, may stay
   positional. Component props are always an object. No placeholder arguments; no parameter nothing reads.
 - **Data fetching:** only in a feature's `api/` hooks (TanStack Query), never inside design-system components.
-  Query keys for clinic data start with the active clinic id. All API failures are thrown as `ApiError`.
+  Query keys for clinic data start with the active clinic id (`useActiveTenantId()`; a list that keeps the previous page while loading must do so only within the same clinic); platform admin data (`/admin/*`) starts with `'admin'`. All API failures are thrown as `ApiError`. A `4xx` is not retried.
   Branch on `error.code`, never on `error.message`; user text comes from `src/api/error-messages.ts`.
 - **Time and money:** the API speaks UTC. Convert only through `src/lib/datetime`; the time zone is always an
   explicit argument, never the computer's. Never write an amount as a float.
 - **Permissions:** drive menus and buttons from `GET /me` `permissions`, not from role names. The server enforces
-  them anyway. Hide what a role can never do; show read-only with a reason; never a bare disabled button.
+  them anyway. Hide what a role can never do; show read-only with a reason; never a bare disabled button. A clinic page that needs a permission sits under `<RequirePermission>` (`src/app/RequirePermission.tsx`), so a typed address shows "no access" and never asks for the data.
 - **Tokens:** the access token lives in `src/api/session/token-store.ts` (memory). No patient data, token or
   typed form value goes in browser storage, a URL, a log or an error report.
 - **Design tokens:** colours, type, spacing, radius and shadows come from `tokens.json` only. Use role classes
@@ -79,7 +79,7 @@ tests/e2e/          Playwright, <feature>.spec.ts
   icon-only buttons (a visible label is required), 44 px targets. Every component has a `*.spec.tsx` (with axe) and
   a `*.stories.tsx` showing every state; `stories.spec.tsx` runs axe over every story. Merge classes with `cn()` from
   `@/lib/cn.ts` (it knows our type scale: plain `twMerge` drops colours next to `text-body-lg`).
-- **Nothing may inject styles at runtime** (the CSP has no `'unsafe-inline'`): no Sonner, no CSS-in-JS. Toasts are
+- **Nothing may inject styles at runtime** (the CSP has no `'unsafe-inline'`): no Sonner, no CSS-in-JS. Radix's scroll lock does, so the build aliases `react-remove-scroll` to `src/design-system/scroll-lock.tsx`; keep that alias in `vite.config.ts`, `vitest.config.ts` and `.storybook/main.ts`. Toasts are
   `notify.success/info` only, for confirmations; errors and actions stay on the page until dismissed.
 - **Dialogs** use `useReturnFocus` (Radix returns focus only to its own Trigger). Forms: `FormErrorSummary` +
   `applyApiErrors` (maps the API's dotted `details[].field` onto fields, keeps what was typed).

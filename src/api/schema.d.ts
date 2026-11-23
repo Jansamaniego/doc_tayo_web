@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/email/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_verifyEmail_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/account/setup": {
         parameters: {
             query?: never;
@@ -209,6 +225,22 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        patch: operations["MeController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/me/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeController_changeEmail_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -276,7 +308,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/invitations": {
+    "/api/v1/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MembersController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/members/{membershipId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MembersController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["MembersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/members/{membershipId}/suspend": {
         parameters: {
             query?: never;
             header?: never;
@@ -284,6 +348,54 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        put?: never;
+        post: operations["MembersController_suspend_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/members/{membershipId}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MembersController_reactivate_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/members/{membershipId}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MembersController_remove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["InvitationsController_list_v1"];
         put?: never;
         post: operations["InvitationsController_create_v1"];
         delete?: never;
@@ -306,6 +418,150 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{invitationId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["InvitationsController_revoke_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RolesController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RolesController_permissions_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tenants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminTenantsController_list_v1"];
+        put?: never;
+        post: operations["AdminTenantsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tenants/{tenantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminTenantsController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tenants/{tenantId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminTenantsController_changeStatus_v1"];
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminUsersController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminUsersController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminUsersController_changeStatus_v1"];
         trace?: never;
     };
     "/api/health": {
@@ -450,6 +706,10 @@ export interface components {
             token: string;
             newPassword: string;
         };
+        VerifyEmailDto: {
+            /** @description The token from the emailed link. */
+            token: string;
+        };
         AccountSetupDto: {
             /** @description The token from the emailed link. */
             token: string;
@@ -545,6 +805,11 @@ export interface components {
             emailVerifiedAt: string | null;
             /** Format: date-time */
             passwordChangedAt: string | null;
+            /**
+             * @description `platform_admin` may use `/admin/*` (show the Clinics and Users tabs). It grants no access to any clinic.
+             * @enum {string}
+             */
+            platformRole: "none" | "platform_admin";
             /** Format: uuid */
             activeTenantId: string | null;
             /**
@@ -558,6 +823,15 @@ export interface components {
         };
         MeProfileEnvelope: {
             data: components["schemas"]["MeProfileData"];
+        };
+        UpdateProfileDto: {
+            /** @example Dr. Maria Santos */
+            fullName: string;
+        };
+        ChangeEmailDto: {
+            /** @example maria.santos@clinic.example */
+            newEmail: string;
+            currentPassword: string;
         };
         ChangePasswordDto: {
             currentPassword: string;
@@ -580,6 +854,77 @@ export interface components {
         };
         SessionListEnvelope: {
             data: components["schemas"]["SessionResponse"][];
+        };
+        MemberRoleResponse: {
+            /** Format: uuid */
+            id: string;
+            /** @example doctor */
+            key: string;
+            /** @example Doctor */
+            name: string;
+        };
+        MemberResponse: {
+            /** Format: uuid */
+            membershipId: string;
+            /** Format: uuid */
+            userId: string;
+            email: string;
+            fullName: string;
+            /** @enum {string} */
+            status: "invited" | "active" | "suspended" | "removed";
+            jobTitle: string | null;
+            roles: components["schemas"]["MemberRoleResponse"][];
+            /** Format: date-time */
+            joinedAt: string | null;
+        };
+        MemberListEnvelope: {
+            data: components["schemas"]["MemberResponse"][];
+            meta: components["schemas"]["PageMetaResponse"];
+        };
+        MemberEnvelope: {
+            data: components["schemas"]["MemberResponse"];
+        };
+        UpdateMemberDto: {
+            /** @description Replaces the member’s roles. Ids from `GET /roles`; `owner` only for owners. */
+            roleIds?: string[];
+            /** @description `null` clears it. */
+            jobTitle?: string | null;
+        };
+        InvitationRoleResponse: {
+            /** Format: uuid */
+            id: string;
+            /** @example doctor */
+            key: string;
+            /** @example Doctor */
+            name: string;
+        };
+        InvitationInviterResponse: {
+            /** Format: uuid */
+            membershipId: string;
+            fullName: string;
+        };
+        InvitationListItemResponse: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            /** Format: uuid */
+            roleId: string;
+            /** @enum {string} */
+            status: "pending" | "accepted" | "revoked" | "expired";
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            createdAt: string;
+            role: components["schemas"]["InvitationRoleResponse"];
+            invitedBy: components["schemas"]["InvitationInviterResponse"];
+            /** Format: date-time */
+            acceptedAt: string | null;
+            /** Format: date-time */
+            revokedAt: string | null;
+        };
+        InvitationListEnvelope: {
+            data: components["schemas"]["InvitationListItemResponse"][];
+            meta: components["schemas"]["PageMetaResponse"];
         };
         CreateInvitationDto: {
             /** @example new.doctor@clinic.example */
@@ -606,8 +951,143 @@ export interface components {
         InvitationEnvelope: {
             data: components["schemas"]["InvitationResponse"];
         };
+        RoleResponse: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * @description Stable machine key.
+             * @example doctor
+             */
+            key: string;
+            /** @example Doctor */
+            name: string;
+            isSystem: boolean;
+            /**
+             * @example [
+             *       "branches.read",
+             *       "tenant.read"
+             *     ]
+             */
+            permissions: string[];
+            /** @description Whether the caller may give this role through `PATCH /members/:id` (owner: owners only). */
+            assignable: boolean;
+        };
+        RoleListEnvelope: {
+            data: components["schemas"]["RoleResponse"][];
+        };
+        PermissionResponse: {
+            /** @example members.read */
+            key: string;
+            description: string;
+        };
+        PermissionListEnvelope: {
+            data: components["schemas"]["PermissionResponse"][];
+        };
+        CreateTenantDto: {
+            /** @example Bayview Clinic */
+            name: string;
+            /**
+             * @description Lower-case letters and digits separated by single hyphens.
+             * @example bayview-clinic
+             */
+            slug: string;
+            /** @example owner@bayview.example */
+            ownerEmail: string;
+            /** @example Dr. Maria Santos */
+            ownerFullName: string;
+            /**
+             * @default Asia/Manila
+             * @example Asia/Manila
+             */
+            timezone: string;
+        };
+        AdminTenantResponse: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            status: "active" | "suspended" | "deactivated";
+            /** @example Asia/Manila */
+            timezone: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AdminTenantEnvelope: {
+            data: components["schemas"]["AdminTenantResponse"];
+        };
+        AdminTenantListItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            status: "active" | "suspended" | "deactivated";
+            /** @example Asia/Manila */
+            timezone: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** @description Active members. */
+            memberCount: number;
+        };
+        AdminTenantListEnvelope: {
+            data: components["schemas"]["AdminTenantListItem"][];
+            meta: components["schemas"]["PageMetaResponse"];
+        };
+        AdminTenantOwner: {
+            /** Format: uuid */
+            userId: string;
+            fullName: string;
+            email: string;
+        };
+        AdminTenantDetail: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            status: "active" | "suspended" | "deactivated";
+            /** @example Asia/Manila */
+            timezone: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** @description Active members. */
+            memberCount: number;
+            /** @description Active owners. */
+            owners: components["schemas"]["AdminTenantOwner"][];
+        };
+        AdminTenantDetailEnvelope: {
+            data: components["schemas"]["AdminTenantDetail"];
+        };
+        TenantStatusDto: {
+            /** @enum {string} */
+            status: "active" | "suspended" | "deactivated";
+        };
+        AdminUserResponse: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            fullName: string;
+            /** @enum {string} */
+            status: "pending" | "active" | "deactivated";
+            /** @enum {string} */
+            platformRole: "none" | "platform_admin";
+            /** @description Memberships that are not removed. */
+            membershipCount: number;
+        };
+        AdminUserListEnvelope: {
+            data: components["schemas"]["AdminUserResponse"][];
+            meta: components["schemas"]["PageMetaResponse"];
+        };
+        AdminUserEnvelope: {
+            data: components["schemas"]["AdminUserResponse"];
+        };
+        UserStatusDto: {
+            /** @enum {string} */
+            status: "active" | "deactivated";
+        };
         /** @enum {string} */
-        ErrorCode: "VALIDATION_FAILED" | "BAD_REQUEST" | "MALFORMED_JSON" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ROUTE_NOT_FOUND" | "NOT_FOUND" | "CONFLICT_UNIQUE" | "CONFLICT_REFERENCE" | "NOT_READY" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "TENANT_NOT_SELECTED" | "TENANT_SUSPENDED" | "TENANT_DEACTIVATED" | "TENANT_ACCESS_DENIED" | "INVALID_CREDENTIALS" | "ACCESS_TOKEN_EXPIRED" | "TOKEN_INVALID" | "ROLE_NOT_ASSIGNABLE" | "CONFLICT" | "METHOD_NOT_ALLOWED" | "RATE_LIMITED";
+        ErrorCode: "VALIDATION_FAILED" | "BAD_REQUEST" | "MALFORMED_JSON" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ROUTE_NOT_FOUND" | "NOT_FOUND" | "CONFLICT_UNIQUE" | "CONFLICT_REFERENCE" | "NOT_READY" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "TENANT_NOT_SELECTED" | "TENANT_SUSPENDED" | "TENANT_DEACTIVATED" | "TENANT_ACCESS_DENIED" | "INVALID_CREDENTIALS" | "ACCESS_TOKEN_EXPIRED" | "TOKEN_INVALID" | "ROLE_NOT_ASSIGNABLE" | "LAST_OWNER" | "OWNER_REQUIRED" | "SELF_ACTION_FORBIDDEN" | "CONFLICT" | "METHOD_NOT_ALLOWED" | "RATE_LIMITED";
         /** @enum {string} */
         FieldErrorCode: "REQUIRED" | "INVALID_FORMAT" | "INVALID_TYPE" | "INVALID_VALUE" | "OUT_OF_RANGE" | "TOO_SHORT" | "TOO_LONG" | "UNKNOWN_FIELD" | "PASSWORD_TOO_COMMON" | "PASSWORD_CONTAINS_EMAIL" | "PASSWORD_INCORRECT";
         FieldErrorBody: {
@@ -868,6 +1348,55 @@ export interface operations {
             };
             /** @description TOKEN_INVALID or VALIDATION_FAILED */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RATE_LIMITED (see Retry-After) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AuthController_verifyEmail_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailDto"];
+            };
+        };
+        responses: {
+            /** @description Email changed and verified; every session of the user is revoked (sign in with the new address). */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description TOKEN_INVALID or VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT_UNIQUE: the address got taken after the request. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1271,6 +1800,81 @@ export interface operations {
             };
         };
     };
+    MeController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileDto"];
+            };
+        };
+        responses: {
+            /** @description The updated profile. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeProfileEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MeController_changeEmail_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeEmailDto"];
+            };
+        };
+        responses: {
+            /** @description Always 202 when the password is right: a link goes to the new address if it is free (no enumeration). */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptedEnvelope"];
+                };
+            };
+            /** @description VALIDATION_FAILED (PASSWORD_INCORRECT on currentPassword) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     MeController_changePassword_v1: {
         parameters: {
             query?: never;
@@ -1396,6 +2000,358 @@ export interface operations {
             };
         };
     };
+    MembersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                /** @description Without it, every member except removed ones. */
+                status?: "invited" | "active" | "suspended" | "removed";
+                /** @description Part of the name or email (case-insensitive). */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MembersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's member or role). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MembersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMemberDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's member or role). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MembersController_suspend_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suspended: the member loses access to this clinic on their next request. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's member or role). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MembersController_reactivate_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active again. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's member or role). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MembersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed (the row is kept for history). Coming back is by a new invitation. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's member or role). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InvitationsController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                status?: "pending" | "accepted" | "revoked" | "expired";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     InvitationsController_create_v1: {
         parameters: {
             query?: never;
@@ -1509,6 +2465,477 @@ export interface operations {
                 };
             };
             /** @description CONFLICT: already accepted or revoked. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InvitationsController_revoke_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked: the emailed link no longer works. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's invitation). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT: already accepted or revoked. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    RolesController_list_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    RolesController_permissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermissionListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminTenantsController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                q?: string;
+                status?: "active" | "suspended" | "deactivated";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTenantListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN: not a platform admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminTenantsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTenantDto"];
+            };
+        };
+        responses: {
+            /** @description Clinic onboarded: roles, default branch, owner membership; the owner gets a setup link (new account) or a notice (existing account). */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTenantEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN: not a platform admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT_UNIQUE: the slug is taken. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminTenantsController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTenantDetailEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN: not a platform admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminTenantsController_changeStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TenantStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Status changed; members see it on their next request. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN: not a platform admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT: not allowed from the current status (deactivation is one-way). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminUsersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                q?: string;
+                status?: "pending" | "active" | "deactivated";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN: not a platform admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminUsersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN: not a platform admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AdminUsersController_changeStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Deactivated (every session ends, sign-in refused) or reactivated. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, or SELF_ACTION_FORBIDDEN (your own account). */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT: already in that status, or a pending account (it activates through its own link). */
             409: {
                 headers: {
                     [name: string]: unknown;

@@ -23,7 +23,18 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       lingui({ macroTransform: true }),
     ],
-    resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+    resolve: {
+      alias: [
+        { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+        // Radix's scroll lock inserts a <style> element, which the production CSP forbids.
+        {
+          find: /^react-remove-scroll$/,
+          replacement: fileURLToPath(
+            new URL('./src/design-system/scroll-lock.tsx', import.meta.url),
+          ),
+        },
+      ],
+    },
     build: { manifest: true },
     html: { cspNonce: DEV_STYLE_NONCE },
     server: {

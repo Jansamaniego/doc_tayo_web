@@ -144,9 +144,11 @@ describe('Dialog', () => {
 function ConfirmHarness({
   onConfirm = () => undefined,
   irreversible = false,
+  typeToConfirm,
 }: {
   onConfirm?: () => void;
   irreversible?: boolean;
+  typeToConfirm?: string;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -166,11 +168,98 @@ function ConfirmHarness({
         description="They will lose access immediately."
         confirmLabel="Remove"
         irreversible={irreversible}
+        {...(typeToConfirm && { typeToConfirm })}
         onConfirm={onConfirm}
       />
     </>
   );
 }
+
+describe('overlays and the Content-Security-Policy', () => {
+  // The production policy has no 'unsafe-inline' for styles, so an overlay must never add a <style>
+  // element (Radix's scroll lock does, unless it is replaced: src/design-system/scroll-lock.tsx).
+  it('opening a dialog adds no <style> element, and locks the page scroll only while open', async () => {
+    const before = document.querySelectorAll('style').length;
+    renderWithProviders(<ConfirmHarness />);
+    await userEvent.click(screen.getByRole('button', { name: 'Remove Dr. Santos' }));
+    await screen.findByRole('alertdialog');
+    expect(document.querySelectorAll('style')).toHaveLength(before);
+    expect(document.body).toHaveAttribute('data-scroll-locked');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => {
+      expect(document.body).not.toHaveAttribute('data-scroll-locked');
+    });
+    expect(document.querySelectorAll('style')).toHaveLength(before);
+  });
+});
+
+describe('ConfirmDialog with typed confirmation (permanent actions)', () => {
+  async function open() {
+    await userEvent.click(screen.getByRole('button', { name: 'Remove Dr. Santos' }));
+    return screen.findByRole('alertdialog');
+  }
+
+  it('asks for the exact text, with a visible label, and keeps Cancel as the initial focus', async () => {
+    renderWithProviders(<ConfirmHarness typeToConfirm="bayview-clinic" />);
+    await open();
+    expect(screen.getByLabelText('Type bayview-clinic to confirm')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
+  });
+
+  it('does nothing and says what is missing while the text does not match, and the dialog stays open', async () => {
+    const onConfirm = vi.fn();
+    renderWithProviders(<ConfirmHarness typeToConfirm="bayview-clinic" onConfirm={onConfirm} />);
+    await open();
+    const confirm = screen.getByRole('button', { name: 'Remove' });
+    expect(confirm).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(confirm);
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText('Type bayview-clinic to confirm'), 'bayview');
+    expect(confirm).toHaveAccessibleDescription(/Type bayview-clinic exactly to continue/);
+    await userEvent.click(confirm);
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('confirms once the text matches (ignoring spaces around it) and closes', async () => {
+    const onConfirm = vi.fn();
+    renderWithProviders(<ConfirmHarness typeToConfirm="bayview-clinic" onConfirm={onConfirm} />);
+    await open();
+    await userEvent.type(
+      screen.getByLabelText('Type bayview-clinic to confirm'),
+      ' bayview-clinic ',
+    );
+    const confirm = screen.getByRole('button', { name: 'Remove' });
+    expect(confirm).not.toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(confirm);
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('starts empty each time it opens, and Escape cancels', async () => {
+    const onConfirm = vi.fn();
+    renderWithProviders(<ConfirmHarness typeToConfirm="bayview-clinic" onConfirm={onConfirm} />);
+    await open();
+    await userEvent.type(screen.getByLabelText('Type bayview-clinic to confirm'), 'bayview-clinic');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+    await open();
+    expect(screen.getByLabelText('Type bayview-clinic to confirm')).toHaveValue('');
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('has no accessibility violations', async () => {
+    renderWithProviders(<ConfirmHarness irreversible typeToConfirm="bayview-clinic" />);
+    await open();
+    expect(
+      await axe(document.body, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations();
+  });
+});
 
 describe('ConfirmDialog (destructive actions)', () => {
   it('names the thing and the consequence, and puts initial focus on Cancel', async () => {

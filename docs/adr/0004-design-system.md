@@ -20,5 +20,5 @@ Status: accepted for implementation (2026-11-21). **Product-owner approval of th
 ## Consequences
 
 - Adding a colour means a token, then a declared pairing, then a passing contrast test.
-- Anything that injects styles at runtime cannot be used (see docs/deployment.md).
+- Anything that injects styles at runtime cannot be used (see docs/deployment.md). **Radix's modal scroll lock does** (`react-remove-scroll` inserts a `<style>`), found in Phase 4 when the e2e first opened a dialog with the CSP check on. It is replaced at build time by `src/design-system/scroll-lock.tsx` (an attribute styled in `index.css`), through a Vite alias; a spec asserts that opening a dialog adds no `<style>`.
 - Stories double as tests: every story is checked with axe in Vitest and in a real browser through the e2e gallery.

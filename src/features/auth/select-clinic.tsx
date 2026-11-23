@@ -4,27 +4,35 @@ import { useState } from 'react';
 
 import { messageForError } from '@/api/error-messages.ts';
 import { isApiError, networkError, type ApiError } from '@/api/errors.ts';
-import type { Membership } from '@/api/session/session-store.ts';
+import { isUsableMembership, type Membership } from '@/api/session/session-store.ts';
 import { StatusPill } from '@/design-system/components/badge.tsx';
 import { Alert } from '@/design-system/components/alert.tsx';
 import { Button } from '@/design-system/components/button.tsx';
+import { AppLink } from '@/lib/app-link.tsx';
 
 export interface SelectClinicProps {
   memberships: Membership[];
   /** Switches to the clinic. Throws an ApiError if it cannot be opened. */
   onSelect: (tenantId: string) => Promise<void>;
   onSignOut: () => void;
+  /** The clinic an admin just took away from this person, when the app sent them here for that. */
+  lostClinicName?: string;
+  /** A platform admin can go to the Clinics tab instead (it needs no clinic). */
+  showAdminLink?: boolean;
 }
 
-const isUsable = (membership: Membership): boolean =>
-  membership.membershipStatus === 'active' && membership.tenantStatus === 'active';
-
-export function SelectClinic({ memberships, onSelect, onSignOut }: SelectClinicProps) {
+export function SelectClinic({
+  memberships,
+  onSelect,
+  onSignOut,
+  lostClinicName,
+  showAdminLink = false,
+}: SelectClinicProps) {
   const { t } = useLingui();
   const [pending, setPending] = useState<string | undefined>();
   const [failure, setFailure] = useState<ApiError | undefined>();
-  const usable = memberships.filter(isUsable);
-  const unavailable = memberships.filter((membership) => !isUsable(membership));
+  const usable = memberships.filter(isUsableMembership);
+  const unavailable = memberships.filter((membership) => !isUsableMembership(membership));
 
   async function choose(tenantId: string): Promise<void> {
     setPending(tenantId);
@@ -48,6 +56,9 @@ export function SelectClinic({ memberships, onSelect, onSignOut }: SelectClinicP
   return (
     <div className="flex flex-col gap-6">
       <h1>{t`Choose a clinic`}</h1>
+      {lostClinicName !== undefined && (
+        <Alert variant="warning">{t`You no longer have access to ${lostClinicName}.`}</Alert>
+      )}
       {failure && <Alert variant="danger">{messageForError(failure)}</Alert>}
 
       {usable.length > 0 ? (
@@ -84,6 +95,12 @@ export function SelectClinic({ memberships, onSelect, onSignOut }: SelectClinicP
             </Button>
           </div>
         </div>
+      )}
+
+      {showAdminLink && (
+        <AppLink href="/admin" standalone className="self-start">
+          {t`Go to the platform overview`}
+        </AppLink>
       )}
 
       {unavailable.length > 0 && (

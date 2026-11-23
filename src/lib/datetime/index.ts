@@ -94,3 +94,21 @@ export function formatTime({ iso, timeZone }: { iso: string; timeZone: string })
     .replace(/[\u202f\u00a0]/g, ' ')
     .replace(/\b(am|pm)\b/i, (suffix) => suffix.toUpperCase());
 }
+
+export interface TimeZoneOption {
+  value: string;
+  label: string;
+}
+
+let cachedTimeZoneOptions: TimeZoneOption[] | undefined;
+
+/**
+ * Every IANA zone the browser knows, as picker options. Built once: the list has about 400 entries
+ * and every form that offers a zone (new clinic, clinic profile, branch) uses this one.
+ */
+export function timeZoneOptions(): TimeZoneOption[] {
+  cachedTimeZoneOptions ??= [...new Set([...Intl.supportedValuesOf('timeZone'), 'UTC'])].map(
+    (zone) => ({ value: zone, label: zone }),
+  );
+  return cachedTimeZoneOptions;
+}

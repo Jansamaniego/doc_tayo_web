@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro';
-import { Outlet, useRouter } from '@tanstack/react-router';
-import { House } from 'lucide-react';
+import { Outlet, useRouter, useRouterState } from '@tanstack/react-router';
+import { Building2, Hospital, House, LayoutDashboard, Users, UsersRound } from 'lucide-react';
 import { useState } from 'react';
 
 import { messageForError } from '@/api/error-messages.ts';
@@ -17,6 +17,9 @@ import { ClinicSwitcher } from '@/design-system/patterns/clinic-switcher.tsx';
 import { UserMenu } from '@/design-system/patterns/user-menu.tsx';
 import { useSessionController } from '@/features/auth/session-context.tsx';
 import { useSpaClick } from '@/lib/app-link.tsx';
+
+// A brand name is not translated.
+const PRODUCT_NAME = 'DocTayo';
 
 function RouterNavLink({ href, className, children, current }: RenderLinkProps) {
   const onClick = useSpaClick({ href });
@@ -38,41 +41,101 @@ export function AuthenticatedShell() {
   const session = useSession();
   const controller = useSessionController();
   const router = useRouter();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [confirmingSignOutAll, setConfirmingSignOutAll] = useState(false);
   const [switchFailure, setSwitchFailure] = useState<ApiError | undefined>();
 
   if (session.status !== 'signed-in') return null;
   const membership = activeMembership(session);
 
-  // Only Home exists so far; each later phase adds its items here, with the permission key that shows it.
+  const isAdmin = session.platformRole === 'platform_admin';
+  // Clinic pages (only with a clinic chosen) first, then the platform tabs. Home, Staff and Clinic
+  // so far; each later phase adds its items here, with the permission key that shows it.
   const items: NavItem[] = [
-    {
-      id: 'home',
-      label: t`Home`,
-      icon: <House aria-hidden="true" className="size-6" />,
-      href: '/',
-    },
+    ...(membership
+      ? [
+          {
+            id: 'home',
+            label: t`Home`,
+            icon: <House aria-hidden="true" className="size-6" />,
+            href: '/',
+          },
+          {
+            id: 'staff',
+            label: t`Staff`,
+            icon: <UsersRound aria-hidden="true" className="size-6" />,
+            href: '/staff',
+            requires: 'members.read',
+          },
+          {
+            id: 'clinic',
+            label: t`Clinic`,
+            icon: <Hospital aria-hidden="true" className="size-6" />,
+            href: '/clinic',
+            requires: 'tenant.read',
+          },
+        ]
+      : []),
+    ...(isAdmin
+      ? [
+          {
+            id: 'admin-overview',
+            label: t`Overview`,
+            icon: <LayoutDashboard aria-hidden="true" className="size-6" />,
+            href: '/admin',
+          },
+          {
+            id: 'admin-clinics',
+            label: t`Clinics`,
+            icon: <Building2 aria-hidden="true" className="size-6" />,
+            href: '/admin/clinics',
+          },
+          {
+            id: 'admin-users',
+            label: t`Users`,
+            icon: <Users aria-hidden="true" className="size-6" />,
+            href: '/admin/users',
+          },
+        ]
+      : []),
   ];
+  const currentId = pathname.startsWith('/admin/users')
+    ? 'admin-users'
+    : pathname.startsWith('/admin/clinics')
+      ? 'admin-clinics'
+      : pathname.startsWith('/admin')
+        ? 'admin-overview'
+        : pathname.startsWith('/staff')
+          ? 'staff'
+          : pathname.startsWith('/clinic')
+            ? 'clinic'
+            : pathname === '/'
+              ? 'home'
+              : '';
 
   return (
     <AppShell
       items={items}
       permissions={session.permissions}
-      currentId="home"
+      currentId={currentId}
       renderLink={(props) => <RouterNavLink {...props} />}
       clinic={
-        <ClinicSwitcher
-          clinics={session.memberships
-            .filter((m) => m.membershipStatus === 'active')
-            .map((m) => ({ id: m.tenantId, name: m.tenantName, status: m.tenantStatus }))}
-          currentId={membership?.tenantId ?? ''}
-          onSelect={(tenantId) => {
-            setSwitchFailure(undefined);
-            controller.switchClinic(tenantId).catch((error: unknown) => {
-              setSwitchFailure(isApiError(error) ? error : networkError(error));
-            });
-          }}
-        />
+        membership ? (
+          <ClinicSwitcher
+            clinics={session.memberships
+              .filter((m) => m.membershipStatus === 'active')
+              .map((m) => ({ id: m.tenantId, name: m.tenantName, status: m.tenantStatus }))}
+            currentId={membership.tenantId}
+            onSelect={(tenantId) => {
+              setSwitchFailure(undefined);
+              controller.switchClinic(tenantId).catch((error: unknown) => {
+                setSwitchFailure(isApiError(error) ? error : networkError(error));
+              });
+            }}
+          />
+        ) : (
+          <span className="font-bold">{PRODUCT_NAME}</span>
+        )
       }
       user={
         <UserMenu

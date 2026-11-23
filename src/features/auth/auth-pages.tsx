@@ -11,17 +11,11 @@ import { forgetEmailToken } from './fragment-token.ts';
 import { ForgotPasswordForm } from './forgot-password-form.tsx';
 import { LoginForm, type LoginNotice } from './login-form.tsx';
 import { ResetPasswordForm } from './reset-password-form.tsx';
-import { safeRedirect } from './safe-redirect.ts';
 import { SelectClinic } from './select-clinic.tsx';
 import { useSessionController } from './session-context.tsx';
+import { VerifyEmailForm } from './verify-email-form.tsx';
 
-export function LoginPage({
-  redirect,
-  notice,
-}: {
-  redirect: string | undefined;
-  notice: LoginNotice | undefined;
-}) {
+export function LoginPage({ notice }: { notice: LoginNotice | undefined }) {
   const { t } = useLingui();
   const router = useRouter();
   const session = useSession();
@@ -31,7 +25,7 @@ export function LoginPage({
       <LoginForm
         notice={notice ?? sessionNotice}
         onSignedIn={() => {
-          void router.navigate({ href: safeRedirect(redirect) });
+          void router.navigate({ to: '/' });
         }}
       />
     </AuthPage>
@@ -86,6 +80,26 @@ export function AcceptInvitationPage({ token }: { token: string | null }) {
   );
 }
 
+export function VerifyEmailPage({ token }: { token: string | null }) {
+  const { t } = useLingui();
+  const router = useRouter();
+  const controller = useSessionController();
+  return (
+    <AuthPage title={t`Confirm your new email address`}>
+      <VerifyEmailForm
+        token={token}
+        onDone={() => {
+          forgetEmailToken();
+          // The server ended every session of this person: end this one here too, without asking it.
+          void controller
+            .endSession('email-changed')
+            .then(() => router.navigate({ to: '/login', search: { notice: 'email-changed' } }));
+        }}
+      />
+    </AuthPage>
+  );
+}
+
 export function SelectClinicPage() {
   const { t } = useLingui();
   const router = useRouter();
@@ -106,6 +120,8 @@ export function SelectClinicPage() {
         onSignOut={() => {
           void controller.signOut();
         }}
+        {...(session.lostClinicName !== undefined && { lostClinicName: session.lostClinicName })}
+        showAdminLink={session.platformRole === 'platform_admin'}
       />
     </AuthPage>
   );

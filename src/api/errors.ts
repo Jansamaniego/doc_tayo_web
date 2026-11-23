@@ -40,6 +40,9 @@ const ERROR_CODES: Record<ErrorCode, true> = {
   ACCESS_TOKEN_EXPIRED: true,
   TOKEN_INVALID: true,
   ROLE_NOT_ASSIGNABLE: true,
+  LAST_OWNER: true,
+  OWNER_REQUIRED: true,
+  SELF_ACTION_FORBIDDEN: true,
   CONFLICT: true,
   METHOD_NOT_ALLOWED: true,
   RATE_LIMITED: true,
@@ -170,4 +173,9 @@ export function networkError(cause: unknown): ApiError {
     details: [],
     cause,
   });
+}
+
+/** Whatever was thrown, as an ApiError (the client throws ApiErrors, but a type cannot say so). */
+export function asApiError(error: unknown): ApiError {
+  return isApiError(error) ? error : networkError(error);
 }

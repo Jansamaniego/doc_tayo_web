@@ -1,12 +1,12 @@
-# Authentication (Phase 3)
+# Authentication (Phases 3–4)
 
-Source of truth for how people sign in. Design and decisions: [plans/02-authentication.md](../plans/02-authentication.md) and ADR-0011, -0012, -0013. Code: `src/modules/auth` (`session/`, `password/`, `flows/`), `src/modules/users`, `src/modules/mail`, `src/modules/maintenance`.
+Source of truth for how people sign in. Design and decisions: [plans/02-authentication.md](../plans/02-authentication.md) and ADR-0011, -0012, -0013. Phase 4 additions (profile, email change, platform role, account status): [plans/03-user-management-and-authorization.md](../plans/03-user-management-and-authorization.md). Code: `src/modules/auth` (`session/`, `password/`, `flows/`), `src/modules/users`, `src/modules/admin`, `src/modules/mail`, `src/modules/maintenance`.
 
 ## The model in one minute
 
 - **Passwords** are hashed with Argon2id. Policy: 10–128 characters (counted as Unicode code points, NFKC-normalised), not on the bundled common-password list, not containing the account's email. No composition rules.
 - **Access token**: a JWT (HS256, 15 minutes) carrying only `sub` (user), `sid` (session), `typ` (`staff`), `iat`, `exp`, `iss`, `aud`. It has **no tenant, role or permission**, so none of those can be stale.
-- **Session**: a database row per sign-in (14 days idle, 30 days absolute). `JwtAuthenticator` re-reads it on **every** request, so logout, password change/reset and deactivation take effect on the next request. The **active tenant lives on the session** and is changed by `POST /auth/switch-tenant`; it also takes effect on the next request.
+- **Session**: a database row per sign-in (14 days idle, 30 days absolute). `JwtAuthenticator` re-reads it on **every** request (joined to the user, whose `status` must be `active` and whose `platform_role` is read in the same query), so logout, password change/reset, email change, deactivation and a removed platform role take effect on the next request. The **active tenant lives on the session** and is changed by `POST /auth/switch-tenant`; it also takes effect on the next request.
 - **Refresh token**: 256 random bits, stored only as a SHA-256 hash, delivered **only** in an httpOnly cookie. Each use rotates it; presenting an already-rotated one revokes the whole session (reuse detection, no grace window).
 - **Emails** are queued in the same transaction as the change that causes them and sent after commit by the outbox relay.
 
@@ -21,11 +21,15 @@ Source of truth for how people sign in. Design and decisions: [plans/02-authenti
 | `POST /auth/password/forgot` | public | **Always** `202`, whether or not the email has an account. |
 | `POST /auth/password/reset` | public (token) | `204`; every session revoked. `400 TOKEN_INVALID` or `VALIDATION_FAILED`. |
 | `POST /auth/account/setup` | public (token) | `204`; activates an onboarded `pending` owner. |
+| `POST /auth/email/verify` | public (token) | `204`; the address from `POST /me/email` becomes the account's (verified); **every** session revoked (`email_changed`); a notice to the old address. `409 CONFLICT_UNIQUE` if it got taken meanwhile. |
 | `POST /invitations/accept` | public (token) | `204`; joins the clinic. No automatic sign-in. |
-| `GET /me`, `/me/memberships`, `/me/sessions` | signed in | Profile + permissions in the active tenant / memberships / active sessions. |
+| `GET /me`, `/me/memberships`, `/me/sessions` | signed in | Profile, `platformRole` and permissions in the active tenant / memberships / active sessions. |
+| `PATCH /me` | signed in | `200`; `{ fullName }` only (a phone field is `TODO-LATER L-01`). |
+| `POST /me/email` | signed in | `{ newEmail, currentPassword }`. Wrong password `400 PASSWORD_INCORRECT`; otherwise **always** `202`: a 30-minute single-use link goes to the new address only if it is free (no enumeration). |
 | `DELETE /me/sessions/:id` | signed in | `204`; another user's session id is `404`. |
 | `POST /me/password` | signed in | `204`; other sessions revoked, this one kept; a "password changed" email. |
-| `POST /invitations`, `POST /invitations/:id/resend` | `members.invite` | Create / resend (new token, old link dies). |
+| `POST /invitations`, `POST /invitations/:id/resend`, `POST /invitations/:id/revoke` | `members.invite` | Create / resend (new token, old link dies) / revoke (link dies). Listing (`GET /invitations`) needs `members.read`. |
+| `PATCH /admin/users/:id/status` | platform admin | `{ status: active \| deactivated }`; deactivation revokes every session (`user_deactivated`). See [authorization.md](authorization.md). |
 
 Every `/auth/*` and `/me*` response carries `Cache-Control: no-store`.
 
@@ -77,14 +81,14 @@ sequenceDiagram
 | everything else | 300 / minute / IP |
 | `POST /auth/login` | 5 / 15 min per IP + email **and** 30 / 15 min per IP |
 | `POST /auth/refresh` | 30 / minute / IP |
-| `password/forgot`, `password/reset`, `account/setup`, `invitations/accept` | 5 / 15 min / IP |
-| `POST /me/password` | 5 / 15 min / user |
+| `password/forgot`, `password/reset`, `account/setup`, `email/verify`, `invitations/accept` | 5 / 15 min / IP |
+| `POST /me/password`, `POST /me/email` | 5 / 15 min / user (each route counted separately) |
 
 Over the limit: `429 RATE_LIMITED` with `Retry-After`. **Lockout:** 10 consecutive failed logins for an existing active user lock the account for 15 minutes; a locked login answers with the same `429`, even with the right password, so the response never says whether an account exists. The counter is not reset when the lock expires (the next failure locks again); a success, password reset or account setup clears it.
 
 ## Email
 
-Services call `MailQueue.enqueue(tx, kind, payload)` inside their transaction; after commit the relay (polls every second; 10 attempts with backoff) runs the `@OnOutboxMessage` handler, which renders and sends. At-least-once: a duplicate is acceptable, a lost email is not. Links go to the frontend (`APP_PUBLIC_URL`) with the token in the **URL fragment** (`/reset-password#token=…`), which browsers never send to a server. Kinds: `password_reset`, `password_changed`, `account_setup`, `clinic_owner`, `invitation`.
+Services call `MailQueue.enqueue(tx, kind, payload)` inside their transaction; after commit the relay (polls every second; 10 attempts with backoff) runs the `@OnOutboxMessage` handler, which renders and sends. At-least-once: a duplicate is acceptable, a lost email is not. Links go to the frontend (`APP_PUBLIC_URL`) with the token in the **URL fragment** (`/reset-password#token=…`), which browsers never send to a server. Kinds: `password_reset`, `password_changed`, `account_setup`, `clinic_owner`, `invitation`, `email_change` (link to the new address, `/verify-email#token=…`), `email_changed` (notice to the old address).
 
 Transports (`MAIL_TRANSPORT`): `log` (development default, logs the message including links: never use it where logs are shipped), `file` (`var/mail`, gitignored), `memory` (tests), `smtp` (`SMTP_URL`; **required in production**). The outbox tables live in the `nest_outbox` schema, created by our Prisma migration; the store runs with `migrate: false`.
 
@@ -95,6 +99,8 @@ The queued payload contains the raw token until the email is delivered (and in `
 - **Onboarded owners** are created `pending`. Onboarding issues a 7-day single-use setup link in the same transaction; an owner who already has an active account instead gets an ownership notice. `POST /auth/account/setup` sets the password and activates the user.
 - **Invitations**: one role each (never `owner`), 7 days, at most one open invitation per email per clinic (a partial unique index). Accepting needs only the token for an existing active user; a new or still-`pending` user must also send `fullName` and `newPassword`. A deactivated user cannot be brought back this way. A removed membership is re-activated with the newly invited role.
 - **Password reset/change** revoke sessions (reset: all; change: all others) and queue a "password changed" email.
+- **Email change**: `POST /me/email` checks the current password, then issues an `email_change` token (30 minutes; `user_tokens.new_email` holds the address, a check constraint pairs the two) unless the address belongs to someone. Only the newest link works. Opening it switches and verifies the address in one transaction, ends every session, and notifies the old address. A deactivated account cannot complete it.
+- **Profile**: `PATCH /me` edits the global name (not per clinic).
 
 ## Housekeeping
 
@@ -102,7 +108,7 @@ The queued payload contains the raw token until the email is delivered (and in `
 
 ## Audit events
 
-`auth.login`, `auth.login_failed` (existing accounts only), `auth.logout`, `auth.logout_all`, `auth.refresh_reuse_detected`, `auth.tenant_switched` (tenant = the new one), `auth.password_reset_requested`, `auth.password_reset`, `auth.password_changed`, `auth.account_setup`, `auth.session_revoked`, `invitation.created`, `invitation.resent`, `invitation.accepted`. Field names only; never a password, token or email body.
+`auth.login`, `auth.login_failed` (existing accounts only), `auth.logout`, `auth.logout_all`, `auth.refresh_reuse_detected`, `auth.tenant_switched` (tenant = the new one), `auth.password_reset_requested`, `auth.password_reset`, `auth.password_changed`, `auth.account_setup`, `auth.session_revoked`, `invitation.created`, `invitation.resent`, `invitation.accepted`, `invitation.revoked`, `user.profile_updated`, `user.email_change_requested`, `user.email_changed`; platform: `user.deactivated`, `user.reactivated`, `user.platform_role_granted`. Member administration: `member.roles_changed`, `member.updated`, `member.suspended`, `member.reactivated`, `member.removed`. Field names only; never a password, token or email body.
 
 ## Testing helpers
 

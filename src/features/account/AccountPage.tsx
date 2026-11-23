@@ -3,7 +3,9 @@ import type { ReactNode } from 'react';
 
 import { usePageTitle } from '@/lib/use-page-title.ts';
 
+import { ChangeEmailForm } from './change-email-form.tsx';
 import { ChangePasswordForm } from './change-password-form.tsx';
+import { ProfileNameForm } from './profile-name-form.tsx';
 
 export interface AccountPageProps {
   fullName: string;
@@ -21,7 +23,7 @@ function Detail({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-/** The person's own details (read-only: the API has no way to edit a profile yet) and their password. */
+/** The person's own details: their name and email (each changed by its own form) and their password. */
 export function AccountPage({ fullName, email, clinicName, roleNames }: AccountPageProps) {
   const { t } = useLingui();
   usePageTitle(t`My account`);
@@ -37,12 +39,30 @@ export function AccountPage({ fullName, email, clinicName, roleNames }: AccountP
           {t`Your details`}
         </h2>
         <dl className="flex flex-col gap-3">
-          <Detail label={t`Name`}>{fullName}</Detail>
           <Detail label={t`Email`}>{email}</Detail>
-          <Detail label={t`Clinic`}>{clinicName}</Detail>
-          <Detail label={t`Role`}>{roleNames.join(', ')}</Detail>
+          {clinicName !== '' && <Detail label={t`Clinic`}>{clinicName}</Detail>}
+          {roleNames.length > 0 && <Detail label={t`Role`}>{roleNames.join(', ')}</Detail>}
         </dl>
-        <p className="text-ink-muted">{t`To change your name or email, ask your clinic admin.`}</p>
+      </section>
+
+      <section
+        aria-labelledby="name-heading"
+        className="flex flex-col gap-4 rounded-lg border border-divider bg-surface p-6 shadow-1"
+      >
+        <h2 id="name-heading" className="text-h3">
+          {t`Your name`}
+        </h2>
+        <ProfileNameForm fullName={fullName} />
+      </section>
+
+      <section
+        aria-labelledby="email-heading"
+        className="flex flex-col gap-4 rounded-lg border border-divider bg-surface p-6 shadow-1"
+      >
+        <h2 id="email-heading" className="text-h3">
+          {t`Change email`}
+        </h2>
+        <ChangeEmailForm currentEmail={email} />
       </section>
 
       <section

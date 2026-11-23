@@ -10,12 +10,14 @@ Read next, as needed: [authentication.md](authentication.md) (why it works this 
 |---|---|
 | Sign-in, refresh, logout, logout everywhere, switch clinic | **Available** |
 | Forgot/reset password, change password, account setup, accepting an invitation | **Available** |
-| `GET /me`, `/me/memberships`, `/me/sessions`, `DELETE /me/sessions/:id` | **Available** |
+| `GET /me`, `PATCH /me` (name), `/me/memberships`, `/me/sessions`, `DELETE /me/sessions/:id` | **Available** |
+| Email change: `POST /me/email`, then `POST /auth/email/verify` from the emailed link | **Available** |
 | Clinic profile (`GET/PATCH /tenant`) and branches (list, create, view, edit) | **Available** |
-| Invite staff (`POST /invitations`, `/invitations/:id/resend`) | **Available** (needs `members.invite`) |
-| Create a clinic over HTTP | **Not available.** No endpoint until the platform-admin API (Phase 4). Use the dev seed (section 2). |
-| List staff, change roles, remove a member, list or revoke invitations | **Not available** (Phase 4) |
-| `PATCH /me` (edit profile), email change, email verification | **Not available** (Phase 4) |
+| Staff: list, view, change roles and job title, suspend, reactivate, remove (`/members`) | **Available** (`members.read` / `members.manage`; [staff-management-integration.md](staff-management-integration.md)) |
+| Invitations: list, invite, resend, revoke (`/invitations`) | **Available** (`members.read` to list; `members.invite` for the rest; [staff-management-integration.md](staff-management-integration.md)) |
+| Roles and permissions for the staff screens (`GET /roles`, `GET /permissions`) | **Available** (`members.read`) |
+| Platform admin tabs: Clinics and Users (`/admin/*`) | **Available** to platform admins only ([platform-admin-integration.md](platform-admin-integration.md)) |
+| A phone number on the profile | **Not available** (`TODO-LATER L-01` in `later.md`) |
 | Patients, appointments, encounters, prescriptions, billing | **Not available** (Phases 5–6) |
 
 Do not build screens or client code for the "not available" rows; the endpoints do not exist yet.
@@ -28,20 +30,23 @@ docker compose run --rm --build migrate # apply migrations (--build after pullin
 npm run db:seed:dev                     # creates the development clinic and users (see below)
 ```
 
-Without Docker, follow the README quick start, then `npm run db:seed:dev`. The seed uses the `DATABASE_URL` in `.env`; for the Docker database that is port `5434`. It refuses to run in production and is safe to run repeatedly.
+Without Docker, follow the README quick start, then `npm run db:seed:dev`. The seed uses the `DATABASE_URL` in `.env`; for the Docker database that is port `5434`. It refuses to run in production and is safe to run repeatedly; a second run also puts the seeded staff back to active with their original role.
 
-**Seeded accounts** (password for both: `dev-password-change-me-123`):
+**Seeded accounts** (the same password for all: `dev-password-change-me-123`):
 
 | Account | Role | Notes |
 |---|---|---|
 | `owner@sunrise.test` | Owner | every permission; one clinic, "Sunrise Clinic" (branches "Main" and "Quezon City Annex") |
+| `clinic-admin@sunrise.test` | Clinic admin | every permission, but not an owner: cannot give or take the Owner role or change an owner's status (see `OWNER_REQUIRED`) |
+| `doctor@sunrise.test` | Doctor | read-only like the receptionist; no staff screens |
 | `reception@sunrise.test` | Receptionist | read-only: `tenant.read`, `branches.read`; useful for testing hidden/disabled UI and `403` |
+| `admin@doctayo.test` | Platform admin | no clinic; reaches only `/admin/*` ([platform-admin-integration.md](platform-admin-integration.md)) |
 
 Useful URLs: API `http://localhost:3000/api/v1`, Swagger UI `http://localhost:3000/api/docs`, live OpenAPI `http://localhost:3000/api/docs-json` (non-production), health `http://localhost:3000/api/health`.
 
 **API environment the frontend developer must have** (`.env`, see [environment.md](environment.md)): `CORS_ALLOWED_ORIGINS=http://localhost:5173` (your dev origin) and `CORS_ALLOW_CREDENTIALS=true` (without it the refresh cookie is never sent). `localhost` on different ports counts as the **same site**, so the cookie works locally. In production the app and API must share a registrable domain (for example `app.` and `api.`).
 
-**Emails in development** (invitation, reset, setup links): with the default `MAIL_TRANSPORT=log` the API prints each email; the **link is in the body, printed at `debug` log level** (`LOG_LEVEL=debug`, the `.env.example` default). Copy the link from the API console.
+**Emails in development** (invitation, reset, setup and email-change links): with the default `MAIL_TRANSPORT=log` the API prints each email; the **link is in the body, printed at `debug` log level** (`LOG_LEVEL=debug`, the `.env.example` default). Copy the link from the API console.
 
 **Typed client:** generate types from the contract, for example `npx openapi-typescript docs/openapi.json -o src/api/schema.d.ts` (a suggestion; not run as part of this repository). Regenerate whenever `docs/openapi.json` changes. The contract declares the `bearer` security scheme (every operation needs it except the public ones, which have `security: []`) and the error body: every 4xx/5xx response references the `ErrorResponse` schema, whose `ErrorCode` and `FieldErrorCode` enums list every code (see [error-codes.md](error-codes.md)).
 
@@ -89,11 +94,11 @@ export function refreshAccessToken(): Promise<string> {
 
 - A user can belong to several clinics. `login` returns `memberships` (each with `tenantId`, `tenantName`, `tenantStatus`, `membershipStatus`, `roles`: a list of `{ key, name }`, where `key` is the stable machine key such as `owner` and `name` is the display text). Decide what a user may DO from `permissions` (`GET /me`, `switch-tenant`), not from role keys; use roles to label people and `activeTenantId`.
 - `activeTenantId` is set automatically only when the user has **exactly one** active membership in an active clinic. Otherwise it is `null`: show a clinic picker (offer the memberships whose `membershipStatus` and `tenantStatus` are both `active`; show suspended ones as unavailable) and call `POST /auth/switch-tenant` with `{ tenantId }`.
-- Any clinic-scoped call (`/tenant`, `/branches`, `/invitations`) made with no active clinic answers `403 TENANT_NOT_SELECTED`: send the user to the picker.
+- Any clinic-scoped call (`/tenant`, `/branches`, `/members`, `/invitations`, `/roles`) made with no active clinic answers `403 TENANT_NOT_SELECTED`: send the user to the picker. This also happens right after an admin suspends or removes the user in that clinic: the API unselects the clinic on their sessions.
 - `switch-tenant` takes effect on the very next request; **the access token does not change**. Its response gives the new `tenant` and the `permissions` held there.
-- **Menus and buttons:** use `GET /me` → `permissions` (the user's permissions in the active clinic) to show or hide UI. This is for convenience only; the server enforces permissions on every request.
+- **Menus and buttons:** use `GET /me` → `permissions` (the user's permissions in the active clinic) to show or hide UI, and `GET /me` → `platformRole` (`platform_admin` or `none`) for the platform-admin tabs. This is for convenience only; the server enforces permissions on every request.
 
-Current permission keys: `tenant.read`, `tenant.settings.manage`, `branches.read`, `branches.manage`, `members.invite`.
+Current permission keys: `tenant.read`, `tenant.settings.manage`, `branches.read`, `branches.manage`, `members.read`, `members.invite`, `members.manage` (owner and clinic admin hold all of them; doctor, nurse and receptionist hold `tenant.read` and `branches.read`). `GET /permissions` returns the list with descriptions.
 
 ## 6. What to do for each error
 
@@ -112,6 +117,9 @@ Current permission keys: `tenant.read`, `tenant.settings.manage`, `branches.read
 | `NOT_FOUND` | 404 | Also returned for another clinic's records. |
 | `CONFLICT`, `CONFLICT_UNIQUE` | 409 | Already exists / invalid state (for invitations: "already a member", "an invitation is already open: resend it"). |
 | `ROLE_NOT_ASSIGNABLE` | 422 | The Owner role cannot be given by invitation. |
+| `OWNER_REQUIRED` | 403 | Only an owner may give or take the Owner role, or suspend/remove/reactivate an owner. Use `GET /roles` → `assignable` to offer only allowed roles. |
+| `SELF_ACTION_FORBIDDEN` | 403 | Nobody can suspend, remove or change the roles of their own membership (another admin must), nor change their own account status in `/admin`. Hide those actions on the user's own row. |
+| `LAST_OWNER` | 409 | The change would leave the clinic with no active owner (in practice only when two owners act at the same moment). Reload and show the message. |
 | `SERVICE_UNAVAILABLE`, `INTERNAL_ERROR` | 503/500 | Generic "try again" with the `requestId`. |
 
 Full list: [error-codes.md](error-codes.md). Field-level codes include `REQUIRED`, `INVALID_FORMAT`, `TOO_SHORT`, `TOO_LONG`, `UNKNOWN_FIELD`, `PASSWORD_TOO_COMMON`, `PASSWORD_CONTAINS_EMAIL`, `PASSWORD_INCORRECT`.
@@ -126,6 +134,7 @@ The API emails links to **your** app (the base URL is the API's `APP_PUBLIC_URL`
 | `/reset-password#token=…` | password-reset email (valid 30 minutes, single use) | token + new password | `POST /auth/password/reset` `{ token, newPassword }` → `204`; **all sessions end**, send the user to sign-in |
 | `/account-setup#token=…` | setup email to a new clinic owner (valid 7 days, single use) | token + new password (+ optional `fullName`) | `POST /auth/account/setup` → `204`, then sign-in |
 | `/accept-invitation#token=…` | invitation email (valid 7 days) | token (+ name and password for new users) | `POST /invitations/accept` → `204`, then sign-in (there is **no automatic sign-in**) |
+| `/verify-email#token=…` | email-change email, sent to the **new** address (valid 30 minutes, single use) | token | `POST /auth/email/verify` `{ token }` → `204`; **all sessions end**, sign in with the new address. `409 CONFLICT_UNIQUE`: the address got taken meanwhile |
 | `/login` | ownership notice email | | |
 
 **Accepting an invitation:** the page cannot know whether the invited email already has an account. Send `{ token }` first. If the API answers `400 VALIDATION_FAILED` with `details` for `fullName` and `newPassword` (`REQUIRED`), reveal those two fields and send again with `{ token, fullName, newPassword }`. An existing active user needs only the token.
@@ -134,12 +143,17 @@ The API emails links to **your** app (the base URL is the API's `APP_PUBLIC_URL`
 
 ## 8. Account screens
 
-- **Profile:** `GET /me`. Read-only for now (`PATCH /me` does not exist).
+- **Profile:** `GET /me`; `PATCH /me` `{ fullName }` → `200` with the `GET /me` shape. Only the name can be edited (no phone yet).
+- **Change email:** `POST /me/email` `{ newEmail, currentPassword }` → always `202 { data: { accepted: true } }` when the password is right (`400 PASSWORD_INCORRECT` on `currentPassword` otherwise), whether or not the address is free: say "check the new inbox". The email does not change until the link is opened (`/verify-email`, section 7); the old address then gets a notice. Limited to 5 attempts per 15 minutes per user (`429`).
 - **Change password:** `POST /me/password` `{ currentPassword, newPassword }` → `204`. The current device stays signed in; every other session is revoked. Limited to 5 attempts per 15 minutes per user (`429`).
 - **Devices:** `GET /me/sessions` (flags `current`); `DELETE /me/sessions/:id` revokes one (`204`). Revoking the current one signs out.
-- **Staff invitations:** `POST /invitations` `{ email, roleId }`. `roleId` must be a role of the active clinic, and there is **no endpoint to list roles yet**: for now the role ids are only known to the backend. (Listing roles arrives in Phase 4.) Do not build the invite form until `GET /roles` exists.
 
-## 9. Things that will bite you
+## 9. Staff and platform screens
+
+- **Staff, invitations, profile and email change (Phase 4):** the screens, which buttons to show for whom, and the errors of each are in [staff-management-integration.md](staff-management-integration.md), split into sub-phases (owner and clinic-admin screens first).
+- **Platform admin:** the Clinics and Users tabs, shown when `GET /me` → `platformRole` is `platform_admin`. Everything about them is in [platform-admin-integration.md](platform-admin-integration.md).
+
+## 10. Things that will bite you
 
 - Forgetting `credentials: 'include'` on `login`, `refresh` and `logout`: the cookie is silently not stored or sent.
 - Refreshing concurrently (section 4): it logs the user out.

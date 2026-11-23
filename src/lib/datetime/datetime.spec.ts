@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatDate, formatTime, fromClinicDateTime, toClinicDateTime } from './index.ts';
+import {
+  formatDate,
+  formatTime,
+  fromClinicDateTime,
+  timeZoneOptions,
+  toClinicDateTime,
+} from './index.ts';
 
 // These specs run with TZ=America/New_York (vitest.config.ts) and again with TZ=Asia/Manila in CI.
 // Every result must be the same: nothing may depend on the computer's time zone.
@@ -83,5 +89,24 @@ describe('formatDate / formatTime', () => {
     expect(
       formatDate({ iso: '2026-11-20T06:30:00Z', timeZone: MANILA, style: 'medium' }),
     ).not.toMatch(/^\d+\/\d+\/\d+$/);
+  });
+});
+
+describe('timeZoneOptions', () => {
+  it('offers the zones a clinic may use, each as its own label, including Manila and UTC', () => {
+    const options = timeZoneOptions();
+    expect(options).toContainEqual({ value: 'Asia/Manila', label: 'Asia/Manila' });
+    expect(options).toContainEqual({ value: 'UTC', label: 'UTC' });
+    expect(options.every((option) => option.value === option.label)).toBe(true);
+  });
+
+  it('lists every zone once, and every zone is one the formatting code accepts', () => {
+    const values = timeZoneOptions().map((option) => option.value);
+    expect(new Set(values).size).toBe(values.length);
+    for (const zone of values) {
+      expect(() =>
+        formatDate({ iso: '2026-01-01T00:00:00Z', timeZone: zone, style: 'medium' }),
+      ).not.toThrow();
+    }
   });
 });

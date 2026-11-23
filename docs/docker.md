@@ -17,6 +17,7 @@ docker compose down                    # stop; the database is kept (add -v to d
 | Lint, type-check, check formatting | `docker compose run --rm web npm run lint` / `typecheck` / `format:check` |
 | Check tokens and the API contract | `docker compose run --rm web npm run tokens:check` / `api:check` |
 | Run the browser tests (Chromium, Firefox, **WebKit**, mobile) | `docker compose run --rm e2e` |
+| Run the platform admin e2e (needs the emails as files) | `MAIL_TRANSPORT=file docker compose up -d api`, `docker compose run --rm seed`, then `docker compose run --rm e2e npx playwright test tests/e2e/platform-admin.spec.ts --project=chromium` (not run yet) |
 | Run one browser test file | `docker compose run --rm e2e npx playwright test tests/e2e/smoke.spec.ts --project=chromium` |
 | See the style guide | `docker compose up storybook` then http://localhost:6006 |
 | Run the production build (nginx) | `docker compose up --build web-prod` then http://localhost:8080 |

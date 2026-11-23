@@ -9,7 +9,9 @@ import type { TokenStore } from './token-store.ts';
 export type SessionEvent =
   | { type: 'signed-out' }
   /** The active clinic changed: clear everything cached for the old one. */
-  | { type: 'clinic-changed'; fromOtherTab: boolean; tenantName: string | undefined };
+  | { type: 'clinic-changed'; fromOtherTab: boolean; tenantName: string | undefined }
+  /** An admin suspended or removed the person from the active clinic: clear what was cached for it. */
+  | { type: 'clinic-lost' };
 
 export interface SessionControllerDeps {
   client: ApiClient;
@@ -64,14 +66,30 @@ export function createSessionController({
       client.GET('/api/v1/me/memberships'),
     ]);
     if (!me.data || !memberships.data) throw networkError(new Error('Empty answer.'));
-    const { id, email, fullName, activeTenantId, permissions } = me.data.data;
+    const { id, email, fullName, activeTenantId, permissions, platformRole } = me.data.data;
+
+    // The server clears the active clinic when an admin suspends or removes the person (their next
+    // request says so), so a clinic that was open and now is not means it was taken away.
+    const before = store.get();
+    const hadActiveClinic = before.status === 'signed-in' && before.activeTenantId !== null;
+    const isClinicLost = hadActiveClinic && activeTenantId === null;
+    const lostClinicName = isClinicLost
+      ? before.memberships.find((membership) => membership.tenantId === before.activeTenantId)
+          ?.tenantName
+      : before.status === 'signed-in' && activeTenantId === null
+        ? before.lostClinicName
+        : undefined;
+
     store.set({
       status: 'signed-in',
       user: { id, email, fullName },
       memberships: memberships.data.data,
       activeTenantId,
       permissions,
+      platformRole,
+      ...(lostClinicName !== undefined && { lostClinicName }),
     });
+    if (isClinicLost) emit({ type: 'clinic-lost' });
   }
 
   function endLocally(notice?: SessionNotice): void {
@@ -87,6 +105,9 @@ export function createSessionController({
       if (message.type === 'signed-out') {
         endLocally('signed-out-elsewhere');
       } else if (message.type === 'clinic-switched') {
+        // A tab that is not signed in has no token: asking who it is would end its "session" and
+        // sign the tab that switched out.
+        if (store.get().status !== 'signed-in') return;
         void loadSession().then(
           () => {
             const state = store.get();
@@ -164,6 +185,8 @@ export function createSessionController({
   }
 
   function endSession(notice: SessionNotice): Promise<void> {
+    // Nothing to end here, so there is nothing to tell the other tabs (they may be signed in).
+    if (store.get().status === 'signed-out') return Promise.resolve();
     endLocally(notice);
     tabSync.post({ type: 'signed-out' });
     return Promise.resolve();
@@ -174,7 +197,17 @@ export function createSessionController({
     if (!result.data) throw networkError(new Error('Empty answer.'));
     const { activeTenantId, tenant, permissions } = result.data.data;
     const state = store.get();
-    if (state.status === 'signed-in') store.set({ ...state, activeTenantId, permissions });
+    if (state.status === 'signed-in') {
+      // Choosing a clinic ends the "you lost access" notice, so it is not carried over.
+      store.set({
+        status: 'signed-in',
+        user: state.user,
+        memberships: state.memberships,
+        activeTenantId,
+        permissions,
+        platformRole: state.platformRole,
+      });
+    }
     emit({ type: 'clinic-changed', fromOtherTab: false, tenantName: tenant.name });
     tabSync.post({ type: 'clinic-switched', tenantId });
   }

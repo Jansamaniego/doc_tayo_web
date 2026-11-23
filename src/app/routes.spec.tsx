@@ -1,10 +1,11 @@
 import { I18nProvider } from '@lingui/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vitest-axe';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Membership } from '@/api/session/session-store.ts';
 import { forgetEmailToken } from '@/features/auth/fragment-token.ts';
@@ -12,7 +13,9 @@ import { sessionStore, type SessionState } from '@/api/session/session-store.ts'
 import { SessionControllerProvider } from '@/features/auth/session-context.tsx';
 import { i18n } from '@/i18n/index.ts';
 import { fakeController } from '@/test/fake-session.tsx';
+import { server } from '@/test/msw/server.ts';
 
+import { createQueryClient } from './query-client.ts';
 import { createAppRouter } from './router.ts';
 
 const SUNRISE: Membership = {
@@ -32,6 +35,7 @@ const signedIn = (
     memberships: [SUNRISE],
     activeTenantId: 'a',
     permissions: ['tenant.read', 'branches.read'],
+    platformRole: 'none',
     ...overrides,
   });
 };
@@ -40,7 +44,9 @@ function renderAt(path: string, controller = fakeController()) {
   const router = createAppRouter(createMemoryHistory({ initialEntries: [path] }));
   const result = render(
     <I18nProvider i18n={i18n}>
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider
+        client={createQueryClient({ onForbidden: () => undefined, onClinicLost: () => undefined })}
+      >
         <SessionControllerProvider controller={controller}>
           <RouterProvider router={router} />
         </SessionControllerProvider>
@@ -57,12 +63,12 @@ afterEach(() => {
 });
 
 describe('route guards', () => {
-  it('sends a signed-out person to the sign-in page and remembers where they were going', async () => {
+  it('sends a signed-out person to the sign-in page, and does not remember where they were going', async () => {
     sessionStore.set({ status: 'signed-out' });
     const { router } = renderAt('/select-clinic');
     expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/login');
-    expect(router.state.location.search).toMatchObject({ redirect: '/select-clinic' });
+    expect(router.state.location.search).toEqual({});
   });
 
   it('sends a signed-in person with no active clinic to the clinic picker', async () => {
@@ -82,19 +88,45 @@ describe('route guards', () => {
     expect(screen.getAllByRole('main')).toHaveLength(1);
   });
 
-  it('moves a signed-in person away from the sign-in page, to where they were going', async () => {
+  it('sends a person whose clinic was taken away to the picker, with a notice naming it', async () => {
+    signedIn({ activeTenantId: null, permissions: [], lostClinicName: 'Sunrise Clinic' });
+    const { router } = renderAt('/staff');
+    await screen.findByRole('heading', { level: 1, name: 'Choose a clinic' });
+    expect(router.state.location.pathname).toBe('/select-clinic');
+    expect(screen.getByText('You no longer have access to Sunrise Clinic.')).toBeInTheDocument();
+  });
+
+  it('shows the empty state, and no clinic to open, when nothing usable is left', async () => {
+    signedIn({
+      activeTenantId: null,
+      permissions: [],
+      memberships: [{ ...SUNRISE, membershipStatus: 'suspended' }],
+      lostClinicName: 'Sunrise Clinic',
+    });
+    renderAt('/');
+    expect(
+      await screen.findByText("You don't have a clinic you can open right now."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Sunrise Clinic/ })).not.toBeInTheDocument();
+  });
+
+  it('moves a signed-in person away from the sign-in page, to the home page', async () => {
     signedIn({ activeTenantId: null, permissions: [] });
-    const { router } = renderAt('/login?redirect=/select-clinic');
+    const { router } = renderAt('/login');
     await screen.findByRole('heading', { level: 1, name: 'Choose a clinic' });
     expect(router.state.location.pathname).toBe('/select-clinic');
   });
 
-  it('never follows a redirect to another site', async () => {
-    signedIn();
-    const { router } = renderAt('/login?redirect=//evil.example.com');
-    await screen.findByRole('heading', { level: 1, name: /Ana/ });
-    expect(router.state.location.pathname).toBe('/');
-  });
+  it.each(['/account', '/admin', '/staff', '//evil.example.com', 'https://evil.example.com'])(
+    'ignores an old ?redirect=%s: signing in always leads to the home page',
+    async (target) => {
+      signedIn();
+      const { router } = renderAt(`/login?redirect=${encodeURIComponent(target)}`);
+      await screen.findByRole('heading', { level: 1, name: /Ana/ });
+      expect(router.state.location.pathname).toBe('/');
+      expect(router.state.location.search).toEqual({});
+    },
+  );
 });
 
 describe('sign-in page', () => {
@@ -108,6 +140,7 @@ describe('sign-in page', () => {
     ['password-reset', 'Your password was saved. Sign in with your new password.'],
     ['account-ready', 'Your account is ready. Sign in to start.'],
     ['invitation-accepted', 'You have joined the clinic. Sign in to open it.'],
+    ['email-changed', 'Your email was changed. Sign in with your new address.'],
   ])('confirms %s after the emailed-link flows', async (notice, text) => {
     renderAt(`/login?notice=${notice}`);
     expect(await screen.findByText(text)).toBeInTheDocument();
@@ -178,7 +211,7 @@ describe('app shell', () => {
     sessionStore.set({ status: 'signed-out' });
     const { router } = renderAt('/account');
     await screen.findByRole('heading', { level: 1, name: 'Sign in' });
-    expect(router.state.location.search).toMatchObject({ redirect: '/account' });
+    expect(router.state.location.search).toEqual({});
   });
 
   it('has no accessibility violations', async () => {
@@ -200,5 +233,487 @@ describe('app shell', () => {
       expect(router.state.location.pathname).toBe('/login');
     });
     vi.useRealTimers();
+  });
+});
+
+describe('platform admin tabs', () => {
+  const API = 'http://localhost:3000/api/v1';
+  const EMPTY_PAGE = { data: [], meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 } };
+  beforeEach(() => {
+    server.use(
+      http.get(`${API}/admin/tenants`, () => HttpResponse.json(EMPTY_PAGE)),
+      http.get(`${API}/admin/users`, () => HttpResponse.json(EMPTY_PAGE)),
+      http.get('http://localhost:3000/api/health/ready', () => HttpResponse.json({ status: 'ok' })),
+    );
+  });
+  const adminOnly = (): void => {
+    signedIn({
+      platformRole: 'platform_admin',
+      memberships: [],
+      activeTenantId: null,
+      permissions: [],
+    });
+  };
+
+  it('lands an admin with no clinic on the platform overview, never on the clinic picker', async () => {
+    adminOnly();
+    const { router } = renderAt('/');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Platform overview' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/admin');
+  });
+
+  it('shows an admin with no clinic only Overview, Clinics and Users in the navigation, and no clinic switcher', async () => {
+    adminOnly();
+    renderAt('/admin');
+    const nav = await screen.findByRole('navigation', { name: 'Main' });
+    expect(within(nav).getByRole('link', { name: 'Overview' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(within(nav).getByRole('link', { name: 'Clinics' })).toBeInTheDocument();
+    expect(within(nav).getByRole('link', { name: 'Users' })).toBeInTheDocument();
+    expect(within(nav).queryByRole('link', { name: 'Home' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Sunrise Clinic')).not.toBeInTheDocument();
+  });
+
+  it('marks Clinics, not Overview, as the current page on the clinics list', async () => {
+    adminOnly();
+    renderAt('/admin/clinics');
+    const nav = await screen.findByRole('navigation', { name: 'Main' });
+    expect(within(nav).getByRole('link', { name: 'Clinics' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(within(nav).getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows an admin who also belongs to a clinic the clinic home and all three items', async () => {
+    signedIn({ platformRole: 'platform_admin' });
+    renderAt('/');
+    expect(await screen.findByRole('heading', { level: 1, name: /Welcome/ })).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    for (const name of ['Home', 'Overview', 'Clinics', 'Users']) {
+      expect(within(nav).getByRole('link', { name })).toBeInTheDocument();
+    }
+  });
+
+  it('shows a clinic owner no admin items, and /admin/clinics is "page not found"', async () => {
+    signedIn();
+    renderAt('/admin/clinics');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'We could not find this page' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Clinics' })).not.toBeInTheDocument();
+  });
+
+  it('sends a signed-out visitor to sign-in', async () => {
+    sessionStore.set({ status: 'signed-out' });
+    const { router } = renderAt('/admin/users');
+    await screen.findByRole('heading', { level: 1, name: 'Sign in' });
+    expect(router.state.location.search).toEqual({});
+  });
+
+  it('opens the account page without a clinic', async () => {
+    adminOnly();
+    renderAt('/account');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'My account' }),
+    ).toBeInTheDocument();
+  });
+
+  it('offers the way to Clinics on the clinic picker', async () => {
+    adminOnly();
+    renderAt('/select-clinic');
+    expect(
+      await screen.findByRole('link', { name: 'Go to the platform overview' }),
+    ).toHaveAttribute('href', '/admin');
+  });
+
+  it('hides the tabs and shows "page not found" when the role is taken away', async () => {
+    adminOnly();
+    const { router } = renderAt('/admin/clinics');
+    await screen.findByRole('heading', { level: 1, name: 'Clinics' });
+    act(() => {
+      signedIn({ memberships: [], activeTenantId: null, permissions: [], platformRole: 'none' });
+    });
+    await act(() => router.invalidate());
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'We could not find this page' }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('staff pages', () => {
+  const API = 'http://localhost:3000/api/v1';
+  const STAFF_PAGE = {
+    data: [
+      {
+        membershipId: 'm1',
+        userId: 'u1',
+        email: 'ana@example.com',
+        fullName: 'Ana Cruz',
+        status: 'active',
+        jobTitle: null,
+        roles: [{ id: 'r1', key: 'clinic_admin', name: 'Clinic admin' }],
+        joinedAt: null,
+      },
+    ],
+    meta: { page: 1, pageSize: 20, totalItems: 1, totalPages: 1 },
+  };
+  let membersRequests = 0;
+  beforeEach(() => {
+    membersRequests = 0;
+    server.use(
+      http.get(`${API}/members`, () => {
+        membersRequests += 1;
+        return HttpResponse.json(STAFF_PAGE);
+      }),
+      http.get(`${API}/members/m1`, () => HttpResponse.json({ data: STAFF_PAGE.data[0] })),
+      http.get(`${API}/roles`, () => HttpResponse.json({ data: [] })),
+      http.get(`${API}/tenant`, () =>
+        HttpResponse.json({
+          data: {
+            id: 'a',
+            name: 'Sunrise Clinic',
+            slug: 'sunrise',
+            status: 'active',
+            timezone: 'Asia/Manila',
+            contactEmail: null,
+            contactPhone: null,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
+        }),
+      ),
+    );
+  });
+  const manager = (): void => {
+    signedIn({ permissions: ['tenant.read', 'branches.read', 'members.read', 'members.manage'] });
+  };
+
+  it('shows a person who may read staff the Staff item, and opens the list', async () => {
+    manager();
+    renderAt('/staff');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Staff' })).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect(within(nav).getByRole('link', { name: 'Staff' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(await screen.findByRole('link', { name: 'Ana Cruz' })).toBeInTheDocument();
+  });
+
+  it('opens a member, with Staff still the current item', async () => {
+    manager();
+    renderAt('/staff/m1');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Ana Cruz' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', { name: 'Staff' }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows a person without members.read no Staff item, and "no access" for a typed address, without asking for the staff', async () => {
+    signedIn({ permissions: ['tenant.read', 'branches.read'] });
+    renderAt('/staff');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Staff' })).not.toBeInTheDocument();
+    expect(membersRequests).toBe(0);
+  });
+
+  it('shows "no access" for a member address too, without asking for the member', async () => {
+    signedIn({ permissions: ['tenant.read', 'branches.read'] });
+    renderAt('/staff/m1');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+  });
+
+  it('sends a signed-in person with no clinic chosen to the clinic picker', async () => {
+    signedIn({ activeTenantId: null, permissions: [] });
+    const { router } = renderAt('/staff');
+    await screen.findByRole('heading', { level: 1, name: 'Choose a clinic' });
+    expect(router.state.location.pathname).toBe('/select-clinic');
+  });
+
+  it('sends a signed-out visitor to sign-in', async () => {
+    sessionStore.set({ status: 'signed-out' });
+    const { router } = renderAt('/staff');
+    await screen.findByRole('heading', { level: 1, name: 'Sign in' });
+    expect(router.state.location.search).toEqual({});
+  });
+
+  it('opens the Invitations tab for a person who may read staff, with both tabs and Staff still current in the navigation', async () => {
+    manager();
+    server.use(
+      http.get(`${API}/invitations`, () =>
+        HttpResponse.json({
+          data: [],
+          meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 },
+        }),
+      ),
+    );
+    const { router } = renderAt('/staff/invitations');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Invitations' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/staff/invitations');
+    const tabs = screen.getByRole('navigation', { name: 'Staff sections' });
+    expect(within(tabs).getByRole('link', { name: 'Invitations' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(within(tabs).getByRole('link', { name: 'Staff' })).not.toHaveAttribute('aria-current');
+    expect(
+      within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', { name: 'Staff' }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows "no access" on /staff/invitations without members.read, and asks for nothing', async () => {
+    signedIn({ permissions: ['tenant.read', 'branches.read'] });
+    renderAt('/staff/invitations');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the invitation status in the address and nothing typed', async () => {
+    manager();
+    server.use(
+      http.get(`${API}/invitations`, () =>
+        HttpResponse.json({
+          data: [],
+          meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 },
+        }),
+      ),
+    );
+    const { router } = renderAt('/staff/invitations?status=expired');
+    expect(await screen.findByText('No expired invitations')).toBeInTheDocument();
+    expect(router.state.location.search).toEqual({ status: 'expired' });
+  });
+
+  it('links the Staff tab to the Invitations tab and back', async () => {
+    manager();
+    server.use(
+      http.get(`${API}/invitations`, () =>
+        HttpResponse.json({
+          data: [],
+          meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 },
+        }),
+      ),
+    );
+    renderAt('/staff');
+    await screen.findByRole('heading', { level: 1, name: 'Staff' });
+    const tabs = screen.getByRole('navigation', { name: 'Staff sections' });
+    await userEvent.click(within(tabs).getByRole('link', { name: 'Invitations' }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Invitations' }),
+    ).toBeInTheDocument();
+  });
+
+  it('takes a missing member back to the list with a message', async () => {
+    manager();
+    server.use(
+      http.get(`${API}/members/gone`, () =>
+        HttpResponse.json(
+          { error: { status: 404, code: 'NOT_FOUND', message: 'x', requestId: 'r' } },
+          { status: 404 },
+        ),
+      ),
+    );
+    const { router } = renderAt('/staff/gone');
+    expect(await screen.findByText('This person is not on your staff.')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/staff');
+  });
+});
+
+describe('the page for confirming a new email address', () => {
+  const API = 'http://localhost:3000/api/v1';
+  const endSessionLikeTheRealOne = () =>
+    fakeController({
+      endSession: vi.fn(() => {
+        sessionStore.set({ status: 'signed-out', notice: 'email-changed' });
+        return Promise.resolve();
+      }),
+    });
+
+  it('reads the token from the address and removes it from the address bar, signed out', async () => {
+    window.history.replaceState(null, '', '/verify-email#token=abc123');
+    renderAt('/verify-email');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Confirm your new email address' }),
+    ).toBeInTheDocument();
+    expect(window.location.hash).toBe('');
+    expect(screen.getByRole('button', { name: 'Confirm new email address' })).toBeInTheDocument();
+  });
+
+  it('opens for a signed-in person too, without sending them away', async () => {
+    signedIn();
+    window.history.replaceState(null, '', '/verify-email#token=abc123');
+    const { router } = renderAt('/verify-email');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Confirm your new email address' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/verify-email');
+  });
+
+  it('without a token says the link is not valid', async () => {
+    renderAt('/verify-email');
+    expect(
+      await screen.findByText('This link has expired, was already used, or a newer link was sent.'),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ['signed out', false],
+    ['signed in', true],
+  ])(
+    '%s: confirming ends the session, tells the other tabs, and lands on sign-in with the notice, with no token in any address',
+    async (_name, isSignedIn) => {
+      if (isSignedIn) signedIn();
+      server.use(
+        http.post(`${API}/auth/email/verify`, () => new HttpResponse(null, { status: 204 })),
+      );
+      window.history.replaceState(null, '', '/verify-email#token=abc123');
+      const controller = endSessionLikeTheRealOne();
+      const { router } = renderAt('/verify-email', controller);
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Confirm new email address' }),
+      );
+      expect(
+        await screen.findByText('Your email was changed. Sign in with your new address.'),
+      ).toBeInTheDocument();
+      expect(controller.endSession).toHaveBeenCalledWith('email-changed');
+      expect(router.state.location.pathname).toBe('/login');
+      expect(router.state.location.href).not.toContain('abc123');
+      expect(window.location.href).not.toContain('abc123');
+      expect(sessionStore.get().status).toBe('signed-out');
+    },
+  );
+});
+
+describe('clinic pages', () => {
+  const API = 'http://localhost:3000/api/v1';
+  const TENANT = {
+    id: 'a',
+    name: 'Sunrise Clinic',
+    slug: 'sunrise',
+    status: 'active',
+    timezone: 'Asia/Manila',
+    contactEmail: 'hello@sunrise.test',
+    contactPhone: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  };
+  const BRANCH = {
+    id: 'b1',
+    name: 'Main',
+    addressLine: null,
+    city: null,
+    province: null,
+    timezone: null,
+    isActive: true,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  };
+  let branchRequests = 0;
+  beforeEach(() => {
+    branchRequests = 0;
+    server.use(
+      http.get(`${API}/tenant`, () => HttpResponse.json({ data: TENANT })),
+      http.get(`${API}/branches`, () => {
+        branchRequests += 1;
+        return HttpResponse.json({
+          data: [BRANCH],
+          meta: { page: 1, pageSize: 20, totalItems: 1, totalPages: 1 },
+        });
+      }),
+      http.get(`${API}/branches/b1`, () => HttpResponse.json({ data: BRANCH })),
+    );
+  });
+  const reader = (): void => {
+    signedIn({ permissions: ['tenant.read', 'branches.read'] });
+  };
+  const manager = (): void => {
+    signedIn({
+      permissions: ['tenant.read', 'tenant.settings.manage', 'branches.read', 'branches.manage'],
+    });
+  };
+
+  it('shows every clinic role the Clinic item, current on the profile and on a branch', async () => {
+    reader();
+    renderAt('/clinic');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Clinic' })).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect(within(nav).getByRole('link', { name: 'Clinic' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('opens the branch list and a branch, with Clinic still the current item', async () => {
+    reader();
+    const { router } = renderAt('/clinic/branches');
+    expect(await screen.findByRole('link', { name: 'Main' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/clinic/branches');
+    await userEvent.click(screen.getByRole('link', { name: 'Main' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Main' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', {
+        name: 'Clinic',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows a receptionist the clinic read-only, with the reasons', async () => {
+    reader();
+    renderAt('/clinic');
+    await screen.findByText('hello@sunrise.test');
+    expect(screen.queryByRole('button', { name: 'Edit details' })).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Only an owner or clinic admin can change the clinic's details."),
+    ).toBeInTheDocument();
+  });
+
+  it('shows a manager Edit details, and Add branch on the list', async () => {
+    manager();
+    renderAt('/clinic');
+    expect(await screen.findByRole('button', { name: 'Edit details' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('link', { name: 'Branches' }));
+    expect(await screen.findByRole('link', { name: 'Add branch' })).toBeInTheDocument();
+  });
+
+  it('shows "no access" for the add-branch address to a person who may not manage branches, and asks for nothing', async () => {
+    reader();
+    renderAt('/clinic/branches/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(branchRequests).toBe(0);
+  });
+
+  it('opens the add-branch form for a manager', async () => {
+    manager();
+    renderAt('/clinic/branches/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Add a branch' }),
+    ).toBeInTheDocument();
+  });
+
+  it('sends a person with no clinic chosen to the clinic picker', async () => {
+    signedIn({ activeTenantId: null, permissions: [] });
+    const { router } = renderAt('/clinic');
+    await screen.findByRole('heading', { level: 1, name: 'Choose a clinic' });
+    expect(router.state.location.pathname).toBe('/select-clinic');
+  });
+
+  it('keeps the branch filter in the address and starts at Active', async () => {
+    reader();
+    const { router } = renderAt('/clinic/branches?status=inactive&page=2');
+    expect(await screen.findByLabelText('Show')).toHaveValue('inactive');
+    expect(router.state.location.search).toEqual({ status: 'inactive', page: 2 });
   });
 });

@@ -161,6 +161,18 @@ describe('compose.yaml', () => {
     expect(services.e2e?.depends_on?.api?.condition).toBe('service_healthy');
   });
 
+  it('lets the browser tests read the emails the API writes (the platform admin spec opens the owner setup link)', async () => {
+    const { services } = await compose();
+    // One named volume: the API writes its emails there (MAIL_TRANSPORT=file), the e2e container reads them.
+    const mount = (service: Service | undefined): string | undefined =>
+      service?.volumes?.find((volume) => volume.startsWith('mail:'));
+    expect(mount(services.api)).toBe('mail:/app/var/mail');
+    expect(mount(services.e2e)).toBe('mail:/mail:ro');
+    expect(services.e2e?.environment?.E2E_MAIL_DIR).toBe('/mail');
+    // Emails stay in the API console by default; the file transport is an opt-in for e2e runs.
+    expect(services.api?.environment?.MAIL_TRANSPORT).toBe('${MAIL_TRANSPORT:-log}');
+  });
+
   it('keeps node_modules in a volume, so the host and the container never mix their dependencies', async () => {
     const { services } = await compose();
     expect(services.web?.volumes?.some((volume) => volume.endsWith(':/app/node_modules'))).toBe(

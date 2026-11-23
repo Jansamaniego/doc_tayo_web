@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
+import { Button } from '@/design-system/components/button.tsx';
 import { TextLink, type TextLinkProps } from '@/design-system/components/link.tsx';
 
 /**
@@ -32,4 +33,24 @@ export function useSpaClick({
     event.preventDefault();
     void router.navigate({ href });
   };
+}
+
+/** A link that looks like a button (for a primary action that goes to another page). */
+export function AppButtonLink({
+  href,
+  children,
+  variant = 'primary',
+}: {
+  href: string;
+  children: ReactNode;
+  variant?: 'primary' | 'secondary';
+}) {
+  const onClick = useSpaClick({ href });
+  return (
+    <Button asChild variant={variant}>
+      <a href={href} onClick={onClick}>
+        {children}
+      </a>
+    </Button>
+  );
 }

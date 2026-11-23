@@ -47,6 +47,7 @@ function happyApi(
     activeTenantId?: string | null;
     memberships?: unknown[];
     permissions?: string[];
+    platformRole?: 'none' | 'platform_admin';
   } = {},
 ) {
   const calls: string[] = [];
@@ -62,6 +63,7 @@ function happyApi(
           ...OWNER,
           emailVerifiedAt: null,
           passwordChangedAt: null,
+          platformRole: overrides.platformRole ?? 'none',
           activeTenantId: overrides.activeTenantId === undefined ? 'a' : overrides.activeTenantId,
           permissions: overrides.permissions ?? OWNER_PERMISSIONS,
         },
@@ -152,6 +154,24 @@ describe('boot (the first thing the app does)', () => {
       memberships: [SUNRISE],
       activeTenantId: 'a',
       permissions: OWNER_PERMISSIONS,
+      platformRole: 'none',
+    });
+  });
+
+  it('knows a platform admin, who may have no clinic at all', async () => {
+    happyApi({
+      platformRole: 'platform_admin',
+      activeTenantId: null,
+      memberships: [],
+      permissions: [],
+    });
+    const { controller, store } = makeTab();
+    await controller.boot();
+    expect(store.get()).toMatchObject({
+      status: 'signed-in',
+      platformRole: 'platform_admin',
+      activeTenantId: null,
+      memberships: [],
     });
   });
 
@@ -391,6 +411,20 @@ describe('switchClinic', () => {
     );
   };
 
+  it('is kept when the person switches clinic', async () => {
+    happyApi({
+      platformRole: 'platform_admin',
+      activeTenantId: null,
+      memberships: [SUNRISE, HARBOR],
+      permissions: [],
+    });
+    switchApi();
+    const { controller, store } = makeTab();
+    await controller.boot();
+    await controller.switchClinic('b');
+    expect(store.get()).toMatchObject({ platformRole: 'platform_admin', activeTenantId: 'b' });
+  });
+
   it("switches the active clinic and takes that clinic's permissions (the token does not change)", async () => {
     happyApi({ activeTenantId: null, memberships: [SUNRISE, HARBOR], permissions: [] });
     const calls: string[] = [];
@@ -463,6 +497,86 @@ describe('switchClinic', () => {
   });
 });
 
+describe('a tab that is not signed in (a second window left on the sign-in page)', () => {
+  // The API answers UNAUTHENTICATED to a request without a token, and the client reads that as "the
+  // session ended". Such a tab must neither ask who it is nor tell the other tabs it signed out.
+  const apiWithoutToken = (calls: string[]): void => {
+    server.use(
+      http.get(`${API}/me`, ({ request }) => {
+        calls.push(`me:${request.headers.get('authorization') ?? 'none'}`);
+        return request.headers.get('authorization')
+          ? HttpResponse.json({
+              data: {
+                ...OWNER,
+                emailVerifiedAt: null,
+                passwordChangedAt: null,
+                platformRole: 'none',
+                activeTenantId: 'b',
+                permissions: ['tenant.read'],
+              },
+            })
+          : error(401, 'UNAUTHENTICATED');
+      }),
+      http.post(`${API}/auth/switch-tenant`, () =>
+        HttpResponse.json({
+          data: {
+            activeTenantId: 'b',
+            tenant: { id: 'b', name: 'Harbor Clinic', status: 'active' },
+            permissions: ['tenant.read'],
+          },
+        }),
+      ),
+    );
+  };
+  const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 150));
+
+  it('does not sign anyone out when another tab picks a clinic', async () => {
+    const name = `idle-${channel}`;
+    const calls: string[] = [];
+    happyApi({ activeTenantId: null, memberships: [SUNRISE, HARBOR] });
+    const signedInTab = makeTab(name);
+    const signedOutTab = makeTab(name);
+    await signedInTab.controller.boot();
+    signedOutTab.store.set({ status: 'signed-out' });
+    apiWithoutToken(calls);
+
+    await signedInTab.controller.switchClinic('b');
+    await settle();
+
+    expect(signedInTab.store.get()).toMatchObject({ status: 'signed-in', activeTenantId: 'b' });
+    expect(signedInTab.tokens.get()).not.toBeNull();
+    expect(signedOutTab.store.get()).toEqual({ status: 'signed-out' });
+    expect(calls).toEqual([]);
+  });
+
+  it('being told its session ended changes nothing and tells nobody', async () => {
+    const name = `quiet-${channel}`;
+    happyApi();
+    const signedInTab = makeTab(name);
+    const signedOutTab = makeTab(name);
+    await signedInTab.controller.boot();
+    signedOutTab.store.set({ status: 'signed-out' });
+
+    await signedOutTab.controller.endSession('expired');
+    await settle();
+
+    expect(signedOutTab.store.get()).toEqual({ status: 'signed-out' });
+    expect(signedInTab.store.get().status).toBe('signed-in');
+  });
+});
+
+describe('platformRole after the role is taken away', () => {
+  it('is read again by refreshPermissions, so the admin tabs can disappear', async () => {
+    happyApi({ platformRole: 'platform_admin' });
+    const { controller, store } = makeTab();
+    await controller.boot();
+    expect(store.get()).toMatchObject({ platformRole: 'platform_admin' });
+    happyApi({ platformRole: 'none' });
+    await controller.refreshPermissions();
+    expect(store.get()).toMatchObject({ platformRole: 'none' });
+  });
+});
+
 describe('refreshPermissions (after a 403: the permissions may have changed mid-session)', () => {
   it('reloads who the person is and what they may do', async () => {
     happyApi();
@@ -492,5 +606,97 @@ describe('refreshPermissions (after a 403: the permissions may have changed mid-
     server.use(http.get(`${API}/me`, () => HttpResponse.error()));
     await controller.refreshPermissions();
     expect(store.get()).toMatchObject({ status: 'signed-in', permissions: OWNER_PERMISSIONS });
+  });
+});
+
+describe('losing the active clinic (suspended or removed by an admin, plan 05 §5.5)', () => {
+  const clinicLostApi = () => {
+    server.use(
+      http.get(`${API}/me`, () =>
+        HttpResponse.json({
+          data: {
+            ...OWNER,
+            emailVerifiedAt: null,
+            passwordChangedAt: null,
+            platformRole: 'none',
+            activeTenantId: null,
+            permissions: [],
+          },
+        }),
+      ),
+    );
+  };
+
+  it('keeps the person signed in, with no active clinic, and remembers the name of the clinic they lost', async () => {
+    happyApi({ memberships: [SUNRISE, HARBOR] });
+    const { controller, store, tokens } = makeTab();
+    await controller.boot();
+    clinicLostApi();
+    await controller.refreshPermissions();
+    expect(store.get()).toMatchObject({
+      status: 'signed-in',
+      activeTenantId: null,
+      permissions: [],
+      lostClinicName: 'Sunrise Clinic',
+    });
+    expect(tokens.get()).toBe('tok-refreshed');
+  });
+
+  it('announces it, so the app clears everything it cached for that clinic', async () => {
+    happyApi();
+    const { controller, events } = makeTab();
+    await controller.boot();
+    clinicLostApi();
+    await controller.refreshPermissions();
+    expect(events).toContainEqual({ type: 'clinic-lost' });
+  });
+
+  it('keeps the name when the session is read again before a clinic is chosen, and says nothing twice', async () => {
+    happyApi();
+    const { controller, store, events } = makeTab();
+    await controller.boot();
+    clinicLostApi();
+    await controller.refreshPermissions();
+    await controller.refreshPermissions();
+    expect(store.get()).toMatchObject({ lostClinicName: 'Sunrise Clinic' });
+    expect(events.filter((event) => event.type === 'clinic-lost')).toHaveLength(1);
+  });
+
+  it('forgets the name once a clinic is chosen', async () => {
+    happyApi({ memberships: [SUNRISE, HARBOR] });
+    server.use(
+      http.post(`${API}/auth/switch-tenant`, () =>
+        HttpResponse.json({
+          data: {
+            activeTenantId: 'b',
+            tenant: { id: 'b', name: 'Harbor Clinic', status: 'active' },
+            permissions: ['tenant.read'],
+          },
+        }),
+      ),
+    );
+    const { controller, store } = makeTab();
+    await controller.boot();
+    clinicLostApi();
+    await controller.refreshPermissions();
+    await controller.switchClinic('b');
+    expect(store.get()).toMatchObject({ activeTenantId: 'b' });
+    expect(store.get()).not.toHaveProperty('lostClinicName');
+  });
+
+  it('does not report a loss for a person who never had an active clinic, or who still has it', async () => {
+    happyApi({ activeTenantId: null, memberships: [SUNRISE, HARBOR], permissions: [] });
+    const first = makeTab();
+    await first.controller.boot();
+    await first.controller.refreshPermissions();
+    expect(first.store.get()).not.toHaveProperty('lostClinicName');
+    expect(first.events).toEqual([]);
+
+    happyApi();
+    const second = makeTab();
+    await second.controller.boot();
+    await second.controller.refreshPermissions();
+    expect(second.store.get()).not.toHaveProperty('lostClinicName');
+    expect(second.events).toEqual([]);
   });
 });

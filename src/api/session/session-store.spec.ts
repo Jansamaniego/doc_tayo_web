@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   activeMembership,
   sessionStore,
+  updateSignedInUser,
   type Membership,
   type SessionState,
 } from './session-store.ts';
@@ -34,6 +35,7 @@ function signedIn(activeTenantId: string | null): SessionState {
     user: { id: 'u', email: 'ana@example.com', fullName: 'Ana Cruz' },
     memberships: [...MEMBERSHIPS],
     activeTenantId,
+    platformRole: 'none',
     permissions: ['tenant.read'],
   };
 }
@@ -65,5 +67,33 @@ describe('activeMembership', () => {
     expect(activeMembership(signedIn('zzz'))).toBeUndefined();
     expect(activeMembership({ status: 'signed-out' })).toBeUndefined();
     expect(activeMembership({ status: 'booting' })).toBeUndefined();
+  });
+});
+
+describe('updateSignedInUser', () => {
+  it('changes the name of the signed-in person and leaves everything else as it was', () => {
+    sessionStore.set({
+      status: 'signed-in',
+      user: { id: 'u1', email: 'ana@example.com', fullName: 'Ana Cruz' },
+      memberships: MEMBERSHIPS,
+      activeTenantId: 'a',
+      permissions: ['tenant.read'],
+      platformRole: 'none',
+    });
+    updateSignedInUser({ fullName: 'Ana Maria Cruz' });
+    expect(sessionStore.get()).toEqual({
+      status: 'signed-in',
+      user: { id: 'u1', email: 'ana@example.com', fullName: 'Ana Maria Cruz' },
+      memberships: MEMBERSHIPS,
+      activeTenantId: 'a',
+      permissions: ['tenant.read'],
+      platformRole: 'none',
+    });
+  });
+
+  it('does nothing when nobody is signed in (a late answer after signing out)', () => {
+    sessionStore.set({ status: 'signed-out' });
+    updateSignedInUser({ fullName: 'Ana' });
+    expect(sessionStore.get()).toEqual({ status: 'signed-out' });
   });
 });

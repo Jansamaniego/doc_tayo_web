@@ -286,6 +286,61 @@
         "security": []
       }
     },
+    "/api/v1/auth/email/verify": {
+      "post": {
+        "operationId": "AuthController_verifyEmail_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Email changed and verified; every session of the user is revoked (sign in with the new address)."
+          },
+          "400": {
+            "description": "TOKEN_INVALID or VALIDATION_FAILED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT_UNIQUE: the address got taken after the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "RATE_LIMITED (see Retry-After)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
     "/api/v1/auth/account/setup": {
       "post": {
         "operationId": "AuthController_setUpAccount_v1",
@@ -780,6 +835,106 @@
             "bearer": []
           }
         ]
+      },
+      "patch": {
+        "operationId": "MeController_update_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeProfileEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "me"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/email": {
+      "post": {
+        "operationId": "MeController_changeEmail_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Always 202 when the password is right: a link goes to the new address if it is free (no enumeration).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED (PASSWORD_INCORRECT on currentPassword)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "me"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/v1/me/password": {
@@ -932,7 +1087,488 @@
         ]
       }
     },
+    "/api/v1/members": {
+      "get": {
+        "operationId": "MembersController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Without it, every member except removed ones.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "invited",
+                "active",
+                "suspended",
+                "removed"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Part of the name or email (case-insensitive).",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/members/{membershipId}": {
+      "get": {
+        "operationId": "MembersController_get_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's member or role).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "MembersController_update_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's member or role).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/members/{membershipId}/suspend": {
+      "post": {
+        "operationId": "MembersController_suspend_v1",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Suspended: the member loses access to this clinic on their next request."
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's member or role).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/members/{membershipId}/reactivate": {
+      "post": {
+        "operationId": "MembersController_reactivate_v1",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Active again."
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's member or role).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/members/{membershipId}/remove": {
+      "post": {
+        "operationId": "MembersController_remove_v1",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Removed (the row is kept for history). Coming back is by a new invitation."
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, OWNER_REQUIRED (owner role or an owner), SELF_ACTION_FORBIDDEN (your own membership), or a TENANT_* code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's member or role).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT (not allowed from the current status, or a concurrent change) or LAST_OWNER.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/invitations": {
+      "get": {
+        "operationId": "InvitationsController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "pending",
+              "type": "string",
+              "enum": [
+                "pending",
+                "accepted",
+                "revoked",
+                "expired"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "invitations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "post": {
         "operationId": "InvitationsController_create_v1",
         "parameters": [],
@@ -1076,6 +1712,651 @@
         },
         "tags": [
           "invitations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invitations/{invitationId}/revoke": {
+      "post": {
+        "operationId": "InvitationsController_revoke_v1",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Revoked: the emailed link no longer works."
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's invitation).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT: already accepted or revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "invitations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "operationId": "RolesController_list_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "roles"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/permissions": {
+      "get": {
+        "operationId": "RolesController_permissions_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "roles"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/tenants": {
+      "post": {
+        "operationId": "AdminTenantsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTenantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Clinic onboarded: roles, default branch, owner membership; the owner gets a setup link (new account) or a notice (existing account).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTenantEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: not a platform admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT_UNIQUE: the slug is taken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "AdminTenantsController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "suspended",
+                "deactivated"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTenantListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: not a platform admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/tenants/{tenantId}": {
+      "get": {
+        "operationId": "AdminTenantsController_get_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTenantDetailEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: not a platform admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/tenants/{tenantId}/status": {
+      "patch": {
+        "operationId": "AdminTenantsController_changeStatus_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Status changed; members see it on their next request."
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: not a platform admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT: not allowed from the current status (deactivation is one-way).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "operationId": "AdminUsersController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "active",
+                "deactivated"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: not a platform admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{userId}": {
+      "get": {
+        "operationId": "AdminUsersController_get_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: not a platform admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{userId}/status": {
+      "patch": {
+        "operationId": "AdminUsersController_changeStatus_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Deactivated (every session ends, sign-in refused) or reactivated."
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, or SELF_ACTION_FORBIDDEN (your own account).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT: already in that status, or a pending account (it activates through its own link).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
         ],
         "security": [
           {
@@ -1558,6 +2839,18 @@
           "newPassword"
         ]
       },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The token from the emailed link."
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
       "AccountSetupDto": {
         "type": "object",
         "properties": {
@@ -1873,6 +3166,14 @@
             "format": "date-time",
             "nullable": true
           },
+          "platformRole": {
+            "type": "string",
+            "enum": [
+              "none",
+              "platform_admin"
+            ],
+            "description": "`platform_admin` may use `/admin/*` (show the Clinics and Users tabs). It grants no access to any clinic."
+          },
           "activeTenantId": {
             "type": "string",
             "format": "uuid",
@@ -1896,6 +3197,7 @@
           "fullName",
           "emailVerifiedAt",
           "passwordChangedAt",
+          "platformRole",
           "activeTenantId",
           "permissions"
         ]
@@ -1909,6 +3211,36 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "maxLength": 120,
+            "example": "Dr. Maria Santos"
+          }
+        },
+        "required": [
+          "fullName"
+        ]
+      },
+      "ChangeEmailDto": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "example": "maria.santos@clinic.example"
+          },
+          "currentPassword": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "newEmail",
+          "currentPassword"
         ]
       },
       "ChangePasswordDto": {
@@ -1993,6 +3325,248 @@
           "data"
         ]
       },
+      "MemberRoleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "key": {
+            "type": "string",
+            "example": "doctor"
+          },
+          "name": {
+            "type": "string",
+            "example": "Doctor"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name"
+        ]
+      },
+      "MemberResponse": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "invited",
+              "active",
+              "suspended",
+              "removed"
+            ]
+          },
+          "jobTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberRoleResponse"
+            }
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "membershipId",
+          "userId",
+          "email",
+          "fullName",
+          "status",
+          "jobTitle",
+          "roles",
+          "joinedAt"
+        ]
+      },
+      "MemberListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberResponse"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMetaResponse"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "MemberEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MemberResponse"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UpdateMemberDto": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "minItems": 1,
+            "maxItems": 5,
+            "description": "Replaces the member’s roles. Ids from `GET /roles`; `owner` only for owners.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "jobTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "`null` clears it."
+          }
+        }
+      },
+      "InvitationRoleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "key": {
+            "type": "string",
+            "example": "doctor"
+          },
+          "name": {
+            "type": "string",
+            "example": "Doctor"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name"
+        ]
+      },
+      "InvitationInviterResponse": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "membershipId",
+          "fullName"
+        ]
+      },
+      "InvitationListItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "roleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "revoked",
+              "expired"
+            ]
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/InvitationRoleResponse"
+          },
+          "invitedBy": {
+            "$ref": "#/components/schemas/InvitationInviterResponse"
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "revokedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "roleId",
+          "status",
+          "expiresAt",
+          "createdAt",
+          "role",
+          "invitedBy",
+          "acceptedAt",
+          "revokedAt"
+        ]
+      },
+      "InvitationListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvitationListItemResponse"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMetaResponse"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "CreateInvitationDto": {
         "type": "object",
         "properties": {
@@ -2063,6 +3637,426 @@
           "data"
         ]
       },
+      "RoleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "key": {
+            "type": "string",
+            "example": "doctor",
+            "description": "Stable machine key."
+          },
+          "name": {
+            "type": "string",
+            "example": "Doctor"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "example": [
+              "branches.read",
+              "tenant.read"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assignable": {
+            "type": "boolean",
+            "description": "Whether the caller may give this role through `PATCH /members/:id` (owner: owners only)."
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "isSystem",
+          "permissions",
+          "assignable"
+        ]
+      },
+      "RoleListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleResponse"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "PermissionResponse": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "members.read"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "description"
+        ]
+      },
+      "PermissionListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionResponse"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CreateTenantDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "example": "Bayview Clinic"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 60,
+            "example": "bayview-clinic",
+            "description": "Lower-case letters and digits separated by single hyphens."
+          },
+          "ownerEmail": {
+            "type": "string",
+            "example": "owner@bayview.example"
+          },
+          "ownerFullName": {
+            "type": "string",
+            "maxLength": 120,
+            "example": "Dr. Maria Santos"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Asia/Manila",
+            "default": "Asia/Manila"
+          }
+        },
+        "required": [
+          "name",
+          "slug",
+          "ownerEmail",
+          "ownerFullName"
+        ]
+      },
+      "AdminTenantResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Asia/Manila"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "status",
+          "timezone",
+          "createdAt"
+        ]
+      },
+      "AdminTenantEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AdminTenantResponse"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdminTenantListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Asia/Manila"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "memberCount": {
+            "type": "number",
+            "description": "Active members."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "status",
+          "timezone",
+          "createdAt",
+          "memberCount"
+        ]
+      },
+      "AdminTenantListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminTenantListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMetaResponse"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminTenantOwner": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "fullName",
+          "email"
+        ]
+      },
+      "AdminTenantDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Asia/Manila"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "memberCount": {
+            "type": "number",
+            "description": "Active members."
+          },
+          "owners": {
+            "description": "Active owners.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminTenantOwner"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "status",
+          "timezone",
+          "createdAt",
+          "memberCount",
+          "owners"
+        ]
+      },
+      "AdminTenantDetailEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AdminTenantDetail"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "TenantStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "deactivated"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "AdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "deactivated"
+            ]
+          },
+          "platformRole": {
+            "type": "string",
+            "enum": [
+              "none",
+              "platform_admin"
+            ]
+          },
+          "membershipCount": {
+            "type": "number",
+            "description": "Memberships that are not removed."
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "status",
+          "platformRole",
+          "membershipCount"
+        ]
+      },
+      "AdminUserListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminUserResponse"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMetaResponse"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminUserEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AdminUserResponse"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UserStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "deactivated"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
       "ErrorCode": {
         "type": "string",
         "enum": [
@@ -2088,6 +4082,9 @@
           "ACCESS_TOKEN_EXPIRED",
           "TOKEN_INVALID",
           "ROLE_NOT_ASSIGNABLE",
+          "LAST_OWNER",
+          "OWNER_REQUIRED",
+          "SELF_ACTION_FORBIDDEN",
           "CONFLICT",
           "METHOD_NOT_ALLOWED",
           "RATE_LIMITED"
