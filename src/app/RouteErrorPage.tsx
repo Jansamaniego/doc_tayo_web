@@ -23,7 +23,11 @@ export function RouteErrorPage({ error, reset }: { error: unknown; reset: () => 
   const requestId = isApiError(error) ? error.requestId : undefined;
   reportError({ error, requestId });
   return (
-    <div className="mx-auto flex max-w-reading flex-col gap-4 px-4 py-10">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="mx-auto flex max-w-reading flex-col gap-4 px-4 py-10 outline-none"
+    >
       <h1>
         <Trans>Something went wrong</Trans>
       </h1>
@@ -32,6 +36,6 @@ export function RouteErrorPage({ error, reset }: { error: unknown; reset: () => 
         requestId={requestId}
         onRetry={reset}
       />
-    </div>
+    </main>
   );
 }

@@ -3,8 +3,9 @@ import { Outlet, useRouter } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 /**
- * The frame around every page: a skip link, the main landmark, and navigation feedback for
+ * The frame around every page: a skip link and navigation feedback for
  * keyboard and screen-reader users (focus moves to the content, the new page title is announced).
+ * Each layout (the app shell, the sign-in card, an error page) renders its own `<main id="main" tabIndex={-1}>`.
  */
 export function RootLayout() {
   const router = useRouter();
@@ -41,9 +42,7 @@ export function RootLayout() {
       >
         <Trans>Skip to main content</Trans>
       </a>
-      <main id="main" tabIndex={-1} className="outline-none">
-        <Outlet />
-      </main>
+      <Outlet />
       <div aria-live="polite" role="status" className="sr-only">
         {announcement}
       </div>

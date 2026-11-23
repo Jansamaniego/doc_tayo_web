@@ -20,6 +20,14 @@ msgstr "{count, plural, one {# thing needs fixing} other {# things need fixing}}
 msgid "{length} of {maxLength} characters"
 msgstr "{length} of {maxLength} characters"
 
+#: src/features/auth/countdown.ts
+msgid "{minutes, plural, one {# minute} other {# minutes}}"
+msgstr "{minutes, plural, one {# minute} other {# minutes}}"
+
+#: src/features/auth/countdown.ts
+msgid "{seconds, plural, one {# second} other {# seconds}}"
+msgstr "{seconds, plural, one {# second} other {# seconds}}"
+
 #: src/design-system/components/inactivity-warning.tsx
 msgid "{secondsLeft, plural, one {# second} other {# seconds}}"
 msgstr "{secondsLeft, plural, one {# second} other {# seconds}}"
@@ -33,9 +41,21 @@ msgstr "+{0} more"
 msgid "+{more} more"
 msgstr "+{more} more"
 
+#: src/features/auth/passwords.ts
+msgid "10 to 128 characters"
+msgstr "10 to 128 characters"
+
+#: src/features/auth/accept-invitation-form.tsx
+msgid "Accept invitation"
+msgstr "Accept invitation"
+
 #: src/design-system/components/data-table.tsx
 msgid "Actions"
 msgstr "Actions"
+
+#: src/features/home/HomePage.tsx
+msgid "Add your branches"
+msgstr "Add your branches"
 
 #: src/design-system/components/date-fields.tsx
 msgid "AM"
@@ -49,14 +69,13 @@ msgstr "AM or PM"
 msgid "Anything you have not saved will be kept for you if you sign back in."
 msgstr "Anything you have not saved will be kept for you if you sign back in."
 
-#: src/app/HomePage.tsx
-msgid "API not reachable"
-msgstr "API not reachable"
-
-#: src/app/HomePage.tsx
 #: src/i18n/i18n.spec.ts
 msgid "API reachable"
 msgstr "API reachable"
+
+#: src/features/home/HomePage.tsx
+msgid "Appointments"
+msgstr "Appointments"
 
 #: src/design-system/components/inactivity-warning.tsx
 msgid "Are you still there?"
@@ -65,6 +84,18 @@ msgstr "Are you still there?"
 #: src/design-system/patterns/permission.tsx
 msgid "Ask your clinic admin if you need it."
 msgstr "Ask your clinic admin if you need it."
+
+#: src/features/auth/accept-invitation-form.tsx
+msgid "Ask your clinic admin to send you a new invitation."
+msgstr "Ask your clinic admin to send you a new invitation."
+
+#: src/features/auth/select-clinic.tsx
+msgid "Ask your clinic admin, or sign out and try another account."
+msgstr "Ask your clinic admin, or sign out and try another account."
+
+#: src/features/auth/forgot-password-form.tsx
+msgid "Back to sign in"
+msgstr "Back to sign in"
 
 #: src/design-system/patterns/clinic-switcher.tsx
 msgid "Branch"
@@ -78,9 +109,23 @@ msgstr "Breadcrumb"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/app/HomePage.tsx
-msgid "Checking the connection…"
-msgstr "Checking the connection…"
+#: src/features/account/AccountPage.tsx
+#: src/features/account/change-password-form.tsx
+msgid "Change password"
+msgstr "Change password"
+
+#: src/features/home/HomePage.tsx
+msgid "Check your clinic details"
+msgstr "Check your clinic details"
+
+#: src/features/auth/forgot-password-form.tsx
+msgid "Check your email, including the spam folder."
+msgstr "Check your email, including the spam folder."
+
+#: src/features/auth/auth-pages.tsx
+#: src/features/auth/select-clinic.tsx
+msgid "Choose a clinic"
+msgstr "Choose a clinic"
 
 #: src/design-system/components/date-fields.tsx
 msgid "Choose a date"
@@ -94,6 +139,10 @@ msgstr "Choose a date on or after {limit}."
 msgid "Choose a date on or before {limit}."
 msgstr "Choose a date on or before {limit}."
 
+#: src/features/auth/auth-pages.tsx
+msgid "Choose a new password"
+msgstr "Choose a new password"
+
 #: src/design-system/components/select-fields.tsx
 msgid "Choose an option"
 msgstr "Choose an option"
@@ -102,9 +151,17 @@ msgstr "Choose an option"
 msgid "Choose on calendar"
 msgstr "Choose on calendar"
 
+#: src/features/auth/login-form.tsx
+msgid "Choose this on a computer other people also use. You will be signed out after 10 minutes without use."
+msgstr "Choose this on a computer other people also use. You will be signed out after 10 minutes without use."
+
 #: src/design-system/components/text-fields.tsx
 msgid "Clear"
 msgstr "Clear"
+
+#: src/features/account/AccountPage.tsx
+msgid "Clinic"
+msgstr "Clinic"
 
 #: src/design-system/components/alert.tsx
 #: src/design-system/components/dialog.tsx
@@ -125,9 +182,21 @@ msgstr "Copied"
 msgid "Copy"
 msgstr "Copy"
 
+#: src/features/auth/accept-invitation-form.tsx
+msgid "Create account and accept"
+msgstr "Create account and accept"
+
+#: src/features/auth/accept-invitation-form.tsx
+msgid "Create your account to finish joining the clinic."
+msgstr "Create your account to finish joining the clinic."
+
 #: src/design-system/components/stepper.tsx
 msgid "Current"
 msgstr "Current"
+
+#: src/features/account/change-password-form.tsx
+msgid "Current password"
+msgstr "Current password"
 
 #: src/design-system/components/date-fields.tsx
 msgid "Day"
@@ -137,10 +206,35 @@ msgstr "Day"
 msgid "Details for support"
 msgstr "Details for support"
 
+#: src/features/home/HomePage.tsx
+msgid "Doctors and front-desk staff each get their own sign-in."
+msgstr "Doctors and front-desk staff each get their own sign-in."
+
+#: src/features/auth/passwords.ts
+msgid "Does not contain your email address"
+msgstr "Does not contain your email address"
+
 #: src/design-system/components/stepper.tsx
 #: src/design-system/components/text-fields.tsx
 msgid "Done"
 msgstr "Done"
+
+#: src/features/home/HomePage.tsx
+msgid "Each place where you see patients is a branch."
+msgstr "Each place where you see patients is a branch."
+
+#: src/features/account/AccountPage.tsx
+#: src/features/auth/forgot-password-form.tsx
+#: src/features/auth/login-form.tsx
+msgid "Email"
+msgstr "Email"
+
+#: src/features/account/change-password-form.tsx
+#: src/features/auth/accept-invitation-form.tsx
+#: src/features/auth/account-setup-form.tsx
+#: src/features/auth/reset-password-form.tsx
+msgid "Enter a new password."
+msgstr "Enter a new password."
 
 #: src/design-system/components/text-fields.tsx
 msgid "Enter an amount, for example 1,250.50."
@@ -150,34 +244,96 @@ msgstr "Enter an amount, for example 1,250.50."
 msgid "Enter this code in DocTayo → Settings → Displays:"
 msgstr "Enter this code in DocTayo → Settings → Displays:"
 
+#: src/features/account/change-password-form.tsx
+msgid "Enter your current password."
+msgstr "Enter your current password."
+
+#: src/features/auth/forgot-password-form.tsx
+msgid "Enter your email address and we will send you a link to choose a new password."
+msgstr "Enter your email address and we will send you a link to choose a new password."
+
+#: src/features/auth/forgot-password-form.tsx
+#: src/features/auth/login-form.tsx
+msgid "Enter your email address."
+msgstr "Enter your email address."
+
+#: src/features/auth/accept-invitation-form.tsx
+msgid "Enter your name."
+msgstr "Enter your name."
+
+#: src/features/auth/login-form.tsx
+msgid "Enter your password."
+msgstr "Enter your password."
+
 #: src/design-system/components/alert.tsx
 msgid "Error"
 msgstr "Error"
+
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "Every computer, phone and browser where you are signed in will be signed out."
+msgstr "Every computer, phone and browser where you are signed in will be signed out."
 
 #: src/design-system/components/inactivity-warning.tsx
 msgid "For privacy, you will be signed out in {seconds}."
 msgstr "For privacy, you will be signed out in {seconds}."
 
+#: src/features/auth/auth-pages.tsx
+#: src/features/auth/login-form.tsx
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
 #: src/design-system/components/date-fields.tsx
 msgid "From"
 msgstr "From"
+
+#: src/features/home/HomePage.tsx
+msgid "Getting started"
+msgstr "Getting started"
 
 #: src/app/NotFoundPage.tsx
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/features/home/HomePage.tsx
+msgid "Here is where your day at the clinic will start."
+msgstr "Here is where your day at the clinic will start."
+
 #: src/design-system/components/text-fields.tsx
 msgid "Hide password"
 msgstr "Hide password"
+
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "Home"
+msgstr "Home"
+
+#: src/features/home/HomePage.tsx
+msgid "Home · {clinicName}"
+msgstr "Home · {clinicName}"
 
 #: src/design-system/components/date-fields.tsx
 msgid "Hour"
 msgstr "Hour"
 
+#: src/features/auth/forgot-password-form.tsx
+msgid "If there is an account for {sentTo}, we have sent a link to reset the password. The link works for 30 minutes."
+msgstr "If there is an account for {sentTo}, we have sent a link to reset the password. The link works for 30 minutes."
+
 #: src/design-system/components/alert.tsx
 #: src/design-system/components/toast.tsx
 msgid "Information"
 msgstr "Information"
+
+#: src/features/auth/select-clinic.tsx
+msgid "Invitation not accepted yet"
+msgstr "Invitation not accepted yet"
+
+#: src/features/home/HomePage.tsx
+msgid "Invite your team"
+msgstr "Invite your team"
+
+#: src/features/auth/auth-pages.tsx
+msgid "Join a clinic"
+msgstr "Join a clinic"
 
 #: src/design-system/components/dialog.tsx
 msgid "Leave"
@@ -191,9 +347,17 @@ msgstr "Leave without saving?"
 msgid "Live"
 msgstr "Live"
 
+#: src/app/App.tsx
+msgid "Loading…"
+msgstr "Loading…"
+
 #: src/design-system/patterns/app-shell.tsx
 msgid "Main"
 msgstr "Main"
+
+#: src/features/home/HomePage.tsx
+msgid "Make sure the name and time zone are right."
+msgstr "Make sure the name and time zone are right."
 
 #: src/design-system/patterns/app-shell.tsx
 msgid "Menu"
@@ -216,8 +380,20 @@ msgid "More actions"
 msgstr "More actions"
 
 #: src/design-system/patterns/user-menu.tsx
+#: src/features/account/AccountPage.tsx
 msgid "My account"
 msgstr "My account"
+
+#: src/features/account/AccountPage.tsx
+msgid "Name"
+msgstr "Name"
+
+#: src/features/account/change-password-form.tsx
+#: src/features/auth/accept-invitation-form.tsx
+#: src/features/auth/account-setup-form.tsx
+#: src/features/auth/reset-password-form.tsx
+msgid "New password"
+msgstr "New password"
 
 #: src/design-system/components/pagination.tsx
 #: src/design-system/tv/tv-display.tsx
@@ -229,6 +405,7 @@ msgid "Next call coming up"
 msgstr "Next call coming up"
 
 #: src/design-system/patterns/clinic-switcher.tsx
+#: src/features/auth/select-clinic.tsx
 msgid "No longer active"
 msgstr "No longer active"
 
@@ -239,6 +416,14 @@ msgstr "No one waiting"
 #: src/design-system/components/select-fields.tsx
 msgid "No results"
 msgstr "No results"
+
+#: src/features/auth/select-clinic.tsx
+msgid "Not available"
+msgstr "Not available"
+
+#: src/features/home/HomePage.tsx
+msgid "Not available yet"
+msgstr "Not available yet"
 
 #: src/design-system/patterns/permission.tsx
 msgid "Not set"
@@ -269,6 +454,11 @@ msgstr "Off"
 msgid "On"
 msgstr "On"
 
+#. placeholder {0}: membership.tenantName
+#: src/features/auth/select-clinic.tsx
+msgid "Opening {0}…"
+msgstr "Opening {0}…"
+
 #: src/design-system/components/date-fields.tsx
 #: src/design-system/components/field.tsx
 msgid "Optional"
@@ -285,6 +475,10 @@ msgstr "Page not found"
 #: src/design-system/components/pagination.tsx
 msgid "Pagination"
 msgstr "Pagination"
+
+#: src/features/auth/login-form.tsx
+msgid "Password"
+msgstr "Password"
 
 #: src/design-system/components/pagination.tsx
 msgid "Per page"
@@ -314,6 +508,10 @@ msgstr "Please sign in to continue."
 msgid "Please try again."
 msgstr "Please try again."
 
+#: src/features/auth/rate-limit.ts
+msgid "Please wait {duration} before trying again."
+msgstr "Please wait {duration} before trying again."
+
 #: src/design-system/components/date-fields.tsx
 msgid "PM"
 msgstr "PM"
@@ -330,13 +528,52 @@ msgstr "Reconnecting… last updated {lastUpdated}"
 msgid "Reference: {requestId}"
 msgstr "Reference: {requestId}"
 
+#: src/features/account/AccountPage.tsx
+msgid "Role"
+msgstr "Role"
+
+#: src/features/auth/reset-password-form.tsx
+msgid "Save new password"
+msgstr "Save new password"
+
+#: src/features/account/change-password-form.tsx
+#: src/features/auth/accept-invitation-form.tsx
+#: src/features/auth/account-setup-form.tsx
+#: src/features/auth/reset-password-form.tsx
+msgid "Saving…"
+msgstr "Saving…"
+
 #: src/design-system/components/select-fields.tsx
 msgid "Search"
 msgstr "Search"
 
+#: src/features/home/HomePage.tsx
+msgid "Seen today"
+msgstr "Seen today"
+
 #: src/design-system/components/data-table.tsx
 msgid "Selected"
 msgstr "Selected"
+
+#: src/features/auth/token-form-parts.tsx
+msgid "Send a new link"
+msgstr "Send a new link"
+
+#: src/features/auth/forgot-password-form.tsx
+msgid "Send me a link"
+msgstr "Send me a link"
+
+#: src/features/auth/forgot-password-form.tsx
+msgid "Sending…"
+msgstr "Sending…"
+
+#: src/features/auth/account-setup-form.tsx
+msgid "Set up my account"
+msgstr "Set up my account"
+
+#: src/features/auth/auth-pages.tsx
+msgid "Set up your account"
+msgstr "Set up your account"
 
 #: src/design-system/components/text-fields.tsx
 msgid "Show password"
@@ -346,13 +583,31 @@ msgstr "Show password"
 msgid "Showing {from} to {to} of {totalItems}"
 msgstr "Showing {from} to {to} of {totalItems}"
 
+#: src/features/auth/auth-pages.tsx
+#: src/features/auth/login-form.tsx
+msgid "Sign in"
+msgstr "Sign in"
+
 #: src/design-system/patterns/user-menu.tsx
+#: src/features/auth/select-clinic.tsx
 msgid "Sign out"
 msgstr "Sign out"
+
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "Sign out everywhere"
+msgstr "Sign out everywhere"
 
 #: src/design-system/patterns/user-menu.tsx
 msgid "Sign out on all devices"
 msgstr "Sign out on all devices"
+
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "Sign out on all devices?"
+msgstr "Sign out on all devices?"
+
+#: src/features/auth/login-form.tsx
+msgid "Signing in…"
+msgstr "Signing in…"
 
 #: src/app/RootLayout.tsx
 msgid "Skip to main content"
@@ -400,6 +655,7 @@ msgid "Success"
 msgstr "Success"
 
 #: src/design-system/patterns/clinic-switcher.tsx
+#: src/features/auth/select-clinic.tsx
 msgid "Suspended"
 msgstr "Suspended"
 
@@ -459,6 +715,10 @@ msgstr "The service is starting up. Please try again in a moment."
 msgid "The settings below are missing or not valid. Ask the person who installed the app to fix them."
 msgstr "The settings below are missing or not valid. Ask the person who installed the app to fix them."
 
+#: src/features/home/HomePage.tsx
+msgid "These numbers appear here once appointments are being booked."
+msgstr "These numbers appear here once appointments are being booked."
+
 #: src/api/error-messages.ts
 msgid "This action is not allowed here."
 msgstr "This action is not allowed here."
@@ -491,6 +751,10 @@ msgstr "This clinic's access is suspended for now."
 msgid "This field is not accepted."
 msgstr "This field is not accepted."
 
+#: src/features/auth/login-form.tsx
+msgid "This is a shared computer"
+msgstr "This is a shared computer"
+
 #: src/api/error-messages.ts
 msgid "This is linked to other information, so it cannot be changed this way."
 msgstr "This is linked to other information, so it cannot be changed this way."
@@ -516,6 +780,7 @@ msgid "This is too short."
 msgstr "This is too short."
 
 #: src/api/error-messages.ts
+#: src/features/auth/token-form-parts.tsx
 msgid "This link is not valid or has expired. Please ask for a new one."
 msgstr "This link is not valid or has expired. Please ask for a new one."
 
@@ -535,6 +800,14 @@ msgstr "This value is not allowed."
 msgid "To"
 msgstr "To"
 
+#: src/features/account/AccountPage.tsx
+msgid "To change your name or email, ask your clinic admin."
+msgstr "To change your name or email, ask your clinic admin."
+
+#: src/features/home/HomePage.tsx
+msgid "Today at a glance"
+msgstr "Today at a glance"
+
 #: src/api/error-messages.ts
 msgid "Too many attempts. Please wait a moment and try again."
 msgstr "Too many attempts. Please wait a moment and try again."
@@ -547,9 +820,17 @@ msgstr "Try again"
 msgid "Updated {lastUpdated}"
 msgstr "Updated {lastUpdated}"
 
+#: src/features/home/HomePage.tsx
+msgid "Waiting now"
+msgstr "Waiting now"
+
 #: src/design-system/components/alert.tsx
 msgid "Warning"
 msgstr "Warning"
+
+#: src/features/auth/passwords.ts
+msgid "We also check that it is not a very common password."
+msgstr "We also check that it is not a very common password."
 
 #: src/api/error-messages.ts
 msgid "We could not connect. Check your internet connection and try again."
@@ -571,6 +852,10 @@ msgstr "We could not find what you were looking for."
 msgid "We could not understand that request. Please try again."
 msgstr "We could not understand that request. Please try again."
 
+#: src/features/home/HomePage.tsx
+msgid "Welcome, {firstName}"
+msgstr "Welcome, {firstName}"
+
 #: src/design-system/components/date-fields.tsx
 msgid "Year"
 msgstr "Year"
@@ -583,13 +868,74 @@ msgstr "You do not have access to this clinic."
 msgid "You do not have permission to do this."
 msgstr "You do not have permission to do this."
 
+#: src/features/auth/select-clinic.tsx
+msgid "You don't have a clinic you can open right now."
+msgstr "You don't have a clinic you can open right now."
+
 #: src/design-system/patterns/permission.tsx
 msgid "You don't have access to this page"
 msgstr "You don't have access to this page"
 
+#: src/features/auth/accept-invitation-form.tsx
+msgid "You have been invited to join a clinic on DocTayo."
+msgstr "You have been invited to join a clinic on DocTayo."
+
+#: src/features/auth/login-form.tsx
+msgid "You have joined the clinic. Sign in to open it."
+msgstr "You have joined the clinic. Sign in to open it."
+
+#: src/features/auth/select-clinic.tsx
+msgid "You no longer have access"
+msgstr "You no longer have access"
+
+#: src/features/auth/login-form.tsx
+msgid "You signed out in another window."
+msgstr "You signed out in another window."
+
+#: src/features/auth/login-form.tsx
+msgid "You were signed out because the computer was not used for 10 minutes."
+msgstr "You were signed out because the computer was not used for 10 minutes."
+
+#: src/features/auth/select-clinic.tsx
+msgid "Your access is paused"
+msgstr "Your access is paused"
+
+#: src/features/auth/login-form.tsx
+msgid "Your account is ready. Sign in to start."
+msgstr "Your account is ready. Sign in to start."
+
 #: src/design-system/components/dialog.tsx
 msgid "Your changes will be lost."
 msgstr "Your changes will be lost."
+
+#: src/features/auth/select-clinic.tsx
+msgid "Your clinics"
+msgstr "Your clinics"
+
+#: src/features/account/AccountPage.tsx
+msgid "Your details"
+msgstr "Your details"
+
+#: src/features/auth/accept-invitation-form.tsx
+#: src/features/auth/account-setup-form.tsx
+msgid "Your name"
+msgstr "Your name"
+
+#: src/features/auth/login-form.tsx
+msgid "Your password was changed. For your safety, every device was signed out."
+msgstr "Your password was changed. For your safety, every device was signed out."
+
+#: src/features/account/change-password-form.tsx
+msgid "Your password was changed. Your other devices were signed out; this one stays signed in."
+msgstr "Your password was changed. Your other devices were signed out; this one stays signed in."
+
+#: src/features/auth/login-form.tsx
+msgid "Your password was saved. Sign in with your new password."
+msgstr "Your password was saved. Sign in with your new password."
+
+#: src/features/auth/login-form.tsx
+msgid "Your session ended. Please sign in again."
+msgstr "Your session ended. Please sign in again."
 
 #: src/api/error-messages.ts
 msgid "Your session needs to be renewed. Please try again."

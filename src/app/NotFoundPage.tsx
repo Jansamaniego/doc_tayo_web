@@ -7,7 +7,11 @@ export function NotFoundPage() {
   const { t } = useLingui();
   usePageTitle(t`Page not found`);
   return (
-    <div className="mx-auto flex max-w-reading flex-col gap-4 px-4 py-10">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="mx-auto flex max-w-reading flex-col gap-4 px-4 py-10 outline-none"
+    >
       <h1>
         <Trans>We could not find this page</Trans>
       </h1>
@@ -19,6 +23,6 @@ export function NotFoundPage() {
           <Trans>Go to the home page</Trans>
         </TextLink>
       </p>
-    </div>
+    </main>
   );
 }

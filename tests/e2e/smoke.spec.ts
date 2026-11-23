@@ -1,15 +1,15 @@
 import { expect, expectNoAxeViolations, test } from './fixtures/test.ts';
 
 test.describe('smoke', () => {
-  test('the home page loads and the real API is reachable', async ({ page }) => {
+  test('a signed-out visit to the home page lands on the sign-in page', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'DocTayo' })).toBeVisible();
-    await expect(page.getByText('API reachable')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test('has no accessibility violations', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.getByText('API reachable')).toBeVisible();
+    await page.goto('/login');
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
     await expectNoAxeViolations(page);
   });
 
@@ -18,9 +18,9 @@ test.describe('smoke', () => {
     browserName,
   }) => {
     test.skip(browserName === 'webkit', 'Safari does not Tab to links by default.');
-    await page.goto('/');
+    await page.goto('/login');
     // The app renders after the page's load event: wait for it before using the keyboard.
-    await expect(page.getByRole('heading', { level: 1, name: 'DocTayo' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
     await page.keyboard.press('Tab');
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await expect(skipLink).toBeFocused();
@@ -28,12 +28,12 @@ test.describe('smoke', () => {
     await expect(page.locator('#main')).toBeFocused();
   });
 
-  test('the home page reads well in a very narrow, zoomed window (320 CSS px)', async ({
+  test('the sign-in page reads well in a very narrow, zoomed window (320 CSS px)', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto('/');
-    await expect(page.getByText('API reachable')).toBeVisible();
+    await page.goto('/login');
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );

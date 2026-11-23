@@ -131,7 +131,7 @@ Both runners use `.spec.ts`, so they are separated by folder: Vitest `include: [
 
 - TanStack Router with file-based routes and generated route tree.
 - `__root.tsx`: skip link ("Skip to main content"), `<main id="main">`, route announcer (the page title is announced on navigation for screen readers), focus moved to the `h1` on route change.
-- Placeholder routes: `/` (calls `GET /api/health` and shows "API reachable" / "API not reachable"), not-found.
+- Placeholder routes: `/` (calls `GET /api/health` and shows "API reachable" / "API not reachable"), not-found. **Superseded in Phase 3:** `/` is now the signed-in home page and the health placeholder (`HomePage`, `useApiHealth`) was removed.
 - Empty route groups are written down but **not created** until their phase (no empty folders).
 
 ### 2.8 Date, time and money helpers (used everywhere later)

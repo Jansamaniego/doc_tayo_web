@@ -1,8 +1,13 @@
-import { createRouter } from '@tanstack/react-router';
+import { createRouter, type RouterHistory } from '@tanstack/react-router';
 
 import { routeTree } from '@/routeTree.gen.ts';
 
-export const router = createRouter({ routeTree, defaultPreload: 'intent' });
+/** `history` is only given by tests (an in-memory history). */
+export function createAppRouter(history?: RouterHistory) {
+  return createRouter({ routeTree, defaultPreload: 'intent', ...(history && { history }) });
+}
+
+export const router = createAppRouter();
 
 declare module '@tanstack/react-router' {
   interface Register {

@@ -1,6 +1,6 @@
 # Phase 3: App shell and authentication (outline)
 
-Status: **outline** (revised 2026-11-20). Depends on Phases 1–2 (design system approved). Backend: **available now**.
+Status: **in progress** (started 2026-11-21; see "As Built" at the end). Depends on Phases 1–2 (design system approved). Backend: **available now**.
 
 ## Objectives
 
@@ -81,3 +81,24 @@ All flows in the integration guide §4–§7 work against the local API. No toke
 - A second seeded clinic and a multi-clinic user for e2e (backend seed).
 - Reading emails in e2e (file transport path).
 - Q16a: may unsaved input use `sessionStorage` (survives a reload) instead of memory only? Default: memory only.
+
+## As Built (in progress, 2026-11-21)
+
+Done and verified by Vitest (70 files, 937 specs in New York time; the Manila pass of `src/lib` and `src/test` also passes), tsc, eslint and Prettier:
+
+- Session module in `src/api/session/` (single-flight refresh plus Web Lock, one retry on `ACCESS_TOKEN_EXPIRED`, tab messages) and the API client retry.
+- Screens in `src/features/auth/`: sign-in, forgot password, reset password, account setup, accept invitation, clinic picker.
+- Routes in `src/routes/`: `/login` (search: `redirect`, `notice`), `/forgot-password`, `/reset-password`, `/account-setup`, `/accept-invitation` (token read once from the fragment in `beforeLoad`, forgotten on leaving), `/select-clinic`, and the `_app` layout (guard: signed in and a clinic chosen; renders the app shell) with `/` inside it. Guards are in `src/app/guards.ts`; they read the in-memory session store.
+- `App.tsx` boots the session first (loading screen, or an error with Try again when the API is unreachable), then renders the router, re-runs the guards when the session changes and clears the query cache on sign-out or clinic change.
+- App shell with the clinic switcher, user menu (sign out; sign out on all devices asks first) and navigation. Only **Home** exists, so only Home is listed. `UserMenu.onAccount` is optional (the item is hidden without it); the shell passes it, so **My account** opens `/account`.
+- Account page (`/account`, inside the shell, `src/features/account/`): read-only details from the session (name, email, active clinic, roles; there is no `PATCH /me`) and the change-password form (`POST /me/password`, 204; the other sessions are revoked and this one stays signed in; field errors `PASSWORD_INCORRECT` on `currentPassword` and the new-password codes on `newPassword`; `RATE_LIMITED` shows the wait). It does not call `GET /me`: the session already holds the same fields. Last password change date is not shown (it needs a time zone decision).
+- Home page: static (welcome, "Today at a glance" with empty figures, getting-started steps). The figures arrive with appointments.
+
+Deviations from the draft above:
+
+- `RootLayout` no longer renders `<main>`; each layout (app shell, sign-in card, not-found, error page) renders its own `<main id="main">`.
+- The sign-in page also shows three notices after the email-link flows (`password-reset`, `account-ready`, `invitation-accepted`) through a `notice` search parameter.
+
+Not done yet: branch selector (`GET /branches`), inactivity sign-out with warning and in-memory drafts, global error handling and offline banner, the e2e infrastructure (mail catcher, seeded second clinic) and the Phase 3 e2e specs. `tests/e2e/smoke.spec.ts` was updated for the sign-in page but **not run** (Docker e2e not run this session).
+
+**Known failure:** `npm run size` reports startup JavaScript at 179.3 kB of the 170 kB budget (it was 164.7 kB). The session boot code is now in the startup path. Either trim it or raise the budget in plan.md §11: not decided.
