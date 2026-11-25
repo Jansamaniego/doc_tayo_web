@@ -34,6 +34,27 @@ export function toPlainDate({ year, month, day }: PlainDateParts): string {
   return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
+/**
+ * How old someone born on `birthDate` is on `today` (both `YYYY-MM-DD`, in the same calendar): whole
+ * months under 2 years, whole years from then on. A 29 February birthday falls on 1 March in a common
+ * year. A birth date after today (the API accepts tomorrow) counts as 0 months.
+ */
+export function ageOn({ birthDate, today }: { birthDate: string; today: string }): {
+  unit: 'months' | 'years';
+  value: number;
+} {
+  const born = parsePlainDate(birthDate);
+  const now = parsePlainDate(today);
+  if (!born || !now) throw new RangeError('Expected dates as YYYY-MM-DD.');
+  const months = Math.max(
+    0,
+    (now.year - born.year) * 12 + (now.month - born.month) - (now.day < born.day ? 1 : 0),
+  );
+  return months < 24
+    ? { unit: 'months', value: months }
+    : { unit: 'years', value: Math.floor(months / 12) };
+}
+
 export function comparePlainDates(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0; // fixed-width ISO dates sort as text
 }

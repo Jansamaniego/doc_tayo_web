@@ -1,7 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createApiClient } from './client.ts';
+import { server } from '@/test/msw/server.ts';
+
+import { createApiClient, getApiClient, requestHeaders } from './client.ts';
 import { ApiError } from './errors.ts';
+import { sessionStore } from './session/session-store.ts';
 
 const ORIGIN = 'https://api.test';
 const UUID_V7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -105,5 +109,130 @@ describe('createApiClient', () => {
       code: 'NETWORK_ERROR',
       status: 0,
     });
+  });
+});
+
+describe('the clinic check header (X-Expected-Tenant-Id)', () => {
+  const clientIn = (activeTenant: string | null) => {
+    const requests: Request[] = [];
+    const client = createApiClient({
+      apiOrigin: ORIGIN,
+      getAccessToken: () => 'tok',
+      getActiveTenantId: () => activeTenant,
+      fetch: ((input: Request) => {
+        requests.push(input);
+        return Promise.resolve(Response.json({ data: {} }));
+      }) as unknown as typeof fetch,
+    });
+    return { client, requests };
+  };
+
+  it('names the active clinic on every request', async () => {
+    const { client, requests } = clientIn('clinic-a');
+    await client.GET('/api/v1/tenant');
+    await client.POST('/api/v1/branches', { body: { name: 'x', isActive: true } });
+    expect(requests.map((request) => request.headers.get('x-expected-tenant-id'))).toEqual([
+      'clinic-a',
+      'clinic-a',
+    ]);
+  });
+
+  it.each([null, ''])(
+    'is left out, never sent empty, when there is no clinic (%j)',
+    async (none) => {
+      const { client, requests } = clientIn(none);
+      await client.GET('/api/v1/tenant');
+      expect(requests[0]?.headers.has('x-expected-tenant-id')).toBe(false);
+    },
+  );
+
+  it('names the clinic a form was opened in when the caller says so, whatever is active now', async () => {
+    const { client, requests } = clientIn('clinic-b');
+    await client.POST('/api/v1/branches', {
+      body: { name: 'x', isActive: true },
+      headers: requestHeaders({ tenantId: 'clinic-a' }),
+    });
+    expect(requests[0]?.headers.get('x-expected-tenant-id')).toBe('clinic-a');
+  });
+
+  it('sends an Idempotency-Key only when one is given', async () => {
+    const { client, requests } = clientIn('clinic-a');
+    await client.POST('/api/v1/branches', { body: { name: 'x', isActive: true } });
+    await client.POST('/api/v1/branches', {
+      body: { name: 'x', isActive: true },
+      headers: requestHeaders({ idempotencyKey: 'key-1' }),
+    });
+    expect(requests[0]?.headers.has('idempotency-key')).toBe(false);
+    expect(requests[1]?.headers.get('idempotency-key')).toBe('key-1');
+    expect(requests[1]?.headers.get('x-expected-tenant-id')).toBe('clinic-a');
+  });
+
+  it('keeps the clinic and the key when the request is sent again after the access token expired', async () => {
+    const requests: Request[] = [];
+    let active = 'clinic-a';
+    const client = createApiClient({
+      apiOrigin: ORIGIN,
+      getAccessToken: () => 'old',
+      getActiveTenantId: () => active,
+      refresh: () => {
+        // Another tab switched clinics while the token was being renewed.
+        active = 'clinic-b';
+        return Promise.resolve('new');
+      },
+      fetch: ((input: Request) => {
+        requests.push(input);
+        return Promise.resolve(
+          requests.length === 1
+            ? Response.json(
+                {
+                  error: {
+                    status: 401,
+                    code: 'ACCESS_TOKEN_EXPIRED',
+                    message: 'm',
+                    requestId: 'r',
+                  },
+                },
+                { status: 401 },
+              )
+            : Response.json({ data: {} }),
+        );
+      }) as unknown as typeof fetch,
+    });
+    await client.POST('/api/v1/branches', {
+      body: { name: 'x', isActive: true },
+      headers: requestHeaders({ idempotencyKey: 'key-9' }),
+    });
+    expect(requests).toHaveLength(2);
+    expect(requests[1]?.headers.get('authorization')).toBe('Bearer new');
+    expect(requests[1]?.headers.get('idempotency-key')).toBe('key-9');
+    expect(requests[1]?.headers.get('x-expected-tenant-id')).toBe('clinic-a');
+  });
+});
+
+describe('getApiClient (the app’s client)', () => {
+  afterEach(() => {
+    sessionStore.set({ status: 'signed-out' });
+  });
+
+  it('names the clinic of the signed-in session', async () => {
+    const seen: (string | null)[] = [];
+    server.use(
+      http.get('http://localhost:3000/api/v1/tenant', ({ request }) => {
+        seen.push(request.headers.get('x-expected-tenant-id'));
+        return HttpResponse.json({ data: {} });
+      }),
+    );
+    sessionStore.set({
+      status: 'signed-in',
+      user: { id: 'u', email: 'a@b.test', fullName: 'A' },
+      memberships: [],
+      activeTenantId: 'clinic-z',
+      permissions: [],
+      platformRole: 'none',
+    });
+    await getApiClient().GET('/api/v1/tenant');
+    sessionStore.set({ status: 'signed-out' });
+    await getApiClient().GET('/api/v1/tenant');
+    expect(seen).toEqual(['clinic-z', null]);
   });
 });

@@ -18,7 +18,12 @@ Read next, as needed: [authentication.md](authentication.md) (why it works this 
 | Roles and permissions for the staff screens (`GET /roles`, `GET /permissions`) | **Available** (`members.read`) |
 | Platform admin tabs: Clinics and Users (`/admin/*`) | **Available** to platform admins only ([platform-admin-integration.md](platform-admin-integration.md)) |
 | A phone number on the profile | **Not available** (`TODO-LATER L-01` in `later.md`) |
-| Patients, appointments, encounters, prescriptions, billing | **Not available** (Phases 5–6) |
+| Patients: list, search, possible duplicates, register, view, edit, archive, restore (`/patients`) | **Available** (`patients.read` / `patients.manage`, held by all five default roles; [clinical-integration.md](clinical-integration.md)) |
+| Practitioners, staff directory, services, appointments, consultations, prescriptions | **Not available yet** (Phase 5 sub-phases 5.2 to 5.5; each is announced here when its endpoints and its part of the clinical guide are ready) |
+| Billing, notifications, reports | **Not available** (Phase 6) |
+| Contract fixes from the frontend's requests D-30 and D-1 | **Available** (Phase 5.0): every path parameter is declared in `openapi.json` (the `pathParams()` workaround can go after you re-sync the contract), and the optional `X-Expected-Tenant-Id` header makes the API refuse a request made for the wrong clinic (`409 TENANT_MISMATCH`, see [api-conventions.md](api-conventions.md)) |
+| `Idempotency-Key` header (safe retries of creating requests) | **Ready on the server**, first used by patient registration (sub-phase 5.1); see [api-conventions.md](api-conventions.md) |
+| Clinical permissions in `GET /me` and `GET /roles` | **Available**: twenty keys now; doctors and nurses get the clinical ones, owners, clinic admins and receptionists do not get medical-record keys ([authorization.md](authorization.md)) |
 
 Do not build screens or client code for the "not available" rows; the endpoints do not exist yet.
 
@@ -38,8 +43,10 @@ Without Docker, follow the README quick start, then `npm run db:seed:dev`. The s
 |---|---|---|
 | `owner@sunrise.test` | Owner | every permission; one clinic, "Sunrise Clinic" (branches "Main" and "Quezon City Annex") |
 | `clinic-admin@sunrise.test` | Clinic admin | every permission, but not an owner: cannot give or take the Owner role or change an owner's status (see `OWNER_REQUIRED`) |
-| `doctor@sunrise.test` | Doctor | read-only like the receptionist; no staff screens |
-| `reception@sunrise.test` | Receptionist | read-only: `tenant.read`, `branches.read`; useful for testing hidden/disabled UI and `403` |
+| `doctor@sunrise.test` | Doctor | clinical permissions (patients, appointments, medical records); no staff screens, no clinic settings |
+| `reception@sunrise.test` | Receptionist | front desk: patients and appointments, **no medical records**; no staff screens; useful for testing hidden/disabled UI and `403` |
+| `owner@lakeside.test` | Owner | every permission; one clinic, "Lakeside Family Clinic" (branch "Main") |
+| `multi@doctayo.test` | Clinic admin in Sunrise Clinic, Doctor in Lakeside Family Clinic | **two clinics**: sign-in selects none, so the clinic picker shows; after switching, the permissions follow the clinic (administration in Sunrise, clinical in Lakeside) |
 | `admin@doctayo.test` | Platform admin | no clinic; reaches only `/admin/*` ([platform-admin-integration.md](platform-admin-integration.md)) |
 
 Useful URLs: API `http://localhost:3000/api/v1`, Swagger UI `http://localhost:3000/api/docs`, live OpenAPI `http://localhost:3000/api/docs-json` (non-production), health `http://localhost:3000/api/health`.

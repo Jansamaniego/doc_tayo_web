@@ -23,6 +23,10 @@ const queryClient = createQueryClient({
   onClinicLost: () => {
     void getSession().refreshPermissions();
   },
+  // Another tab switched clinics: read the session again so this tab shows the real one.
+  onTenantMismatch: () => {
+    void getSession().refreshPermissions();
+  },
 });
 
 /** The first refresh, once per page load (React runs effects twice in development). */

@@ -6,6 +6,10 @@ export const accounts = {
   owner: { email: 'owner@sunrise.test', password },
   clinicAdmin: { email: 'clinic-admin@sunrise.test', password },
   receptionist: { email: 'reception@sunrise.test', password },
+  // The owner of the second seeded clinic ("Lakeside Family Clinic"), with its own patients.
+  lakesideOwner: { email: 'owner@lakeside.test', password },
+  // One account in both clinics (clinic admin in Sunrise, doctor in Lakeside): it picks a clinic.
+  multiClinic: { email: 'multi@doctayo.test', password },
   // A platform admin: no clinic, reaches only /admin/* (docs/platform-admin-integration.md §1).
   admin: { email: 'admin@doctayo.test', password },
 } as const;

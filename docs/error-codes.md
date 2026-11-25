@@ -50,8 +50,18 @@ Every non-2xx response uses one shape:
 | `ACCESS_TOKEN_EXPIRED` | 401 | Your session needs to be refreshed. |
 | `TOKEN_INVALID` | 400 | This link is invalid or has expired. Please request a new one. |
 | `ROLE_NOT_ASSIGNABLE` | 422 | This role cannot be given through an invitation. |
+| `LAST_OWNER` | 409 | A clinic must always keep at least one active owner. |
+| `OWNER_REQUIRED` | 403 | Only an owner can change owners or the owner role. |
+| `SELF_ACTION_FORBIDDEN` | 403 | You cannot change your own membership this way. |
+| `VERSION_CONFLICT` | 409 | This record was changed by someone else. Please reload it and try again. |
+| `TENANT_MISMATCH` | 409 | This page is showing a different clinic than your current one. Please reload the page. |
+| `IDEMPOTENCY_KEY_REUSED` | 422 | This request was already sent with different details. Please start again. |
+| `IDEMPOTENCY_KEY_IN_USE` | 409 | This request is still being processed. Please wait a moment and try again. |
+| `IDEMPOTENCY_KEY_INVALID` | 400 | The request key is not valid. |
 
-`INVALID_CREDENTIALS` is the single answer for an unknown email, a wrong password, and a `pending` or `deactivated` account, so responses never reveal which accounts exist. `ACCESS_TOKEN_EXPIRED` tells the client to call `POST /auth/refresh`; every other token failure is `UNAUTHENTICATED`. `TOKEN_INVALID` covers every emailed-link failure (unknown, expired, used, revoked or replaced token).
+`INVALID_CREDENTIALS` is the single answer for an unknown email, a wrong password, and a `pending` or `deactivated` account, so responses never reveal which accounts exist. `ACCESS_TOKEN_EXPIRED` tells the client to call `POST /auth/refresh`; every other token failure is `UNAUTHENTICATED`. `TOKEN_INVALID` covers every emailed-link failure (unknown, expired, used, revoked or replaced token). `LAST_OWNER`, `OWNER_REQUIRED` and `SELF_ACTION_FORBIDDEN` come from member administration (`/members`): a change that would leave no active owner, a non-owner touching the owner role or an owner's membership, and acting on your own membership.
+
+**Phase 5.0 codes.** `VERSION_CONFLICT`: a write carried an out-of-date `version` (optimistic locking, produced by every versioned resource from sub-phase 5.1); reload the record, merge, and send again. The body does not carry the current version. `TENANT_MISMATCH`: the optional `X-Expected-Tenant-Id` header named a clinic other than the session's active clinic (another tab switched clinics); nothing was done, reload the page. The three `IDEMPOTENCY_KEY_*` codes belong to the `Idempotency-Key` header (see [api-conventions.md](api-conventions.md)): `_REUSED` means the same key was used with a different request, `_IN_USE` means the first request with that key is still running (`Retry-After` says when to ask again), `_INVALID` means the key is not 1 to 255 printable ASCII characters. Only successful outcomes are remembered, so a request that failed is simply sent again with the same key and gets its real answer.
 
 ## Reserved codes
 

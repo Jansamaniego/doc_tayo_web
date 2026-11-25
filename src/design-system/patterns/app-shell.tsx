@@ -153,9 +153,11 @@ export function AppShell({
     </main>
   );
 
-  if (mode === 'desktop') {
-    return (
-      <div className="flex min-h-screen bg-page print:block">
+  // One tree for every width: only the navigation around the page differs. The page stays at the same
+  // place in it, so turning a tablet never rebuilds the page (and empties a half-typed form).
+  return (
+    <div className={cn('flex min-h-screen bg-page print:block', mode !== 'desktop' && 'flex-col')}>
+      {mode === 'desktop' && (
         <aside className="w-64 shrink-0 border-r border-divider bg-surface p-3 print:hidden">
           <nav aria-label={t`Main`}>
             <ul className="flex flex-col gap-1">
@@ -168,28 +170,24 @@ export function AppShell({
             </ul>
           </nav>
         </aside>
-        <div className="flex min-w-0 flex-1 flex-col">
-          {topBar()}
-          {content}
-        </div>
-      </div>
-    );
-  }
-
-  if (mode === 'tablet') {
-    return (
-      <div className="flex min-h-screen flex-col bg-page print:block">
+      )}
+      <div className="flex min-w-0 flex-1 flex-col">
         {topBar(
-          <Button
-            variant="secondary"
-            icon={<Menu className="size-5" />}
-            onClick={() => {
-              setMenuOpen(true);
-            }}
-          >
-            {t`Menu`}
-          </Button>,
+          mode === 'tablet' && (
+            <Button
+              variant="secondary"
+              icon={<Menu className="size-5" />}
+              onClick={() => {
+                setMenuOpen(true);
+              }}
+            >
+              {t`Menu`}
+            </Button>
+          ),
         )}
+        {content}
+      </div>
+      {mode === 'tablet' && (
         <Sheet open={menuOpen} onOpenChange={setMenuOpen} title={t`Menu`}>
           <nav aria-label={t`Main`}>
             <ul className="flex flex-col gap-1">
@@ -202,42 +200,43 @@ export function AppShell({
             </ul>
           </nav>
         </Sheet>
-        {content}
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex min-h-screen flex-col bg-page print:block">
-      {topBar()}
-      {content}
-      <nav
-        aria-label={t`Main`}
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-divider bg-surface print:hidden"
-      >
-        <ul className="flex">
-          <NavLinks items={tabs} currentId={currentId} variant="tab" renderLink={renderLink} />
-          {crowded && (
-            <li className="flex-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(true);
-                }}
-                className="flex min-h-target w-full flex-col items-center justify-center gap-1 border-t-4 border-transparent px-1 text-small hover:bg-hover"
-              >
-                <Ellipsis aria-hidden="true" className="size-6" />
-                {t`More`}
-              </button>
-            </li>
-          )}
-        </ul>
-      </nav>
-      <Sheet open={menuOpen} onOpenChange={setMenuOpen} title={t`More`}>
-        <ul className="flex flex-col gap-1">
-          <NavLinks items={overflow} currentId={currentId} variant="menu" renderLink={renderLink} />
-        </ul>
-      </Sheet>
+      )}
+      {mode === 'mobile' && (
+        <>
+          <nav
+            aria-label={t`Main`}
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-divider bg-surface print:hidden"
+          >
+            <ul className="flex">
+              <NavLinks items={tabs} currentId={currentId} variant="tab" renderLink={renderLink} />
+              {crowded && (
+                <li className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(true);
+                    }}
+                    className="flex min-h-target w-full flex-col items-center justify-center gap-1 border-t-4 border-transparent px-1 text-small hover:bg-hover"
+                  >
+                    <Ellipsis aria-hidden="true" className="size-6" />
+                    {t`More`}
+                  </button>
+                </li>
+              )}
+            </ul>
+          </nav>
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen} title={t`More`}>
+            <ul className="flex flex-col gap-1">
+              <NavLinks
+                items={overflow}
+                currentId={currentId}
+                variant="menu"
+                renderLink={renderLink}
+              />
+            </ul>
+          </Sheet>
+        </>
+      )}
     </div>
   );
 }

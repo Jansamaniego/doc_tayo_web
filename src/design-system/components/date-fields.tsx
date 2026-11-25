@@ -90,6 +90,11 @@ export interface DateFieldProps extends PartsChrome {
   /** Earliest and latest allowed date, `YYYY-MM-DD`. */
   min?: string | undefined;
   max?: string | undefined;
+  /**
+   * True while something is typed that is not a real date. `value` is '' then, so a form that must not
+   * silently drop a half-typed date needs this.
+   */
+  onIncompleteChange?: ((incomplete: boolean) => void) | undefined;
   /** Rendered after the parts (the DatePicker puts its calendar button here). */
   trailing?: ReactNode;
 }
@@ -127,6 +132,7 @@ export function DateField({
   onChange,
   min,
   max,
+  onIncompleteChange,
   trailing,
 }: DateFieldProps) {
   const { t } = useLingui();
@@ -142,7 +148,9 @@ export function DateField({
 
   function update(next: DateParts): void {
     setParts(next);
-    onChange(dateOf(next));
+    const date = dateOf(next);
+    onChange(date);
+    onIncompleteChange?.(date === '' && Object.values(next).some((part) => part !== ''));
   }
 
   const complete = !!parts.month && !!parts.day && parts.year.length === 4;

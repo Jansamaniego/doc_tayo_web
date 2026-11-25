@@ -106,6 +106,12 @@ hit the API's limit of 30 page refreshes a minute per address; if the last spec 
 
 **The clinic settings spec** (`tests/e2e/clinic-settings.spec.ts`) creates a clinic and its owner the same way as the platform admin spec below (so it needs the same API setup and `admin@doctayo.test`), changes only that new clinic, and reads Sunrise Clinic as the seeded receptionist and owner. It runs in Chromium only and leaves a new "E2E Clinic ..." with its branches behind.
 
+**The patient spec** (`tests/e2e/patients.spec.ts`) only reads: it needs the patients that `npm run db:seed:dev`
+registers, and signs in as `reception@sunrise.test` and `owner@lakeside.test`.
+
+`tests/e2e/patient-registration.spec.ts` registers, edits, archives and restores patients, and archives them afterwards (they cannot be
+deleted); it also signs in as `multi@doctayo.test` to switch clinics between two tabs.
+
 **The platform admin spec** (`tests/e2e/platform-admin.spec.ts`) creates a clinic and an owner, then reads
 the owner's setup link from the API's emails. So the API must run with `MAIL_TRANSPORT=file` (it writes to
 its `var/mail`; with Docker: `MAIL_TRANSPORT=file docker compose up -d api`, and the e2e container reads the

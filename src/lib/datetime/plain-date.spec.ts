@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ageOn,
   comparePlainDates,
   daysInMonth,
   formatPlainDate,
@@ -88,5 +89,38 @@ describe('plainDateToLocalDate / localDateToPlainDate (for the calendar widget)'
   it('uses the local calendar day as a container, never a UTC conversion', () => {
     const date = plainDateToLocalDate('2026-11-21');
     expect([date.getFullYear(), date.getMonth(), date.getDate()]).toEqual([2026, 10, 21]);
+  });
+});
+
+describe('ageOn (from plain dates only: no time zone is involved)', () => {
+  const age = (birthDate: string, today: string) => ageOn({ birthDate, today });
+
+  it('counts years from 2 years old, changing on the birthday', () => {
+    expect(age('1985-03-14', '2026-03-13')).toEqual({ unit: 'years', value: 40 });
+    expect(age('1985-03-14', '2026-03-14')).toEqual({ unit: 'years', value: 41 });
+    expect(age('1985-03-14', '2026-03-15')).toEqual({ unit: 'years', value: 41 });
+  });
+
+  it('counts months under 2 years, changing on the day of the month', () => {
+    expect(age('2026-01-15', '2026-01-15')).toEqual({ unit: 'months', value: 0 });
+    expect(age('2026-01-15', '2026-02-14')).toEqual({ unit: 'months', value: 0 });
+    expect(age('2026-01-15', '2026-02-15')).toEqual({ unit: 'months', value: 1 });
+    expect(age('2025-01-15', '2027-01-14')).toEqual({ unit: 'months', value: 23 });
+    expect(age('2025-01-15', '2027-01-15')).toEqual({ unit: 'years', value: 2 });
+  });
+
+  it('gives a person born on 29 February their birthday on 1 March in a common year', () => {
+    expect(age('2020-02-29', '2025-02-28')).toEqual({ unit: 'years', value: 4 });
+    expect(age('2020-02-29', '2025-03-01')).toEqual({ unit: 'years', value: 5 });
+    expect(age('2020-02-29', '2024-02-29')).toEqual({ unit: 'years', value: 4 });
+  });
+
+  it('is 0 months for a birth date after today (the API accepts tomorrow)', () => {
+    expect(age('2026-01-16', '2026-01-15')).toEqual({ unit: 'months', value: 0 });
+  });
+
+  it.each(['', '2020-02-30', '15/01/2020'])('refuses %j as a date', (bad) => {
+    expect(() => age(bad, '2026-01-15')).toThrow(RangeError);
+    expect(() => age('2020-01-15', bad)).toThrow(RangeError);
   });
 });

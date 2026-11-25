@@ -285,3 +285,45 @@ describe('DateRangePicker', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+describe('DateField: telling the form about a date that is typed but not usable', () => {
+  const setup = (initial = '') => {
+    const onIncompleteChange = vi.fn();
+    renderWithProviders(
+      <DateField
+        legend="Date of birth"
+        value={initial}
+        onChange={() => undefined}
+        onIncompleteChange={onIncompleteChange}
+      />,
+    );
+    return onIncompleteChange;
+  };
+  const month = () => screen.getByLabelText('Month');
+  const day = () => screen.getByLabelText('Day');
+  const year = () => screen.getByLabelText('Year');
+
+  it('is incomplete while only some parts are filled, and no longer once a real date is there', async () => {
+    const incomplete = setup();
+    await userEvent.selectOptions(month(), 'March');
+    expect(incomplete).toHaveBeenLastCalledWith(true);
+    await userEvent.type(day(), '8');
+    await userEvent.type(year(), '1980');
+    expect(incomplete).toHaveBeenLastCalledWith(false);
+  });
+
+  it('is incomplete for a date that does not exist', async () => {
+    const incomplete = setup();
+    await userEvent.selectOptions(month(), 'February');
+    await userEvent.type(day(), '30');
+    await userEvent.type(year(), '2020');
+    expect(incomplete).toHaveBeenLastCalledWith(true);
+  });
+
+  it('is not incomplete when every part is cleared again', async () => {
+    const incomplete = setup();
+    await userEvent.type(day(), '8');
+    await userEvent.clear(day());
+    expect(incomplete).toHaveBeenLastCalledWith(false);
+  });
+});

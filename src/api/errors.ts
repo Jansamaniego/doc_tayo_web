@@ -46,6 +46,11 @@ const ERROR_CODES: Record<ErrorCode, true> = {
   CONFLICT: true,
   METHOD_NOT_ALLOWED: true,
   RATE_LIMITED: true,
+  VERSION_CONFLICT: true,
+  TENANT_MISMATCH: true,
+  IDEMPOTENCY_KEY_REUSED: true,
+  IDEMPOTENCY_KEY_IN_USE: true,
+  IDEMPOTENCY_KEY_INVALID: true,
 };
 
 const FIELD_ERROR_CODES: Record<FieldErrorCode, true> = {

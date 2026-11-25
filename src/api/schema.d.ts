@@ -212,6 +212,99 @@ export interface paths {
         patch: operations["BranchesController_update_v1"];
         trace?: never;
     };
+    "/api/v1/patients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List or search patients
+         * @description Without `q`, by last name. `q` is a patient number, a phone number or a name. Responses are never cached.
+         */
+        get: operations["PatientsController_list_v1"];
+        put?: never;
+        /**
+         * Register a patient
+         * @description Assigns the next patient number of the clinic. Send an `Idempotency-Key` so a double tap does not register twice.
+         */
+        post: operations["PatientsController_register_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/patients/possible-duplicates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Existing patients a new registration may duplicate
+         * @description Up to 5 candidates: the same phone, or a similar name with the same birth date. Never blocks registration.
+         */
+        get: operations["PatientsController_findPossibleDuplicates_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/patients/{patientId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PatientsController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["PatientsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/patients/{patientId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a patient (hidden from lists, never deleted) */
+        post: operations["PatientsController_archive_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/patients/{patientId}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PatientsController_unarchive_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -796,6 +889,121 @@ export interface components {
             timezone?: string | null;
             isActive?: boolean;
         };
+        PatientResponse: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * @description Unique within the clinic.
+             * @example P-000123
+             */
+            patientNumber: string;
+            firstName: string;
+            middleName: string | null;
+            lastName: string;
+            suffix: string | null;
+            /** @enum {string} */
+            sex: "female" | "male" | "unknown";
+            /** @example 1985-03-14 */
+            birthDate: string | null;
+            /** @example +639171234567 */
+            phone: string | null;
+            email: string | null;
+            addressLine: string | null;
+            city: string | null;
+            province: string | null;
+            guardianName: string | null;
+            guardianPhone: string | null;
+            allergies: string | null;
+            notes: string | null;
+            /** Format: date-time */
+            archivedAt: string | null;
+            archiveReason: string | null;
+            /** @description Send it back when editing or archiving (optimistic locking). */
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PatientListEnvelope: {
+            data: components["schemas"]["PatientResponse"][];
+            meta: components["schemas"]["PageMetaResponse"];
+        };
+        Object: Record<string, never>;
+        PossibleDuplicateResponse: {
+            /** @enum {string} */
+            reason: "same_phone" | "similar_name_same_birth_date";
+            patient: components["schemas"]["PatientResponse"];
+        };
+        PossibleDuplicatesEnvelope: {
+            data: components["schemas"]["PossibleDuplicateResponse"][];
+        };
+        CreatePatientDto: {
+            firstName: string;
+            middleName?: string | null;
+            lastName: string;
+            /** @example Jr. */
+            suffix?: string | null;
+            /**
+             * @default unknown
+             * @enum {string}
+             */
+            sex: "female" | "male" | "unknown";
+            /**
+             * @description YYYY-MM-DD, a real date from 1900 to tomorrow (UTC). Never a time.
+             * @example 1985-03-14
+             */
+            birthDate?: string | null;
+            /**
+             * @description Local formats are accepted and stored as E.164 (+639171234567).
+             * @example 0917 123 4567
+             */
+            phone?: string | null;
+            email?: string | null;
+            addressLine?: string | null;
+            city?: string | null;
+            province?: string | null;
+            guardianName?: string | null;
+            guardianPhone?: string | null;
+            allergies?: string | null;
+            /** @description Non-clinical notes for the front desk, e.g. "prefers Tagalog". */
+            notes?: string | null;
+        };
+        PatientEnvelope: {
+            data: components["schemas"]["PatientResponse"];
+        };
+        UpdatePatientDto: {
+            /** @description The version you read. A stale one is 409 VERSION_CONFLICT. */
+            version: number;
+            firstName?: string;
+            middleName?: string | null;
+            lastName?: string;
+            suffix?: string | null;
+            /** @enum {string} */
+            sex?: "female" | "male" | "unknown";
+            /** @example 1985-03-14 */
+            birthDate?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            addressLine?: string | null;
+            city?: string | null;
+            province?: string | null;
+            guardianName?: string | null;
+            guardianPhone?: string | null;
+            allergies?: string | null;
+            notes?: string | null;
+        };
+        ArchivePatientDto: {
+            version: number;
+            /**
+             * @description Why the patient is archived. Shown to staff, not to the patient.
+             * @example Duplicate record
+             */
+            reason: string;
+        };
+        UnarchivePatientDto: {
+            version: number;
+        };
         MeProfileData: {
             /** Format: uuid */
             id: string;
@@ -1087,7 +1295,7 @@ export interface components {
             status: "active" | "deactivated";
         };
         /** @enum {string} */
-        ErrorCode: "VALIDATION_FAILED" | "BAD_REQUEST" | "MALFORMED_JSON" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ROUTE_NOT_FOUND" | "NOT_FOUND" | "CONFLICT_UNIQUE" | "CONFLICT_REFERENCE" | "NOT_READY" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "TENANT_NOT_SELECTED" | "TENANT_SUSPENDED" | "TENANT_DEACTIVATED" | "TENANT_ACCESS_DENIED" | "INVALID_CREDENTIALS" | "ACCESS_TOKEN_EXPIRED" | "TOKEN_INVALID" | "ROLE_NOT_ASSIGNABLE" | "LAST_OWNER" | "OWNER_REQUIRED" | "SELF_ACTION_FORBIDDEN" | "CONFLICT" | "METHOD_NOT_ALLOWED" | "RATE_LIMITED";
+        ErrorCode: "VALIDATION_FAILED" | "BAD_REQUEST" | "MALFORMED_JSON" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ROUTE_NOT_FOUND" | "NOT_FOUND" | "CONFLICT_UNIQUE" | "CONFLICT_REFERENCE" | "NOT_READY" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "TENANT_NOT_SELECTED" | "TENANT_SUSPENDED" | "TENANT_DEACTIVATED" | "TENANT_ACCESS_DENIED" | "INVALID_CREDENTIALS" | "ACCESS_TOKEN_EXPIRED" | "TOKEN_INVALID" | "ROLE_NOT_ASSIGNABLE" | "LAST_OWNER" | "OWNER_REQUIRED" | "SELF_ACTION_FORBIDDEN" | "VERSION_CONFLICT" | "TENANT_MISMATCH" | "IDEMPOTENCY_KEY_REUSED" | "IDEMPOTENCY_KEY_IN_USE" | "IDEMPOTENCY_KEY_INVALID" | "CONFLICT" | "METHOD_NOT_ALLOWED" | "RATE_LIMITED";
         /** @enum {string} */
         FieldErrorCode: "REQUIRED" | "INVALID_FORMAT" | "INVALID_TYPE" | "INVALID_VALUE" | "OUT_OF_RANGE" | "TOO_SHORT" | "TOO_LONG" | "UNKNOWN_FIELD" | "PASSWORD_TOO_COMMON" | "PASSWORD_CONTAINS_EMAIL" | "PASSWORD_INCORRECT";
         FieldErrorBody: {
@@ -1670,7 +1878,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                branchId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -1716,7 +1926,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                branchId: string;
+            };
             cookie?: never;
         };
         requestBody: {
@@ -1761,6 +1973,385 @@ export interface operations {
                 };
             };
             /** @description CONFLICT_UNIQUE: the name is taken in this clinic. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_list_v1: {
+        parameters: {
+            query?: {
+                /** @description A name (typo and accent tolerant; any word may start the text), a patient number (P-000123) or a phone number in any format. Search text is never logged. */
+                q?: string;
+                includeArchived?: boolean;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_register_v1: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional unique value (a UUID is ideal, 1 to 255 printable ASCII characters). Send the same key when retrying this request after a timeout or a double tap: it is carried out once and the first answer is repeated for 24 hours. The same key with a different body is refused (422 IDEMPOTENCY_KEY_REUSED); while the first request is still running a retry is refused (409 IDEMPOTENCY_KEY_IN_USE, see Retry-After). Only successful requests are remembered. */
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePatientDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_IN_USE: the first request with this key is still running. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_REUSED: this key was already used with a different request. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_findPossibleDuplicates_v1: {
+        parameters: {
+            query?: {
+                firstName?: string;
+                lastName?: string;
+                birthDate?: components["schemas"]["Object"];
+                /** @description Any format. Encode "+" as %2B in a query string. Text that is not a usable phone number is ignored (the form may be half typed). */
+                phone?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PossibleDuplicatesEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's patient). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePatientDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's patient). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description VERSION_CONFLICT: someone saved first; reload the patient and try again. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_archive_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArchivePatientDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's patient). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT: already archived. VERSION_CONFLICT: someone saved first; reload the patient and try again. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientsController_unarchive_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnarchivePatientDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's patient). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT: not archived. VERSION_CONFLICT: someone saved first; reload the patient and try again. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -1968,7 +2559,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                sessionId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2048,7 +2641,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                membershipId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2094,7 +2689,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                membershipId: string;
+            };
             cookie?: never;
         };
         requestBody: {
@@ -2153,7 +2750,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                membershipId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2207,7 +2806,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                membershipId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2261,7 +2862,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                membershipId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2424,7 +3027,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                invitationId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2479,7 +3084,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                invitationId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2700,7 +3307,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                tenantId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2746,7 +3355,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                tenantId: string;
+            };
             cookie?: never;
         };
         requestBody: {
@@ -2846,7 +3457,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                userId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2892,7 +3505,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                userId: string;
+            };
             cookie?: never;
         };
         requestBody: {

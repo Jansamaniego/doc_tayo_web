@@ -5,6 +5,7 @@ import {
   formatTime,
   fromClinicDateTime,
   timeZoneOptions,
+  todayInZone,
   toClinicDateTime,
 } from './index.ts';
 
@@ -108,5 +109,24 @@ describe('timeZoneOptions', () => {
         formatDate({ iso: '2026-01-01T00:00:00Z', timeZone: zone, style: 'medium' }),
       ).not.toThrow();
     }
+  });
+});
+
+describe('todayInZone', () => {
+  const now = new Date('2026-03-01T23:30:00.000Z');
+
+  it('is the date it is in that zone right now, not on this computer', () => {
+    expect(todayInZone({ timeZone: 'Asia/Manila', now })).toBe('2026-03-02');
+    expect(todayInZone({ timeZone: 'America/New_York', now })).toBe('2026-03-01');
+    expect(todayInZone({ timeZone: 'UTC', now })).toBe('2026-03-01');
+  });
+
+  it('refuses an unknown or empty zone', () => {
+    expect(() => todayInZone({ timeZone: 'Nowhere/City', now })).toThrow(RangeError);
+    expect(() => todayInZone({ timeZone: '', now })).toThrow(RangeError);
+  });
+
+  it('uses the current time by default', () => {
+    expect(todayInZone({ timeZone: 'Asia/Manila' })).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

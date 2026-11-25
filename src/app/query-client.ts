@@ -15,17 +15,23 @@ function retryRead(failureCount: number, error: unknown): boolean {
  * `TENANT_NOT_SELECTED` and `TENANT_ACCESS_DENIED` mean an admin suspended or removed the person
  * from the clinic they had open: the same "ask again" applies, and the clinic guard then sends
  * them to the picker (docs/staff-management-integration.md 4.5).
+ * `TENANT_MISMATCH` means the request named a clinic that is no longer the active one (switched in
+ * another tab): the session is read again so this tab shows the clinic it is really in. What the
+ * person typed stays on the page (docs/clinical-integration.md).
  */
 export function createQueryClient({
   onForbidden,
   onClinicLost,
+  onTenantMismatch,
 }: {
   onForbidden: () => void;
   onClinicLost: () => void;
+  onTenantMismatch: () => void;
 }): QueryClient {
   const onError = (error: unknown): void => {
     if (!isApiError(error)) return;
     if (error.code === 'FORBIDDEN') onForbidden();
+    else if (error.code === 'TENANT_MISMATCH') onTenantMismatch();
     else if (error.code === 'TENANT_NOT_SELECTED' || error.code === 'TENANT_ACCESS_DENIED') {
       onClinicLost();
     }

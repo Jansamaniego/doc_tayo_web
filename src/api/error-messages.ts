@@ -36,6 +36,11 @@ const ERROR_MESSAGES: Record<ErrorCode | 'NETWORK_ERROR', MessageDescriptor> = {
   CONFLICT: msg`This cannot be done while the record is in its current state.`,
   METHOD_NOT_ALLOWED: msg`This action is not allowed here.`,
   RATE_LIMITED: msg`Too many attempts. Please wait a moment and try again.`,
+  VERSION_CONFLICT: msg`Someone else changed this while you were working. Please reload it and try again.`,
+  TENANT_MISMATCH: msg`This page was opened for another clinic. Nothing was saved. Check which clinic you are in and try again.`,
+  IDEMPOTENCY_KEY_REUSED: msg`This request was already sent with different details. Please start again.`,
+  IDEMPOTENCY_KEY_IN_USE: msg`Still saving. Please wait a moment.`,
+  IDEMPOTENCY_KEY_INVALID: msg`We could not send that request. Please start again.`,
   NETWORK_ERROR: msg`We could not connect. Check your internet connection and try again.`,
 };
 

@@ -36,6 +36,17 @@ export function toClinicDateTime({
   };
 }
 
+/** Today's calendar date (`YYYY-MM-DD`) in the clinic's zone, whatever the computer thinks. */
+export function todayInZone({
+  timeZone,
+  now = new Date(),
+}: {
+  timeZone: string;
+  now?: Date;
+}): string {
+  return toClinicDateTime({ iso: now.toISOString(), timeZone }).date;
+}
+
 /** What the user picked in the clinic's zone -> an ISO UTC timestamp for the API. */
 export function fromClinicDateTime({
   date,

@@ -2,7 +2,6 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 
 import { getApiClient } from '@/api/client.ts';
 import { networkError } from '@/api/errors.ts';
-import { pathParams } from '@/api/path-params.ts';
 import type { components } from '@/api/schema';
 
 export type TenantStatus = components['schemas']['AdminTenantListItem']['status'];
@@ -43,7 +42,7 @@ export function useAdminTenant(tenantId: string) {
     queryKey: [...KEY, 'detail', tenantId],
     queryFn: async () => {
       const result = await getApiClient().GET('/api/v1/admin/tenants/{tenantId}', {
-        ...pathParams({ tenantId }),
+        params: { path: { tenantId } },
       });
       if (!result.data) throw networkError(new Error('Empty answer.'));
       return result.data.data;
@@ -57,7 +56,7 @@ export function useSetTenantStatus() {
   return useMutation({
     mutationFn: async ({ tenantId, status }: { tenantId: string; status: TenantStatus }) => {
       await getApiClient().PATCH('/api/v1/admin/tenants/{tenantId}/status', {
-        ...pathParams({ tenantId }),
+        params: { path: { tenantId } },
         body: { status },
       });
     },

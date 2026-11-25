@@ -15,6 +15,11 @@ msgstr ""
 msgid "(you)"
 msgstr ""
 
+#. placeholder {0}: list.data.meta.totalItems
+#: src/features/patients/list/PatientsPage.tsx
+msgid "{0, plural, one {# patient found} other {# patients found}}"
+msgstr ""
+
 #. placeholder {0}: formatDate({ iso: joinedAt, timeZone, style: 'medium' })
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "{0} ({timeZone})"
@@ -58,6 +63,10 @@ msgstr ""
 #. placeholder {0}: current.name
 #: src/features/clinic/branches/BranchPage.tsx
 msgid "{0} will no longer be offered when staff choose a branch. Its records stay, and you can reactivate it."
+msgstr ""
+
+#: src/features/patients/form/DuplicateCandidates.tsx
+msgid "{count, plural, one {# possible matching record} other {# possible matching records}}"
 msgstr ""
 
 #: src/design-system/patterns/form-error-summary.tsx
@@ -116,8 +125,21 @@ msgstr ""
 msgid "{name} is active again."
 msgstr ""
 
+#: src/features/patients/record/PatientActions.tsx
+msgid "{name} is archived."
+msgstr ""
+
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 msgid "{name} is deactivated."
+msgstr ""
+
+#. placeholder {0}: patient.patientNumber
+#: src/features/patients/form/RegisterPatientPage.tsx
+msgid "{name} is registered as {0}."
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "{name} is restored."
 msgstr ""
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
@@ -130,6 +152,14 @@ msgstr ""
 
 #: src/design-system/components/inactivity-warning.tsx
 msgid "{secondsLeft, plural, one {# second} other {# seconds}}"
+msgstr ""
+
+#: src/features/patients/birth-date.ts
+msgid "{value, plural, one {# month} other {# months}}"
+msgstr ""
+
+#: src/features/patients/birth-date.ts
+msgid "{value, plural, one {# year} other {# years}}"
 msgstr ""
 
 #. placeholder {0}: next.length - MAX_GROUPS
@@ -159,6 +189,10 @@ msgstr ""
 
 #: src/features/staff/invitations/InvitationsPage.tsx
 msgid "A new link was sent. The old link no longer works."
+msgstr ""
+
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "A reason can have at most 200 characters."
 msgstr ""
 
 #: src/features/auth/accept-invitation-form.tsx
@@ -191,6 +225,7 @@ msgstr ""
 #: src/features/admin/users/UserStatusPill.tsx
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/clinic/branches/BranchStatusPill.tsx
+#: src/features/patients/list/PatientsPage.tsx
 #: src/features/staff/members/MemberStatusPill.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Active"
@@ -225,6 +260,8 @@ msgstr ""
 
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
 msgid "Address"
 msgstr ""
 
@@ -254,12 +291,21 @@ msgstr ""
 msgid "All clinics on DocTayo"
 msgstr ""
 
+#: src/features/patients/record/PatientNotFound.tsx
+msgid "All patients"
+msgstr ""
+
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "All staff"
 msgstr ""
 
 #: src/features/admin/users/UserDetailPage.tsx
 msgid "All users"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
+msgid "Allergies"
 msgstr ""
 
 #: src/design-system/components/date-fields.tsx
@@ -299,6 +345,35 @@ msgstr ""
 msgid "Appointments today"
 msgstr ""
 
+#: src/features/patients/record/PatientActions.tsx
+msgid "Archive"
+msgstr ""
+
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "Archive {name}?"
+msgstr ""
+
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "Archive patient"
+msgstr ""
+
+#: src/features/patients/form/DuplicateCandidates.tsx
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Archived"
+msgstr ""
+
+#: src/features/patients/record/ArchivedBanner.tsx
+msgid "Archived on {date}: {reason}"
+msgstr ""
+
+#: src/features/patients/record/ArchivedBanner.tsx
+msgid "Archived: {reason}"
+msgstr ""
+
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "Archiving…"
+msgstr ""
+
 #: src/design-system/components/inactivity-warning.tsx
 msgid "Are you still there?"
 msgstr ""
@@ -317,6 +392,12 @@ msgstr ""
 
 #: src/features/auth/forgot-password-form.tsx
 msgid "Back to sign in"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/list/PatientsPage.tsx
+#: src/features/patients/record/PatientPage.tsx
+msgid "Birth date"
 msgstr ""
 
 #: src/design-system/patterns/clinic-switcher.tsx
@@ -348,6 +429,9 @@ msgstr ""
 #: src/design-system/components/confirm-dialog.tsx
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/profile/ClinicProfileForm.tsx
+#: src/features/patients/form/EditPatientPage.tsx
+#: src/features/patients/form/RegisterPatientPage.tsx
+#: src/features/patients/record/ArchiveDialog.tsx
 #: src/features/staff/invitations/InviteDialog.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Cancel"
@@ -370,6 +454,10 @@ msgstr ""
 msgid "Change time zone"
 msgstr ""
 
+#: src/features/patients/form/EditPatientPage.tsx
+msgid "Changes saved."
+msgstr ""
+
 #: src/features/admin/overview/OverviewBlocks.tsx
 msgid "Check again"
 msgstr ""
@@ -378,6 +466,10 @@ msgstr ""
 #: src/features/admin/users/UsersListPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Check the spelling, or try another word."
+msgstr ""
+
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Check the spelling, or try the patient number or phone number."
 msgstr ""
 
 #: src/features/home/HomePage.tsx
@@ -447,6 +539,8 @@ msgstr ""
 
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
 msgid "City"
 msgstr ""
 
@@ -460,6 +554,7 @@ msgstr ""
 
 #: src/features/admin/clinics/ClinicsListPage.tsx
 #: src/features/admin/users/UsersListPage.tsx
+#: src/features/patients/list/PatientsPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Clear search"
 msgstr ""
@@ -527,6 +622,10 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#: src/features/patients/form/use-patient-form.ts
+msgid "Complete the birth date with a real date, or leave it empty."
+msgstr ""
+
 #: src/features/auth/verify-email-form.tsx
 msgid "Confirm new email address"
 msgstr ""
@@ -543,6 +642,10 @@ msgstr ""
 msgid "Connect this display"
 msgstr ""
 
+#: src/features/patients/record/PatientPage.tsx
+msgid "Contact"
+msgstr ""
+
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 #: src/features/clinic/profile/ClinicProfilePage.tsx
 msgid "Contact email"
@@ -554,11 +657,16 @@ msgid "Contact phone"
 msgstr ""
 
 #: src/design-system/components/state-views.tsx
+#: src/features/patients/record/PatientPage.tsx
 msgid "Copied"
 msgstr ""
 
 #: src/design-system/components/state-views.tsx
 msgid "Copy"
+msgstr ""
+
+#: src/features/patients/record/PatientPage.tsx
+msgid "Copy number"
 msgstr ""
 
 #: src/features/auth/accept-invitation-form.tsx
@@ -669,6 +777,7 @@ msgid "Each place where you see patients is a branch."
 msgstr ""
 
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/patients/record/PatientActions.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Edit"
 msgstr ""
@@ -681,16 +790,30 @@ msgstr ""
 msgid "Edit job title"
 msgstr ""
 
+#: src/features/patients/form/EditPatientPage.tsx
+msgid "Edit patient"
+msgstr ""
+
 #: src/features/account/AccountPage.tsx
 #: src/features/admin/users/UserDetailPage.tsx
 #: src/features/admin/users/UsersListPage.tsx
 #: src/features/auth/forgot-password-form.tsx
 #: src/features/auth/login-form.tsx
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
 #: src/features/staff/invitations/InvitationsPage.tsx
 #: src/features/staff/invitations/InviteDialog.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Email"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Enter a birth date between Jan 1, 1900 and today."
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Enter a mobile number, or start a landline or foreign number with + and the country code."
 msgstr ""
 
 #: src/features/account/change-password-form.tsx
@@ -722,6 +845,14 @@ msgstr ""
 #: src/features/admin/clinics/NewClinicForm.tsx
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 msgid "Enter the clinic name."
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Enter the first name."
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Enter the last name."
 msgstr ""
 
 #: src/features/account/change-email-form.tsx
@@ -800,8 +931,26 @@ msgstr ""
 msgid "Expires"
 msgstr ""
 
+#: src/features/patients/form/PatientFields.tsx
+#: src/features/patients/form/VersionConflictNotice.tsx
+#: src/features/patients/record/PatientPage.tsx
+msgid "Female"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "First name"
+msgstr ""
+
+#: src/features/patients/form/PatientFields.tsx
+msgid "For example 0917 123 4567"
+msgstr ""
+
 #: src/design-system/components/inactivity-warning.tsx
 msgid "For privacy, you will be signed out in {seconds}."
+msgstr ""
+
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "For staff only, for example Duplicate record"
 msgstr ""
 
 #: src/features/auth/auth-pages.tsx
@@ -811,6 +960,11 @@ msgstr ""
 
 #: src/design-system/components/date-fields.tsx
 msgid "From"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
+msgid "Front desk notes (not medical)"
 msgstr ""
 
 #: src/features/home/HomePage.tsx
@@ -835,6 +989,18 @@ msgstr ""
 
 #: src/features/auth/select-clinic.tsx
 msgid "Go to the platform overview"
+msgstr ""
+
+#: src/features/patients/record/PatientPage.tsx
+msgid "Guardian"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Guardian name"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Guardian phone"
 msgstr ""
 
 #: src/features/home/HomePage.tsx
@@ -905,6 +1071,10 @@ msgstr ""
 msgid "Invited by"
 msgstr ""
 
+#: src/features/patients/form/DuplicateCandidates.tsx
+msgid "Is this the same person?"
+msgstr ""
+
 #: src/features/staff/members/EditMemberForm.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
@@ -920,7 +1090,16 @@ msgstr ""
 msgid "Joined"
 msgstr ""
 
+#: src/features/patients/form/PatientFields.tsx
+msgid "Jr., Sr., III"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Last name"
+msgstr ""
+
 #: src/design-system/components/dialog.tsx
+#: src/lib/leave-guard.tsx
 msgid "Leave"
 msgstr ""
 
@@ -933,6 +1112,7 @@ msgid "Leave empty to use the clinic's time zone."
 msgstr ""
 
 #: src/design-system/components/dialog.tsx
+#: src/lib/leave-guard.tsx
 msgid "Leave without saving?"
 msgstr ""
 
@@ -953,6 +1133,10 @@ msgstr ""
 msgid "Loading invitations…"
 msgstr ""
 
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Loading patients…"
+msgstr ""
+
 #: src/features/staff/invitations/InviteDialog.tsx
 #: src/features/staff/members/RolesReference.tsx
 msgid "Loading roles…"
@@ -969,6 +1153,11 @@ msgstr ""
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 #: src/features/clinic/profile/ClinicProfilePage.tsx
 msgid "Loading the clinic…"
+msgstr ""
+
+#: src/features/patients/form/EditPatientPage.tsx
+#: src/features/patients/record/PatientPage.tsx
+msgid "Loading the patient…"
 msgstr ""
 
 #: src/features/clinic/branches/BranchPage.tsx
@@ -1000,8 +1189,18 @@ msgstr ""
 msgid "Make sure the name and time zone are right."
 msgstr ""
 
+#: src/features/patients/form/PatientFields.tsx
+#: src/features/patients/form/VersionConflictNotice.tsx
+#: src/features/patients/record/PatientPage.tsx
+msgid "Male"
+msgstr ""
+
 #: src/design-system/patterns/app-shell.tsx
 msgid "Menu"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Middle name"
 msgstr ""
 
 #: src/design-system/components/date-fields.tsx
@@ -1028,6 +1227,8 @@ msgstr ""
 #: src/features/account/profile-name-form.tsx
 #: src/features/admin/users/UsersListPage.tsx
 #: src/features/clinic/branches/BranchesPage.tsx
+#: src/features/patients/list/PatientsPage.tsx
+#: src/features/patients/record/PatientPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Name"
 msgstr ""
@@ -1093,6 +1294,10 @@ msgstr ""
 msgid "No expired invitations"
 msgstr ""
 
+#: src/features/patients/record/PatientPage.tsx
+msgid "No guardian recorded"
+msgstr ""
+
 #: src/features/clinic/branches/BranchesPage.tsx
 msgid "No inactive branches"
 msgstr ""
@@ -1104,6 +1309,14 @@ msgstr ""
 
 #: src/design-system/tv/tv-display.tsx
 msgid "No one waiting"
+msgstr ""
+
+#: src/features/patients/list/PatientsPage.tsx
+msgid "No patient matches your search"
+msgstr ""
+
+#: src/features/patients/list/PatientsPage.tsx
+msgid "No patients yet"
 msgstr ""
 
 #: src/features/staff/invitations/InvitationsPage.tsx
@@ -1146,12 +1359,27 @@ msgstr ""
 msgid "None"
 msgstr ""
 
+#: src/features/patients/form/VersionConflictNotice.tsx
+msgid "None of the fields below changed, but the record did (for example it was archived or restored). Check it, then press Save again."
+msgstr ""
+
+#: src/features/patients/record/PatientPage.tsx
+msgid "None recorded"
+msgstr ""
+
 #: src/features/auth/select-clinic.tsx
 msgid "Not available"
 msgstr ""
 
 #: src/features/home/HomePage.tsx
 msgid "Not available yet"
+msgstr ""
+
+#: src/features/patients/form/PatientFields.tsx
+#: src/features/patients/form/VersionConflictNotice.tsx
+#: src/features/patients/list/PatientsPage.tsx
+#: src/features/patients/record/PatientPage.tsx
+msgid "Not recorded"
 msgstr ""
 
 #: src/design-system/patterns/permission.tsx
@@ -1169,6 +1397,7 @@ msgstr ""
 #: src/features/account/profile-name-form.tsx
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/profile/ClinicProfileForm.tsx
+#: src/features/patients/form/EditPatientPage.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Nothing to change."
 msgstr ""
@@ -1225,6 +1454,14 @@ msgstr ""
 msgid "Only people who manage staff can change this."
 msgstr ""
 
+#: src/features/patients/form/DuplicateCandidates.tsx
+msgid "Open record"
+msgstr ""
+
+#: src/features/patients/form/DuplicateCandidates.tsx
+msgid "Open record of {name}"
+msgstr ""
+
 #. placeholder {0}: membership.tenantName
 #: src/features/auth/select-clinic.tsx
 msgid "Opening {0}…"
@@ -1267,6 +1504,23 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Patient number"
+msgstr ""
+
+#: src/features/patients/record/PatientPage.tsx
+msgid "Patient record"
+msgstr ""
+
+#: src/features/patients/record/PatientPage.tsx
+msgid "Patient summary"
+msgstr ""
+
+#: src/features/patients/list/PatientsPage.tsx
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "Patients"
+msgstr ""
+
 #: src/features/admin/overview/SampleActivity.tsx
 msgid "Patients seen today"
 msgstr ""
@@ -1284,6 +1538,12 @@ msgstr ""
 
 #: src/design-system/components/pagination.tsx
 msgid "Per page"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/list/PatientsPage.tsx
+#: src/features/patients/record/PatientPage.tsx
+msgid "Phone"
 msgstr ""
 
 #: src/features/admin/users/UserDetailPage.tsx
@@ -1345,6 +1605,8 @@ msgstr ""
 
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
 msgid "Province"
 msgstr ""
 
@@ -1364,12 +1626,29 @@ msgstr ""
 msgid "Reactivate {name}?"
 msgstr ""
 
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "Reason"
+msgstr ""
+
 #: src/design-system/tv/tv-display.tsx
 msgid "Reconnecting… last updated {lastUpdated}"
 msgstr ""
 
 #: src/design-system/components/state-views.tsx
 msgid "Reference: {requestId}"
+msgstr ""
+
+#: src/features/patients/form/RegisterPatientPage.tsx
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Register a patient"
+msgstr ""
+
+#: src/features/patients/form/RegisterPatientPage.tsx
+msgid "Register as a new patient"
+msgstr ""
+
+#: src/features/patients/form/RegisterPatientPage.tsx
+msgid "Register patient"
 msgstr ""
 
 #: src/features/staff/members/MemberDetailPage.tsx
@@ -1392,6 +1671,18 @@ msgstr ""
 #. placeholder {0}: row.email
 #: src/features/staff/invitations/InvitationsPage.tsx
 msgid "Resend invitation to {0}"
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "Restore"
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "Restore {name}?"
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "Restoring…"
 msgstr ""
 
 #: src/features/staff/invitations/InvitationsPage.tsx
@@ -1425,6 +1716,10 @@ msgstr ""
 msgid "Roles"
 msgstr ""
 
+#: src/features/patients/form/DuplicateCandidates.tsx
+msgid "Same phone number"
+msgstr ""
+
 #: src/features/admin/overview/SampleActivity.tsx
 msgid "Sample data"
 msgstr ""
@@ -1433,6 +1728,10 @@ msgstr ""
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Save"
+msgstr ""
+
+#: src/features/patients/form/EditPatientPage.tsx
+msgid "Save changes"
 msgstr ""
 
 #: src/features/account/profile-name-form.tsx
@@ -1450,12 +1749,22 @@ msgstr ""
 #: src/features/auth/reset-password-form.tsx
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/clinic/profile/ClinicProfileForm.tsx
+#: src/features/patients/form/EditPatientPage.tsx
+#: src/features/patients/form/RegisterPatientPage.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Saving…"
 msgstr ""
 
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "Say why this patient is archived."
+msgstr ""
+
 #: src/design-system/components/select-fields.tsx
 msgid "Search"
+msgstr ""
+
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Search by name, patient number or phone"
 msgstr ""
 
 #: src/features/admin/clinics/ClinicsListPage.tsx
@@ -1516,8 +1825,17 @@ msgstr ""
 msgid "Set when the clinic was created; it cannot be changed."
 msgstr ""
 
+#: src/features/patients/form/use-patient-form.ts
+#: src/features/patients/record/PatientPage.tsx
+msgid "Sex"
+msgstr ""
+
 #: src/features/clinic/branches/BranchesPage.tsx
 msgid "Show"
+msgstr ""
+
+#: src/features/patients/list/PatientsPage.tsx
+msgid "Show archived"
 msgstr ""
 
 #: src/features/staff/invitations/InviteDialog.tsx
@@ -1567,12 +1885,28 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
+#: src/features/patients/form/DuplicateCandidates.tsx
+msgid "Similar name and the same birth date"
+msgstr ""
+
 #: src/app/RootLayout.tsx
 msgid "Skip to main content"
 msgstr ""
 
 #: src/api/error-messages.ts
 msgid "Some fields need attention."
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "Someone else changed this patient. Check the record, then try again."
+msgstr ""
+
+#: src/api/error-messages.ts
+msgid "Someone else changed this while you were working. Please reload it and try again."
+msgstr ""
+
+#: src/features/patients/form/VersionConflictNotice.tsx
+msgid "Someone else saved changes to this patient while you were editing"
 msgstr ""
 
 #: src/features/auth/verify-email-form.tsx
@@ -1621,6 +1955,7 @@ msgstr ""
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/clinic/profile/ClinicProfilePage.tsx
+#: src/features/patients/list/PatientsPage.tsx
 #: src/features/staff/invitations/InvitationsPage.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
@@ -1628,6 +1963,7 @@ msgid "Status"
 msgstr ""
 
 #: src/design-system/components/dialog.tsx
+#: src/lib/leave-guard.tsx
 msgid "Stay"
 msgstr ""
 
@@ -1639,9 +1975,17 @@ msgstr ""
 msgid "Step {position} of {total}: {name}"
 msgstr ""
 
+#: src/api/error-messages.ts
+msgid "Still saving. Please wait a moment."
+msgstr ""
+
 #: src/design-system/components/alert.tsx
 #: src/design-system/components/toast.tsx
 msgid "Success"
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "Suffix"
 msgstr ""
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
@@ -1776,8 +2120,16 @@ msgstr ""
 msgid "These numbers appear here once appointments are being booked."
 msgstr ""
 
+#: src/features/patients/record/ArchiveDialog.tsx
+msgid "They are hidden from the patient list and from search. Patients are never deleted, and you can restore them."
+msgstr ""
+
 #: src/features/staff/invitations/InviteDialog.tsx
 msgid "They get an email with a link that works for 7 days."
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "They will appear in the patient list and in search again."
 msgstr ""
 
 #: src/features/admin/users/UserDetailPage.tsx
@@ -1798,6 +2150,10 @@ msgstr ""
 
 #: src/features/clinic/branches/BranchesPage.tsx
 msgid "This branch is not in your clinic."
+msgstr ""
+
+#: src/features/patients/form/use-patient-form.ts
+msgid "This can have at most {limit} characters."
 msgstr ""
 
 #: src/api/error-messages.ts
@@ -1873,8 +2229,24 @@ msgstr ""
 msgid "This link is not valid or has expired. Please ask for a new one."
 msgstr ""
 
+#: src/features/patients/form/opened-clinic.tsx
+msgid "This page was opened for {opened}. You are now working in {now}. Nothing was saved."
+msgstr ""
+
+#: src/api/error-messages.ts
+msgid "This page was opened for another clinic. Nothing was saved. Check which clinic you are in and try again."
+msgstr ""
+
 #: src/api/error-messages.ts
 msgid "This password is too easy to guess. Please choose another."
+msgstr ""
+
+#: src/features/patients/form/RegisterPatientPage.tsx
+msgid "This patient may already have been registered. Check the matching records before registering again."
+msgstr ""
+
+#: src/features/patients/record/PatientActions.tsx
+msgid "This patient was already archived or restored by someone else."
 msgstr ""
 
 #: src/features/admin/users/UserDetailPage.tsx
@@ -1891,6 +2263,10 @@ msgstr ""
 
 #: src/features/staff/members/member-errors.ts
 msgid "This person was changed by someone else. Check their details and try again."
+msgstr ""
+
+#: src/api/error-messages.ts
+msgid "This request was already sent with different details. Please start again."
 msgstr ""
 
 #: src/api/error-messages.ts
@@ -2036,8 +2412,16 @@ msgstr ""
 msgid "We could not find this page"
 msgstr ""
 
+#: src/features/patients/record/PatientNotFound.tsx
+msgid "We could not find this patient"
+msgstr ""
+
 #: src/api/error-messages.ts
 msgid "We could not find what you were looking for."
+msgstr ""
+
+#: src/api/error-messages.ts
+msgid "We could not send that request. Please start again."
 msgstr ""
 
 #: src/api/error-messages.ts
@@ -2067,12 +2451,20 @@ msgstr ""
 msgid "What each role can do"
 msgstr ""
 
+#: src/lib/leave-guard.tsx
+msgid "What you typed will be lost."
+msgstr ""
+
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 msgid "With the country code, for example +639171234567. Spaces and dashes are fine."
 msgstr ""
 
 #: src/design-system/components/date-fields.tsx
 msgid "Year"
+msgstr ""
+
+#: src/features/patients/form/VersionConflictNotice.tsx
+msgid "You also changed this: your value is kept. Check it."
 msgstr ""
 
 #: src/features/admin/users/UserDetailPage.tsx
@@ -2138,6 +2530,10 @@ msgstr ""
 
 #: src/features/auth/login-form.tsx
 msgid "Your account is ready. Sign in to start."
+msgstr ""
+
+#: src/features/patients/form/VersionConflictNotice.tsx
+msgid "Your changes are still in the form. Check it, then press Save again."
 msgstr ""
 
 #: src/design-system/components/dialog.tsx

@@ -1,6 +1,14 @@
 import { useLingui } from '@lingui/react/macro';
 import { Outlet, useRouter, useRouterState } from '@tanstack/react-router';
-import { Building2, Hospital, House, LayoutDashboard, Users, UsersRound } from 'lucide-react';
+import {
+  ContactRound,
+  Building2,
+  Hospital,
+  House,
+  LayoutDashboard,
+  Users,
+  UsersRound,
+} from 'lucide-react';
 import { useState } from 'react';
 
 import { messageForError } from '@/api/error-messages.ts';
@@ -61,6 +69,13 @@ export function AuthenticatedShell() {
             href: '/',
           },
           {
+            id: 'patients',
+            label: t`Patients`,
+            icon: <ContactRound aria-hidden="true" className="size-6" />,
+            href: '/patients',
+            requires: 'patients.read',
+          },
+          {
             id: 'staff',
             label: t`Staff`,
             icon: <UsersRound aria-hidden="true" className="size-6" />,
@@ -105,13 +120,15 @@ export function AuthenticatedShell() {
       ? 'admin-clinics'
       : pathname.startsWith('/admin')
         ? 'admin-overview'
-        : pathname.startsWith('/staff')
-          ? 'staff'
-          : pathname.startsWith('/clinic')
-            ? 'clinic'
-            : pathname === '/'
-              ? 'home'
-              : '';
+        : pathname.startsWith('/patients')
+          ? 'patients'
+          : pathname.startsWith('/staff')
+            ? 'staff'
+            : pathname.startsWith('/clinic')
+              ? 'clinic'
+              : pathname === '/'
+                ? 'home'
+                : '';
 
   return (
     <AppShell

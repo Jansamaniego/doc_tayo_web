@@ -45,7 +45,11 @@ function renderAt(path: string, controller = fakeController()) {
   const result = render(
     <I18nProvider i18n={i18n}>
       <QueryClientProvider
-        client={createQueryClient({ onForbidden: () => undefined, onClinicLost: () => undefined })}
+        client={createQueryClient({
+          onForbidden: () => undefined,
+          onClinicLost: () => undefined,
+          onTenantMismatch: () => undefined,
+        })}
       >
         <SessionControllerProvider controller={controller}>
           <RouterProvider router={router} />
@@ -715,5 +719,247 @@ describe('clinic pages', () => {
     const { router } = renderAt('/clinic/branches?status=inactive&page=2');
     expect(await screen.findByLabelText('Show')).toHaveValue('inactive');
     expect(router.state.location.search).toEqual({ status: 'inactive', page: 2 });
+  });
+});
+
+describe('patient pages', () => {
+  const API = 'http://localhost:3000/api/v1';
+  let requests = 0;
+  beforeEach(() => {
+    requests = 0;
+    server.use(
+      http.get(`${API}/patients`, () => {
+        requests += 1;
+        return HttpResponse.json({
+          data: [],
+          meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 },
+        });
+      }),
+      http.get(`${API}/tenant`, () => HttpResponse.json({ data: { timezone: 'Asia/Manila' } })),
+    );
+  });
+  const reader = (): void => {
+    signedIn({ permissions: ['tenant.read', 'branches.read', 'patients.read'] });
+  };
+
+  it('shows Patients after Home to a person who may read patients, and opens the list', async () => {
+    reader();
+    renderAt('/patients');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Patients' })).toBeInTheDocument();
+    const links = within(screen.getByRole('navigation', { name: 'Main' })).getAllByRole('link');
+    expect(links.slice(0, 2).map((link) => link.textContent)).toEqual(['Home', 'Patients']);
+    expect(links[1]).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows a person without patients.read no item, and "no access" for a typed address, asking for nothing', async () => {
+    signedIn({ permissions: ['tenant.read'] });
+    renderAt('/patients');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Patients' })).not.toBeInTheDocument();
+    expect(requests).toBe(0);
+  });
+
+  it('reads "show archived" and the page from the address, and ignores a typed ?q=', async () => {
+    reader();
+    const asked: URL[] = [];
+    server.use(
+      http.get(`${API}/patients`, ({ request }) => {
+        asked.push(new URL(request.url));
+        return HttpResponse.json({
+          data: [],
+          meta: { page: 2, pageSize: 20, totalItems: 0, totalPages: 0 },
+        });
+      }),
+    );
+    renderAt('/patients?includeArchived=true&page=2&q=secret');
+    await screen.findByText('No patients yet');
+    expect(asked[0]?.searchParams.get('includeArchived')).toBe('true');
+    expect(asked[0]?.searchParams.get('page')).toBe('2');
+    expect(asked[0]?.searchParams.has('q')).toBe(false);
+    expect(
+      screen.getByRole('searchbox', { name: 'Search by name, patient number or phone' }),
+    ).toHaveValue('');
+  });
+
+  const servePatient = () => {
+    server.use(
+      http.get(`${API}/patients/p1`, () => {
+        requests += 1;
+        return HttpResponse.json({
+          data: {
+            id: 'p1',
+            patientNumber: 'P-000001',
+            firstName: 'Juan',
+            middleName: null,
+            lastName: 'Cruz',
+            suffix: null,
+            sex: 'male',
+            birthDate: null,
+            phone: null,
+            email: null,
+            addressLine: null,
+            city: null,
+            province: null,
+            guardianName: null,
+            guardianPhone: null,
+            allergies: null,
+            notes: null,
+            archivedAt: null,
+            archiveReason: null,
+            version: 1,
+          },
+        });
+      }),
+    );
+  };
+
+  it('opens a patient, with Patients still the current item', async () => {
+    reader();
+    servePatient();
+    renderAt('/patients/p1');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Juan Cruz' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', {
+        name: 'Patients',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows "no access" for a patient address without patients.read, asking for nothing', async () => {
+    signedIn({ permissions: ['tenant.read'] });
+    servePatient();
+    renderAt('/patients/p1');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(requests).toBe(0);
+  });
+
+  const manager = (): void => {
+    signedIn({ permissions: ['tenant.read', 'patients.read', 'patients.manage'] });
+  };
+
+  it('opens the registration form for a person who may register, not the patient page "new"', async () => {
+    manager();
+    renderAt('/patients/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Register a patient' }),
+    ).toBeInTheDocument();
+    expect(requests).toBe(0);
+  });
+
+  it('shows "no access" for the registration form without patients.manage', async () => {
+    reader();
+    renderAt('/patients/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+  });
+
+  it('asks before leaving the registration form with typed input', async () => {
+    manager();
+    const { router } = renderAt('/patients/new');
+    await userEvent.type(await screen.findByLabelText(/^First name/), 'Ana');
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    const dialog = await screen.findByRole('alertdialog');
+    expect(dialog).toHaveTextContent('Leave without saving?');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Stay' }));
+    expect(router.state.location.pathname).toBe('/patients/new');
+    expect(screen.getByLabelText(/^First name/)).toHaveValue('Ana');
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    await userEvent.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Leave' }),
+    );
+    await screen.findByRole('heading', { level: 1, name: 'Patients' });
+  });
+
+  it('lets the person leave an untouched form without asking', async () => {
+    manager();
+    renderAt('/patients/new');
+    await userEvent.click(await screen.findByRole('link', { name: 'Cancel' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Patients' })).toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('does not hold a signed-out person on a form with typed input', async () => {
+    manager();
+    const { router } = renderAt('/patients/new');
+    await userEvent.type(await screen.findByLabelText(/^First name/), 'Ana');
+    act(() => {
+      sessionStore.set({ status: 'signed-out' });
+    });
+    await act(() => router.invalidate());
+    expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument();
+  });
+
+  it('goes to the new patient’s page after registering, without asking to leave', async () => {
+    manager();
+    server.use(
+      http.post(`${API}/patients`, () =>
+        HttpResponse.json(
+          { data: { id: 'p1', patientNumber: 'P-000001', firstName: 'Juan', lastName: 'Cruz' } },
+          { status: 201 },
+        ),
+      ),
+    );
+    servePatient();
+    const { router } = renderAt('/patients/new');
+    await userEvent.type(await screen.findByLabelText(/^First name/), 'Juan');
+    await userEvent.type(screen.getByLabelText(/^Last name/), 'Cruz');
+    await userEvent.click(screen.getByRole('button', { name: 'Register patient' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Juan Cruz' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/patients/p1');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('opens the edit form from the patient page, and comes back after saving without asking', async () => {
+    manager();
+    servePatient();
+    server.use(http.patch(`${API}/patients/p1`, () => HttpResponse.json({ data: { id: 'p1' } })));
+    const { router } = renderAt('/patients/p1');
+    await userEvent.click(await screen.findByRole('link', { name: 'Edit' }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Edit patient' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/patients/p1/edit');
+    await userEvent.type(await screen.findByLabelText(/^City/), 'Taguig');
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Juan Cruz' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/patients/p1');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('asks before leaving the edit form with changes', async () => {
+    manager();
+    servePatient();
+    renderAt('/patients/p1/edit');
+    await userEvent.type(await screen.findByLabelText(/^City/), 'Taguig');
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent('Leave without saving?');
+  });
+
+  it('shows "no access" for the edit form without patients.manage, asking for nothing', async () => {
+    reader();
+    servePatient();
+    renderAt('/patients/p1/edit');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(requests).toBe(0);
+  });
+
+  it('sends a signed-in person with no clinic chosen to the clinic picker', async () => {
+    signedIn({ activeTenantId: null, permissions: [] });
+    const { router } = renderAt('/patients');
+    await screen.findByRole('heading', { level: 1, name: 'Choose a clinic' });
+    expect(router.state.location.pathname).toBe('/select-clinic');
+  });
+
+  it('sends a signed-out visitor to sign-in', async () => {
+    sessionStore.set({ status: 'signed-out' });
+    renderAt('/patients');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument();
   });
 });

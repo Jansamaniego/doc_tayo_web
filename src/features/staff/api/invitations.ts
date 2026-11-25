@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { getApiClient } from '@/api/client.ts';
 import { networkError } from '@/api/errors.ts';
-import { pathParams } from '@/api/path-params.ts';
 import type { components } from '@/api/schema';
 import { useActiveTenantId } from '@/api/session/session-store.ts';
 
@@ -63,7 +62,7 @@ export function useResendInvitation() {
   return useMutation({
     mutationFn: async (invitationId: string) => {
       await getApiClient().POST('/api/v1/invitations/{invitationId}/resend', {
-        ...pathParams({ invitationId }),
+        params: { path: { invitationId } },
       });
     },
     ...refresh,
@@ -75,7 +74,7 @@ export function useRevokeInvitation() {
   return useMutation({
     mutationFn: async (invitationId: string) => {
       await getApiClient().POST('/api/v1/invitations/{invitationId}/revoke', {
-        ...pathParams({ invitationId }),
+        params: { path: { invitationId } },
       });
     },
     ...refresh,

@@ -187,3 +187,33 @@ describe('AppShell on mobile (bottom tab bar)', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+describe('AppShell: changing the screen width keeps the page', () => {
+  const shell = (layout: 'desktop' | 'tablet' | 'mobile') => (
+    <AppShell
+      items={ITEMS}
+      permissions={OWNER}
+      currentId="home"
+      layout={layout}
+      clinic={<span>Sunrise Clinic</span>}
+      user={<span>Ana Cruz</span>}
+    >
+      <input aria-label="Typed" />
+    </AppShell>
+  );
+
+  it.each([
+    ['desktop', 'tablet'],
+    ['desktop', 'mobile'],
+    ['tablet', 'mobile'],
+    ['mobile', 'desktop'],
+  ] as const)(
+    'from %s to %s keeps what was typed (turning a tablet must not empty a form)',
+    async (from, to) => {
+      const view = renderWithProviders(shell(from));
+      await userEvent.type(screen.getByLabelText('Typed'), 'half a patient');
+      view.rerender(shell(to));
+      expect(screen.getByLabelText('Typed')).toHaveValue('half a patient');
+    },
+  );
+});

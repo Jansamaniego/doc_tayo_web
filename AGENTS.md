@@ -36,7 +36,7 @@ Dockerfile, compose file or nginx config, `scripts/docker-files.spec.ts` must st
 ```
 src/app/            providers, router, root layout, boot, global pages
 src/routes/         TanStack Router file routes: thin (guard + compose); logic lives in features/
-src/features/<x>/   one folder per product area (auth, account, home, shell, admin, staff): api/ (query hooks), components/, then folders by concern
+src/features/<x>/   one folder per product area (auth, account, home, shell, admin, staff, clinic, patients): api/ (query hooks), components/, then folders by concern
 src/design-system/  tokens/ (tokens.json is the source), components/, patterns/ (app shell, forms, permissions), tv/ (waiting-room display). Imports nothing from features/api/routes/app
 src/api/            the ONLY place that calls the API: client, errors, session/, generated schema.d.ts
 src/lib/            datetime/ (the only UTC<->clinic-time code), money.ts, preferences.ts, zod.ts, small helpers
@@ -65,6 +65,7 @@ tests/e2e/          Playwright, <feature>.spec.ts
   positional. Component props are always an object. No placeholder arguments; no parameter nothing reads.
 - **Data fetching:** only in a feature's `api/` hooks (TanStack Query), never inside design-system components.
   Query keys for clinic data start with the active clinic id (`useActiveTenantId()`; a list that keeps the previous page while loading must do so only within the same clinic); platform admin data (`/admin/*`) starts with `'admin'`. All API failures are thrown as `ApiError`. A `4xx` is not retried.
+  The client sends `X-Expected-Tenant-Id` itself. A form that saves clinic data passes the clinic it was opened in (`headers: requestHeaders({ tenantId })`), and a creating request goes through `createIdempotentAction()` (`src/api/idempotency.ts`, one instance per open form) with `requestHeaders({ idempotencyKey })`.
   Branch on `error.code`, never on `error.message`; user text comes from `src/api/error-messages.ts`.
 - **Time and money:** the API speaks UTC. Convert only through `src/lib/datetime`; the time zone is always an
   explicit argument, never the computer's. Never write an amount as a float.
@@ -81,6 +82,7 @@ tests/e2e/          Playwright, <feature>.spec.ts
   `@/lib/cn.ts` (it knows our type scale: plain `twMerge` drops colours next to `text-body-lg`).
 - **Nothing may inject styles at runtime** (the CSP has no `'unsafe-inline'`): no Sonner, no CSS-in-JS. Radix's scroll lock does, so the build aliases `react-remove-scroll` to `src/design-system/scroll-lock.tsx`; keep that alias in `vite.config.ts`, `vitest.config.ts` and `.storybook/main.ts`. Toasts are
   `notify.success/info` only, for confirmations; errors and actions stay on the page until dismissed.
+- A long form on its own page renders `<LeaveGuard>` (`src/lib/leave-guard.tsx`), which asks before its typed input is lost.
 - **Dialogs** use `useReturnFocus` (Radix returns focus only to its own Trigger). Forms: `FormErrorSummary` +
   `applyApiErrors` (maps the API's dotted `details[].field` onto fields, keeps what was typed).
 - **TV display:** `TvDisplay` accepts display-safe fields only (no full name, no priority). Never add one.

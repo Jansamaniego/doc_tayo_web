@@ -566,3 +566,9 @@ Built 2026-11-21. 53 Vitest files with 749 specs; 19 story files with 99 stories
 - ~~WebKit (Safari) in e2e~~ (now passing in the Docker e2e image); the GitHub Actions workflow changes (never run on GitHub); the dev server with the dev CSP.
 - Real browser zoom (it is emulated with a narrower window); the font alternates `cv05`/`cv08` were chosen without a side-by-side review.
 - Colour values were reviewed only in screenshots, not on a real tablet or TV.
+
+**Changed 2026-11-25 (found during Phase 6.3):**
+
+- `AppShell` returned a different tree for desktop, tablet and phone widths, so a change of width rebuilt the page inside it and erased typed input. It is now one tree whose navigation changes around a page that stays in place (`app-shell.spec.tsx`).
+- `DateField` gained `onIncompleteChange`, true while something is typed that is not a real date.
+

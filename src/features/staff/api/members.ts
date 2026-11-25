@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { getApiClient } from '@/api/client.ts';
 import { networkError } from '@/api/errors.ts';
-import { pathParams } from '@/api/path-params.ts';
 import type { components } from '@/api/schema';
 import { useActiveTenantId } from '@/api/session/session-store.ts';
 
@@ -48,7 +47,7 @@ export function useMember(membershipId: string) {
     enabled: tenantId !== null,
     queryFn: async () => {
       const result = await getApiClient().GET('/api/v1/members/{membershipId}', {
-        ...pathParams({ membershipId }),
+        params: { path: { membershipId } },
       });
       if (!result.data) throw networkError(new Error('Empty answer.'));
       return result.data.data;
@@ -85,7 +84,7 @@ export function useUpdateMember() {
       changes: MemberChanges;
     }) => {
       const result = await getApiClient().PATCH('/api/v1/members/{membershipId}', {
-        ...pathParams({ membershipId }),
+        params: { path: { membershipId } },
         body: changes,
       });
       if (!result.data) throw networkError(new Error('Empty answer.'));
@@ -112,7 +111,7 @@ export function useSetMemberStatus() {
       action: MemberStatusAction;
     }) => {
       const client = getApiClient();
-      const path = pathParams({ membershipId });
+      const path = { params: { path: { membershipId } } };
       if (action === 'suspend') await client.POST('/api/v1/members/{membershipId}/suspend', path);
       else if (action === 'reactivate')
         await client.POST('/api/v1/members/{membershipId}/reactivate', path);

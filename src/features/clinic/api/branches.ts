@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { getApiClient } from '@/api/client.ts';
 import { networkError } from '@/api/errors.ts';
-import { pathParams } from '@/api/path-params.ts';
 import type { components } from '@/api/schema';
 import { useActiveTenantId } from '@/api/session/session-store.ts';
 
@@ -47,7 +46,7 @@ export function useBranch(branchId: string) {
     enabled: tenantId !== null,
     queryFn: async () => {
       const result = await getApiClient().GET('/api/v1/branches/{branchId}', {
-        ...pathParams({ branchId }),
+        params: { path: { branchId } },
       });
       if (!result.data) throw networkError(new Error('Empty answer.'));
       return result.data.data;
@@ -80,7 +79,7 @@ export function useUpdateBranch() {
   return useMutation({
     mutationFn: async ({ branchId, changes }: { branchId: string; changes: BranchChanges }) => {
       const result = await getApiClient().PATCH('/api/v1/branches/{branchId}', {
-        ...pathParams({ branchId }),
+        params: { path: { branchId } },
         body: changes,
       });
       if (!result.data) throw networkError(new Error('Empty answer.'));

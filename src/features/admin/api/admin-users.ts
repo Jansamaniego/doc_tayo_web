@@ -2,7 +2,6 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 
 import { getApiClient } from '@/api/client.ts';
 import { networkError } from '@/api/errors.ts';
-import { pathParams } from '@/api/path-params.ts';
 import type { components } from '@/api/schema';
 
 export type AdminUser = components['schemas']['AdminUserResponse'];
@@ -41,7 +40,7 @@ export function useAdminUser(userId: string) {
     queryKey: [...KEY, 'detail', userId],
     queryFn: async () => {
       const result = await getApiClient().GET('/api/v1/admin/users/{userId}', {
-        ...pathParams({ userId }),
+        params: { path: { userId } },
       });
       if (!result.data) throw networkError(new Error('Empty answer.'));
       return result.data.data;
@@ -61,7 +60,7 @@ export function useSetUserStatus() {
       status: 'active' | 'deactivated';
     }) => {
       await getApiClient().PATCH('/api/v1/admin/users/{userId}/status', {
-        ...pathParams({ userId }),
+        params: { path: { userId } },
         body: { status },
       });
     },

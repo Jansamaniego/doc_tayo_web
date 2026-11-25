@@ -6,17 +6,41 @@ import { ApiError, networkError, parseErrorResponse } from './errors.ts';
 import { newRequestId } from './request-id.ts';
 import type { paths } from './schema';
 import { refreshAccessToken } from './session/refresh.ts';
+import { sessionStore } from './session/session-store.ts';
 import { tokenStore } from './session/token-store.ts';
 
 export interface CreateApiClientOptions {
   /** Scheme, host and port only: the generated paths already start with /api/v1. */
   apiOrigin: string;
   getAccessToken: () => string | null;
+  /** The clinic the person is working in, sent as `X-Expected-Tenant-Id` so another one is refused. */
+  getActiveTenantId?: () => string | null;
   fetch?: typeof fetch;
   /** Gets a new access token. Must be single-flight (see session/refresh.ts). */
   refresh?: () => Promise<string>;
   /** The server says the session is over (the refresh was refused, or UNAUTHENTICATED). */
   onSessionEnded?: () => void;
+}
+
+const EXPECTED_TENANT_HEADER = 'X-Expected-Tenant-Id';
+
+/**
+ * Headers a single request may need: `headers: requestHeaders({ ... })`.
+ * `tenantId` is the clinic a form was OPENED in: it replaces the active one, so a clinic switched in
+ * another tab cannot receive what was typed for this one (`409 TENANT_MISMATCH`).
+ * `idempotencyKey` makes a creating request safe to repeat (see idempotency.ts).
+ */
+export function requestHeaders({
+  tenantId,
+  idempotencyKey,
+}: {
+  tenantId?: string | undefined;
+  idempotencyKey?: string | undefined;
+}): Record<string, string> {
+  return {
+    ...(tenantId && { [EXPECTED_TENANT_HEADER]: tenantId }),
+    ...(idempotencyKey && { 'Idempotency-Key': idempotencyKey }),
+  };
 }
 
 function isAuthRoute(request: Request): boolean {
@@ -40,6 +64,7 @@ function sessionExpired(): ApiError {
 export function createApiClient({
   apiOrigin,
   getAccessToken,
+  getActiveTenantId,
   fetch: fetchFn,
   refresh,
   onSessionEnded,
@@ -87,6 +112,11 @@ export function createApiClient({
       headers.set('X-Request-Id', newRequestId());
       const token = getAccessToken();
       if (token) headers.set('Authorization', `Bearer ${token}`);
+      const tenantId = getActiveTenantId?.();
+      // Never sent empty; a request that already names a clinic (a form's) keeps it.
+      if (tenantId && !headers.has(EXPECTED_TENANT_HEADER)) {
+        headers.set(EXPECTED_TENANT_HEADER, tenantId);
+      }
       // login, refresh and logout need the httpOnly refresh cookie.
       const outgoing = new Request(request, {
         headers,
@@ -126,6 +156,10 @@ export function getApiClient(): ApiClient {
   shared ??= createApiClient({
     apiOrigin: getEnv().apiOrigin,
     getAccessToken: () => tokenStore.get(),
+    getActiveTenantId: () => {
+      const session = sessionStore.get();
+      return session.status === 'signed-in' ? session.activeTenantId : null;
+    },
     refresh: refreshAccessToken,
     onSessionEnded: () => {
       sessionEndedHandler?.();

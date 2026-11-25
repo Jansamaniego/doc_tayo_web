@@ -229,7 +229,7 @@ All available (guide sections in brackets):
 | `POST /auth/email/verify` | public | 5.4 |
 | `GET /me/memberships`, `POST /auth/switch-tenant` | signed in | 5.5 |
 
-Path parameters still go through `pathParams()` (D-30).
+Path parameters are passed as `params: { path: { … } }` (declared in the contract since Phase 6.0; the `pathParams()` workaround of D-30 is removed).
 
 **Not available, so not built** (guide "Not available in Phase 4"): custom roles and editing a role's permissions, leaving a clinic yourself, an admin-triggered password reset for a member, branch-restricted memberships, a phone number on the profile, an audit-log viewer, deleting a branch, assigning staff to branches.
 

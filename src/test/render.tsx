@@ -10,11 +10,17 @@ import { i18n } from '@/i18n/index.ts';
 /** Renders with the app's providers. `rerender` keeps them, so a changed prop does not lose i18n. */
 export function renderWithProviders(
   ui: ReactElement,
-  { controller }: { controller?: SessionController } = {},
+  {
+    controller,
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    }),
+  }: {
+    controller?: SessionController;
+    /** Pass one to look at the cache afterwards. */
+    queryClient?: QueryClient;
+  } = {},
 ): RenderResult {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
   const wrap = (node: ReactNode): ReactElement => (
     <I18nProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
