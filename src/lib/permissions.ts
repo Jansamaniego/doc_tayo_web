@@ -7,8 +7,9 @@
  * services.read, services.manage, appointments.read, appointments.manage, encounters.read,
  * encounters.intake, encounters.document, encounters.sign, reference.read. The encounters.* keys
  * (medical records) are held by doctors and nurses only, never by an admin by default.
- * Routes require directory.read (the directory and reading practitioners) and practitioners.manage
- * (changing them) since backend 5.2.
+ * Routes require directory.read (the directory and reading practitioners), practitioners.manage
+ * (changing them), services.read (the services list and pages) and services.manage (changing them)
+ * since backend 5.2.
  */
 export function can(permissions: readonly string[], required: string | undefined): boolean {
   return required === undefined || permissions.includes(required);

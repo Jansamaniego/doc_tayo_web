@@ -6,7 +6,7 @@ For the people (or AI agent) building the DocTayo web app. It covers the clinica
 |---|---|---|
 | [5.1 Patients](#51-patients) | Frontend Phase 6: patient list, search, registration, edit, archive | **Available** |
 | [5.2 Practitioners and directory](#52-practitioners-and-directory) | Doctor and staff pickers, doctor profiles and weekly schedules | **Available** |
-| 5.2 Services catalog (`/services`) | Service picker | Not available yet |
+| [5.2 Services catalog](#52-services-catalog) | Service picker, price list settings | **Available** |
 | 5.3 Appointments | Frontend Phase 7 | Not available yet |
 | 5.4 Consultations, 5.5 Prescriptions | Frontend Phase 8 | Not available yet |
 
@@ -122,4 +122,29 @@ Active staff only, by name: `membershipId`, `fullName`, `jobTitle`, `roles` (`ke
 `practitionerProfileId` is your own active profile in the active clinic, or `null` (no active clinic, no profile, or a deactivated one). Read it again after switching clinics.
 
 **Seeded data:** `doctor@sunrise.test` is a practitioner (Mon–Fri 09:00–12:00 and 13:00–17:00 at Main, Saturday morning at the annex); in Lakeside, `multi@doctayo.test` is one (Mon, Wed, Fri). The Sunrise owner and admin have no profile.
+
+## 5.2 Services catalog
+
+What the clinic offers, how long it usually takes and the price the desk quotes. **DocTayo takes no payments**: patients pay at the desk (cash, GCash and so on), so show prices as information, never as a checkout.
+
+Who sees what: `services.read` (all five default roles) lists and views; `services.manage` (owner, clinic admin) adds and edits. Hide the management controls from everyone else.
+
+| Screen | Call |
+|---|---|
+| Service picker | `GET /services?pageSize=100` |
+| Price list settings | `GET /services?includeInactive=true&page=&pageSize=` |
+| One service | `GET /services/:serviceId` |
+| Add | `POST /services` (`name`, `defaultDurationMinutes`, optional `description`, `price`) |
+| Edit, deactivate, reactivate | `PATCH /services/:serviceId` (`isActive`) |
+
+- A service is `{ id, name, description, defaultDurationMinutes, price, currency, isActive, createdAt, updatedAt }`. Lists are ordered by name ignoring case and paginated (`pageSize` up to 100). `includeInactive` is `false` unless sent.
+- **Money is a string.** `price` comes back with two decimals (`"500.00"`). Send a string with up to two decimals and no commas or symbols (`"500"`, `"500.50"`); a JSON number is `400 VALIDATION_FAILED`. Do not do arithmetic on it with floating-point numbers.
+- `price: null` means **no fixed price** (show "price at the desk"); `"0.00"` means free. `currency` is always `PHP` and cannot be sent.
+- `defaultDurationMinutes` is a whole number from 5 to 480. It is only a suggestion for the appointment length.
+- Names are unique per clinic **ignoring case** (`409 CONFLICT_UNIQUE`; show it under the name field).
+- Services are never deleted. Deactivate one to take it out of pickers; reading it by id still works, so old records can show its name.
+- A patch sends only the fields that change (`null` clears `description` or `price`); there is no `version`, so the later save wins. `POST /services` takes no `Idempotency-Key`: if a retry answers `409 CONFLICT_UNIQUE`, reload the list.
+- Every clinic starts with **General consultation** (30 minutes, no price). It is an ordinary service: it can be renamed, priced or deactivated.
+
+**Seeded data:** Sunrise has General consultation (no price), Follow-up, Pediatric check-up, Wound dressing and an inactive Medical certificate; Lakeside has General consultation and Vaccination.
 

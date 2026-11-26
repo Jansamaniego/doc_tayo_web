@@ -40,7 +40,7 @@ src/features/<x>/   one folder per product area (auth, account, home, shell, adm
 src/design-system/  tokens/ (tokens.json is the source), components/, patterns/ (app shell, forms, permissions), tv/ (waiting-room display). Imports nothing from features/api/routes/app
 src/api/            the ONLY place that calls the API: client, errors, session/, generated schema.d.ts
 src/lib/            datetime/ (the only UTC<->clinic-time code), money.ts, preferences.ts, zod.ts, small helpers
-src/i18n/           Lingui setup and catalogues (en + pseudo; fil arrives in Phase 14)
+src/i18n/           Lingui setup and catalogues (en + pseudo; fil arrives in Phase 15)
 tests/e2e/          Playwright, <feature>.spec.ts
 ```
 

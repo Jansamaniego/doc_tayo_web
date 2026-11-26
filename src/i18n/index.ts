@@ -4,7 +4,7 @@ import { messages as en } from './locales/en.po';
 import { messages as pseudo } from './locales/pseudo.po';
 
 // English is the launch language. `pseudo` stretches every string so layouts are tested against
-// longer text before Filipino arrives (Phase 14, plan.md §5.6.1).
+// longer text before Filipino arrives (Phase 15, plan.md §5.6.1).
 export type Locale = 'en' | 'pseudo';
 
 i18n.load({ en, pseudo });

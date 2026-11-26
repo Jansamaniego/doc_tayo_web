@@ -4,7 +4,7 @@ Status: **in progress** (started 2026-11-21; see "As Built" at the end). Depends
 
 ## Objectives
 
-Full session lifecycle, the clinic picker and switcher, the permission-aware app shell for every role, all email-link pages, global error and rate-limit handling, and the shared-computer inactivity sign-out. All text comes from the English catalogue; Filipino is Phase 14.
+Full session lifecycle, the clinic picker and switcher, the permission-aware app shell for every role, all email-link pages, global error and rate-limit handling, and the shared-computer inactivity sign-out. All text comes from the English catalogue; Filipino is Phase 15.
 
 ## Deliverables
 

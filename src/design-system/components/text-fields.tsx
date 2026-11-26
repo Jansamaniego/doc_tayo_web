@@ -159,6 +159,8 @@ function parseAmount(text: string): number | null | 'invalid' {
 }
 
 export interface MoneyFieldProps extends FieldChrome {
+  /** So that a form's error summary can focus the field. */
+  name?: string | undefined;
   /** Whole centavos, or null when empty or not a valid amount. */
   value: number | null;
   onChange: (centavos: number | null) => void;
@@ -166,6 +168,7 @@ export interface MoneyFieldProps extends FieldChrome {
 }
 
 export function MoneyField({
+  name,
   label,
   hint,
   error,
@@ -200,6 +203,7 @@ export function MoneyField({
           </span>
           <input
             {...control}
+            name={name}
             type="text"
             inputMode="decimal"
             autoComplete="off"

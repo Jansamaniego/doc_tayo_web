@@ -20,7 +20,8 @@ Read next, as needed: [authentication.md](authentication.md) (why it works this 
 | A phone number on the profile | **Not available** (`TODO-LATER L-01` in `later.md`) |
 | Patients: list, search, possible duplicates, register, view, edit, archive, restore (`/patients`) | **Available** (`patients.read` / `patients.manage`, held by all five default roles; [clinical-integration.md](clinical-integration.md)) |
 | Staff directory (`/directory`), practitioner profiles, weekly schedules and availability (`/practitioners`), `GET /me` → `practitionerProfileId` | **Available** (`directory.read`; `practitioners.manage` to edit; [clinical-integration.md](clinical-integration.md)) |
-| Services, appointments, consultations, prescriptions | **Not available yet** (Phase 5 sub-phases 5.2 to 5.5; each is announced here when its endpoints and its part of the clinical guide are ready) |
+| Services catalog (`/services`): list, view, add, edit, deactivate | **Available** (`services.read`; `services.manage` to edit; [clinical-integration.md](clinical-integration.md#52-services-catalog)) |
+| Appointments, consultations, prescriptions | **Not available yet** (Phase 5 sub-phases 5.3 to 5.5; each is announced here when its endpoints and its part of the clinical guide are ready) |
 | Billing, notifications, reports | **Not available** (Phase 6) |
 | Contract fixes from the frontend's requests D-30 and D-1 | **Available** (Phase 5.0): every path parameter is declared in `openapi.json` (the `pathParams()` workaround can go after you re-sync the contract), and the optional `X-Expected-Tenant-Id` header makes the API refuse a request made for the wrong clinic (`409 TENANT_MISMATCH`, see [api-conventions.md](api-conventions.md)) |
 | `Idempotency-Key` header (safe retries of creating requests) | **Ready on the server**, first used by patient registration (sub-phase 5.1); see [api-conventions.md](api-conventions.md) |

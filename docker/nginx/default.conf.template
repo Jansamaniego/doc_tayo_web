@@ -11,7 +11,7 @@ server {
   gzip_types text/css application/javascript application/json image/svg+xml;
 
   # The Content-Security-Policy: the same string as src/config/csp.ts (a spec checks it).
-  # Report-only until Phase 13 enforces it.
+  # Report-only until Phase 14 enforces it.
   set $csp "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self' ${API_ORIGIN}; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'";
 
   location = /healthz {

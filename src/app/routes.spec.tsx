@@ -724,6 +724,173 @@ describe('clinic pages', () => {
   });
 });
 
+describe('service pages', () => {
+  const API = 'http://localhost:3000/api/v1';
+  const SERVICE = {
+    id: 's1',
+    name: 'Follow-up',
+    description: null,
+    defaultDurationMinutes: 15,
+    price: null,
+    currency: 'PHP',
+    isActive: true,
+    createdAt: '2026-11-27T00:00:00.000Z',
+    updatedAt: '2026-11-27T00:00:00.000Z',
+  };
+  let requests: URL[] = [];
+  beforeEach(() => {
+    requests = [];
+    server.use(
+      http.get(`${API}/services`, ({ request }) => {
+        requests.push(new URL(request.url));
+        return HttpResponse.json({
+          data: [SERVICE],
+          meta: { page: 1, pageSize: 20, totalItems: 45, totalPages: 3 },
+        });
+      }),
+      http.get(`${API}/services/s1`, ({ request }) => {
+        requests.push(new URL(request.url));
+        return HttpResponse.json({ data: SERVICE });
+      }),
+    );
+  });
+  const reader = (): void => {
+    signedIn({ permissions: ['tenant.read', 'services.read'] });
+  };
+  const manager = (): void => {
+    signedIn({ permissions: ['tenant.read', 'services.read', 'services.manage'] });
+  };
+  const mainLink = (name: string) =>
+    within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', { name });
+
+  it('opens the list from the Services tab, then a service, with Clinic still current', async () => {
+    reader();
+    server.use(http.get(`${API}/tenant`, () => new HttpResponse(null, { status: 500 })));
+    const { router } = renderAt('/clinic');
+    await userEvent.click(
+      within(await screen.findByRole('navigation', { name: 'Clinic sections' })).getByRole('link', {
+        name: 'Services',
+      }),
+    );
+    await userEvent.click(await screen.findByRole('link', { name: 'Follow-up' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Follow-up' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/clinic/services/s1');
+    expect(mainLink('Clinic')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it.each(['/clinic/services', '/clinic/services/s1'])(
+    'shows "no access" at %s without services.read, and asks for nothing',
+    async (path) => {
+      signedIn({ permissions: ['tenant.read'] });
+      renderAt(path);
+      expect(
+        await screen.findByRole('heading', {
+          level: 1,
+          name: "You don't have access to this page",
+        }),
+      ).toBeInTheDocument();
+      expect(requests).toEqual([]);
+    },
+  );
+
+  it('has no Services tab without services.read', async () => {
+    signedIn({ permissions: ['tenant.read', 'branches.read'] });
+    server.use(
+      http.get(`${API}/branches`, () =>
+        HttpResponse.json({
+          data: [],
+          meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 },
+        }),
+      ),
+      http.get(`${API}/tenant`, () => new HttpResponse(null, { status: 500 })),
+    );
+    renderAt('/clinic/branches');
+    const tabs = await screen.findByRole('navigation', { name: 'Clinic sections' });
+    expect(within(tabs).queryByRole('link', { name: 'Services' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the page and the inactive box in the address', async () => {
+    manager();
+    const { router } = renderAt('/clinic/services?inactive=1&page=2&pageSize=50');
+    expect(await screen.findByRole('checkbox', { name: 'Show inactive services' })).toBeChecked();
+    await screen.findByRole('link', { name: 'Follow-up' });
+    expect(router.state.location.search).toEqual({ inactive: 1, page: 2, pageSize: 50 });
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Show inactive services' }));
+    await waitFor(() => {
+      expect(router.state.location.search).toEqual({ pageSize: 50 });
+    });
+  });
+
+  it('never sends an unusable address value to the API', async () => {
+    manager();
+    renderAt('/clinic/services?inactive=yes&page=-3&pageSize=7');
+    await screen.findByRole('link', { name: 'Follow-up' });
+    expect([...(requests[0]?.searchParams.keys() ?? [])]).toEqual([]);
+  });
+
+  it('shows "no access" for the add-service address to a reader, and asks for nothing', async () => {
+    reader();
+    renderAt('/clinic/services/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(requests).toEqual([]);
+  });
+
+  it('adds a service from the list and lands on its page', async () => {
+    manager();
+    server.use(
+      http.post(`${API}/services`, () => HttpResponse.json({ data: SERVICE }, { status: 201 })),
+    );
+    const { router } = renderAt('/clinic/services');
+    await userEvent.click(await screen.findByRole('link', { name: 'Add a service' }));
+    await userEvent.type(await screen.findByLabelText('Service name'), 'Follow-up');
+    await userEvent.click(screen.getByRole('button', { name: 'Add service' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Follow-up' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/clinic/services/s1');
+  });
+
+  it('asks before leaving an add form with typed input', async () => {
+    manager();
+    const { router } = renderAt('/clinic/services/new');
+    await userEvent.type(await screen.findByLabelText('Service name'), 'Half typed');
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    expect(
+      await screen.findByRole('alertdialog', { name: 'Leave without saving?' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/clinic/services/new');
+  });
+
+  it('asks before leaving an edit with changes', async () => {
+    manager();
+    const { router } = renderAt('/clinic/services/s1');
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    await userEvent.type(await screen.findByLabelText('Service name'), ' changed');
+    await userEvent.click(mainLink('Home'));
+    expect(
+      await screen.findByRole('alertdialog', { name: 'Leave without saving?' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/clinic/services/s1');
+  });
+
+  it('replaces a page past the end with the last one', async () => {
+    reader();
+    server.use(
+      http.get(`${API}/services`, ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? '1');
+        return HttpResponse.json({
+          data: page > 3 ? [] : [SERVICE],
+          meta: { page, pageSize: 20, totalItems: 45, totalPages: 3 },
+        });
+      }),
+    );
+    const { router } = renderAt('/clinic/services?page=9');
+    await screen.findByRole('link', { name: 'Follow-up' });
+    expect(router.state.location.search).toEqual({ page: 3 });
+    expect(router.history.length).toBe(1);
+  });
+});
+
 describe('patient pages', () => {
   const API = 'http://localhost:3000/api/v1';
   let requests = 0;

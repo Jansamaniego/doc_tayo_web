@@ -195,7 +195,7 @@ src/features/clinic/
   api/            tenant.ts (useClinicProfile, useUpdateClinicProfile), branches.ts (useBranches, useBranch, useCreateBranch, useUpdateBranch)
   profile/        ClinicProfilePage, ClinicProfileForm, contact-phone.ts (+ spec)
   branches/       BranchesPage, NewBranchPage, BranchPage, BranchForm, BranchStatusPill
-  ClinicTabs.tsx  the Profile / Branches tab bar (route links)
+  ClinicTabs.tsx  the Profile / Branches tab bar (route links; Phase 8.1 added the Services tab)
 src/design-system/patterns/detail-row.tsx  one "label: value" row of a details list (shared, see As Built 5.6)
 src/routes/_app/_clinic/staff/  index.tsx, $membershipId.tsx, invitations.tsx (thin: guard + compose)
 src/routes/_app/_clinic/clinic.tsx  the `tenant.read` gate around /clinic/*

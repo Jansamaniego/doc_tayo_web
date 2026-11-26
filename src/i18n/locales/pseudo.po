@@ -131,6 +131,10 @@ msgstr ""
 msgid "{fullName} will lose access to {clinicName} on their next request. You cannot undo this here: to bring them back, invite them again."
 msgstr ""
 
+#: src/features/services/duration.ts
+msgid "{hours, plural, one {# hour} other {# hours}}"
+msgstr ""
+
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 msgid "{hours}: branch"
 msgstr ""
@@ -141,6 +145,10 @@ msgstr ""
 
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 msgid "{hours}: start"
+msgstr ""
+
+#: src/features/services/duration.ts
+msgid "{hourText} {minuteText}"
 msgstr ""
 
 #: src/design-system/components/text-fields.tsx
@@ -155,8 +163,13 @@ msgstr ""
 msgid "{name} · Has hours"
 msgstr ""
 
+#: src/features/services/form/NewServicePage.tsx
+msgid "{name} added."
+msgstr ""
+
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 #: src/features/practitioners/record/PractitionerActions.tsx
+#: src/features/services/record/ServiceActions.tsx
 msgid "{name} is active again."
 msgstr ""
 
@@ -166,6 +179,7 @@ msgstr ""
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 #: src/features/practitioners/record/PractitionerActions.tsx
+#: src/features/services/record/ServiceActions.tsx
 msgid "{name} is deactivated."
 msgstr ""
 
@@ -188,6 +202,10 @@ msgstr ""
 
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 msgid "{name} will have no working hours."
+msgstr ""
+
+#: src/features/services/record/ServiceActions.tsx
+msgid "{name} will no longer be offered when booking. Nothing is deleted, and past records keep its name."
 msgstr ""
 
 #: src/features/practitioners/record/PractitionerActions.tsx
@@ -216,6 +234,22 @@ msgstr ""
 
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 msgid "{ownName} (no longer active)"
+msgstr ""
+
+#: src/features/services/ServicePrice.tsx
+msgid "{pesos, plural, one {# peso} other {# pesos}}"
+msgstr ""
+
+#: src/features/services/ServicePrice.tsx
+msgid "{pesoText} and {centavoText}"
+msgstr ""
+
+#: src/features/services/ServicePrice.tsx
+msgid "{rest, plural, one {# centavo} other {# centavos}}"
+msgstr ""
+
+#: src/features/services/duration.ts
+msgid "{rest, plural, one {# minute} other {# minutes}}"
 msgstr ""
 
 #: src/features/auth/countdown.ts
@@ -249,6 +283,10 @@ msgstr ""
 
 #: src/features/auth/passwords.ts
 msgid "10 to 128 characters"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+msgid "5 to 480 minutes. A suggestion for the appointment length; it can be changed when booking."
 msgstr ""
 
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
@@ -311,6 +349,7 @@ msgstr ""
 #: src/features/clinic/branches/BranchStatusPill.tsx
 #: src/features/patients/list/PatientsPage.tsx
 #: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/services/list/ServicesPage.tsx
 #: src/features/staff/members/MemberStatusPill.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Active"
@@ -339,6 +378,11 @@ msgstr ""
 msgid "Add a practitioner"
 msgstr ""
 
+#: src/features/services/form/NewServicePage.tsx
+#: src/features/services/list/ServicesPage.tsx
+msgid "Add a service"
+msgstr ""
+
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 msgid "Add an active branch before adding hours."
 msgstr ""
@@ -354,6 +398,10 @@ msgstr ""
 
 #: src/features/practitioners/form/NewPractitionerPage.tsx
 msgid "Add practitioner"
+msgstr ""
+
+#: src/features/services/form/NewServicePage.tsx
+msgid "Add service"
 msgstr ""
 
 #: src/features/home/HomePage.tsx
@@ -406,6 +454,10 @@ msgstr ""
 msgid "All practitioners"
 msgstr ""
 
+#: src/features/services/record/ServiceNotFound.tsx
+msgid "All services"
+msgstr ""
+
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "All staff"
 msgstr ""
@@ -425,6 +477,10 @@ msgstr ""
 
 #: src/design-system/components/date-fields.tsx
 msgid "AM or PM"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+msgid "Amount"
 msgstr ""
 
 #: src/features/staff/invitations/InviteDialog.tsx
@@ -553,6 +609,8 @@ msgstr ""
 #: src/features/practitioners/form/NewPractitionerPage.tsx
 #: src/features/practitioners/schedule/CopyHoursDialog.tsx
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+#: src/features/services/form/NewServicePage.tsx
+#: src/features/services/record/EditService.tsx
 #: src/features/staff/invitations/InviteDialog.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Cancel"
@@ -577,6 +635,7 @@ msgstr ""
 
 #: src/features/patients/form/EditPatientPage.tsx
 #: src/features/practitioners/form/EditPractitionerPage.tsx
+#: src/features/services/record/EditService.tsx
 msgid "Changes saved."
 msgstr ""
 
@@ -661,6 +720,10 @@ msgstr ""
 
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Choose at most 5 roles."
+msgstr ""
+
+#: src/features/services/form/service-form-values.ts
+msgid "Choose Free for a service without charge."
 msgstr ""
 
 #: src/design-system/components/date-fields.tsx
@@ -887,6 +950,7 @@ msgstr ""
 #: src/features/admin/users/UserDetailPage.tsx
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/practitioners/record/PractitionerActions.tsx
+#: src/features/services/record/ServiceActions.tsx
 msgid "Deactivate"
 msgstr ""
 
@@ -901,6 +965,7 @@ msgstr ""
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 #: src/features/practitioners/record/PractitionerActions.tsx
+#: src/features/services/record/ServiceActions.tsx
 msgid "Deactivate {name}?"
 msgstr ""
 
@@ -910,6 +975,11 @@ msgstr ""
 #: src/features/admin/users/UsersListPage.tsx
 #: src/features/admin/users/UserStatusPill.tsx
 msgid "Deactivated"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+#: src/features/services/record/ServicePage.tsx
+msgid "Description"
 msgstr ""
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
@@ -951,6 +1021,7 @@ msgstr ""
 
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/patients/record/PatientActions.tsx
+#: src/features/services/record/ServiceActions.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Edit"
 msgstr ""
@@ -973,6 +1044,10 @@ msgstr ""
 
 #: src/features/practitioners/record/PractitionerActions.tsx
 msgid "Edit profile"
+msgstr ""
+
+#: src/features/services/record/EditService.tsx
+msgid "Edit service"
 msgstr ""
 
 #: src/features/practitioners/record/PractitionerPage.tsx
@@ -1020,8 +1095,17 @@ msgstr ""
 msgid "Enter a web address name (for example bayview-clinic)."
 msgstr ""
 
+#: src/features/services/form/service-form-values.ts
+msgid "Enter a whole number of minutes from 5 to 480."
+msgstr ""
+
 #: src/design-system/components/text-fields.tsx
+#: src/features/services/form/service-form-values.ts
 msgid "Enter an amount, for example 1,250.50."
+msgstr ""
+
+#: src/features/services/form/service-form-values.ts
+msgid "Enter at most ₱9,999,999,999.99."
 msgstr ""
 
 #: src/features/practitioners/form/use-practitioner-form.ts
@@ -1063,6 +1147,10 @@ msgstr ""
 
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 msgid "Enter the phone number with its country code, for example +639171234567."
+msgstr ""
+
+#: src/features/services/form/service-form-values.ts
+msgid "Enter the service name."
 msgstr ""
 
 #: src/design-system/tv/tv-pairing.tsx
@@ -1135,8 +1223,16 @@ msgstr ""
 msgid "First name"
 msgstr ""
 
+#: src/features/services/form/ServiceForm.tsx
+msgid "Fixed price"
+msgstr ""
+
 #: src/features/patients/form/PatientFields.tsx
 msgid "For example 0917 123 4567"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+msgid "For example Follow-up or Wound dressing"
 msgstr ""
 
 #: src/design-system/components/inactivity-warning.tsx
@@ -1150,6 +1246,11 @@ msgstr ""
 #: src/features/auth/auth-pages.tsx
 #: src/features/auth/login-form.tsx
 msgid "Forgot your password?"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+#: src/features/services/ServicePrice.tsx
+msgid "Free"
 msgstr ""
 
 #: src/design-system/components/date-fields.tsx
@@ -1232,6 +1333,7 @@ msgstr ""
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/clinic/branches/BranchStatusPill.tsx
 #: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/services/list/ServicesPage.tsx
 msgid "Inactive"
 msgstr ""
 
@@ -1345,6 +1447,10 @@ msgstr ""
 msgid "Loading roles…"
 msgstr ""
 
+#: src/features/services/list/ServicesPage.tsx
+msgid "Loading services…"
+msgstr ""
+
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Loading staff…"
 msgstr ""
@@ -1375,6 +1481,11 @@ msgstr ""
 
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 msgid "Loading the schedule…"
+msgstr ""
+
+#: src/features/services/record/EditService.tsx
+#: src/features/services/record/ServicePage.tsx
+msgid "Loading the service…"
 msgstr ""
 
 #: src/features/practitioners/form/NewPractitionerPage.tsx
@@ -1520,8 +1631,16 @@ msgstr ""
 msgid "No clinics yet."
 msgstr ""
 
+#: src/features/services/record/ServicePage.tsx
+msgid "No description"
+msgstr ""
+
 #: src/features/staff/invitations/InvitationsPage.tsx
 msgid "No expired invitations"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+msgid "No fixed price"
 msgstr ""
 
 #: src/features/patients/record/PatientPage.tsx
@@ -1576,6 +1695,10 @@ msgstr ""
 
 #: src/features/staff/invitations/InvitationsPage.tsx
 msgid "No revoked invitations"
+msgstr ""
+
+#: src/features/services/list/ServicesPage.tsx
+msgid "No services yet"
 msgstr ""
 
 #: src/features/staff/members/StaffListPage.tsx
@@ -1661,6 +1784,7 @@ msgstr ""
 #: src/features/patients/form/EditPatientPage.tsx
 #: src/features/practitioners/form/EditPractitionerPage.tsx
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+#: src/features/services/form/ServiceForm.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Nothing to change."
 msgstr ""
@@ -1880,6 +2004,20 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
+#: src/features/services/form/ServiceForm.tsx
+#: src/features/services/list/ServicesPage.tsx
+#: src/features/services/record/ServicePage.tsx
+msgid "Price"
+msgstr ""
+
+#: src/features/services/ServicePrice.tsx
+msgid "Price at the desk"
+msgstr ""
+
+#: src/features/services/list/ServicesPage.tsx
+msgid "Prices the front desk quotes. Patients pay at the desk."
+msgstr ""
+
 #: src/features/clinic/ClinicTabs.tsx
 msgid "Profile"
 msgstr ""
@@ -1900,6 +2038,7 @@ msgstr ""
 #: src/features/admin/users/UserDetailPage.tsx
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/practitioners/record/PractitionerActions.tsx
+#: src/features/services/record/ServiceActions.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Reactivate"
 msgstr ""
@@ -2027,6 +2166,7 @@ msgstr ""
 
 #: src/features/patients/form/EditPatientPage.tsx
 #: src/features/practitioners/form/EditPractitionerPage.tsx
+#: src/features/services/record/EditService.tsx
 msgid "Save changes"
 msgstr ""
 
@@ -2058,6 +2198,7 @@ msgstr ""
 #: src/features/practitioners/form/EditPractitionerPage.tsx
 #: src/features/practitioners/form/NewPractitionerPage.tsx
 #: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+#: src/features/services/form/ServiceForm.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Saving…"
 msgstr ""
@@ -2120,6 +2261,23 @@ msgstr ""
 msgid "Sent"
 msgstr ""
 
+#: src/features/services/list/ServicesPage.tsx
+msgid "Service"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+msgid "Service name"
+msgstr ""
+
+#: src/features/clinic/ClinicTabs.tsx
+#: src/features/services/list/ServicesPage.tsx
+msgid "Services"
+msgstr ""
+
+#: src/features/services/list/ServicesPage.tsx
+msgid "Services and prices"
+msgstr ""
+
 #: src/features/auth/account-setup-form.tsx
 msgid "Set up my account"
 msgstr ""
@@ -2147,6 +2305,10 @@ msgstr ""
 
 #: src/features/patients/list/PatientsPage.tsx
 msgid "Show archived"
+msgstr ""
+
+#: src/features/services/list/ServicesPage.tsx
+msgid "Show inactive services"
 msgstr ""
 
 #: src/features/staff/invitations/InviteDialog.tsx
@@ -2276,6 +2438,7 @@ msgstr ""
 #: src/features/clinic/profile/ClinicProfilePage.tsx
 #: src/features/patients/list/PatientsPage.tsx
 #: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/services/list/ServicesPage.tsx
 #: src/features/staff/invitations/InvitationsPage.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
@@ -2501,6 +2664,10 @@ msgstr ""
 msgid "This cannot be undone."
 msgstr ""
 
+#: src/features/services/form/ServiceForm.tsx
+msgid "This clinic already has a service with this name."
+msgstr ""
+
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 msgid "This clinic is deactivated. Deactivation is permanent, so there is nothing more to do here."
 msgstr ""
@@ -2622,6 +2789,10 @@ msgstr ""
 msgid "This role cannot be given through an invitation."
 msgstr ""
 
+#: src/features/services/record/ServicePage.tsx
+msgid "This service is inactive. It is not offered when booking."
+msgstr ""
+
 #: src/api/error-messages.ts
 msgid "This value is not allowed."
 msgstr ""
@@ -2702,6 +2873,7 @@ msgstr ""
 #: src/features/admin/clinics/NewClinicForm.tsx
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/profile/ClinicProfileForm.tsx
+#: src/features/services/form/service-form-values.ts
 msgid "Use at most 120 characters."
 msgstr ""
 
@@ -2711,6 +2883,10 @@ msgstr ""
 
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 msgid "Use at most 254 characters."
+msgstr ""
+
+#: src/features/services/form/service-form-values.ts
+msgid "Use at most 500 characters."
 msgstr ""
 
 #: src/features/admin/clinics/NewClinicForm.tsx
@@ -2728,6 +2904,15 @@ msgstr ""
 #: src/features/admin/users/UsersListPage.tsx
 #: src/features/shell/AuthenticatedShell.tsx
 msgid "Users"
+msgstr ""
+
+#: src/features/services/list/ServicesPage.tsx
+#: src/features/services/record/ServicePage.tsx
+msgid "Usual length"
+msgstr ""
+
+#: src/features/services/form/ServiceForm.tsx
+msgid "Usual length, in minutes"
 msgstr ""
 
 #: src/features/admin/overview/OverviewBlocks.tsx
@@ -2784,6 +2969,10 @@ msgstr ""
 
 #: src/features/practitioners/record/PractitionerNotFound.tsx
 msgid "We could not find this practitioner"
+msgstr ""
+
+#: src/features/services/record/ServiceNotFound.tsx
+msgid "We could not find this service"
 msgstr ""
 
 #: src/api/error-messages.ts

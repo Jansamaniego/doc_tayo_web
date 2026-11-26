@@ -9,7 +9,7 @@ holds **no secrets**.
 | -------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
 | `VITE_API_ORIGIN`          | `http://localhost:3000`  | Scheme, host and optional port only. **No path and no trailing slash**: the generated API paths already begin `/api/v1`. |
 | `VITE_APP_ENV`             | `development`            | `development`, `staging` or `production`.                                                                          |
-| `VITE_ERROR_REPORTING_DSN` | _(empty)_                | Optional. Error reporting is added in Phase 13; leave it empty.                                                    |
+| `VITE_ERROR_REPORTING_DSN` | _(empty)_                | Optional. Error reporting is added in Phase 14; leave it empty.                                                    |
 
 Which file is read:
 

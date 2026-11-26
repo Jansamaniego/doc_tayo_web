@@ -120,6 +120,11 @@ their weekly schedule (with a second branch) in a new clinic, so it needs the sa
 `admin@doctayo.test`); it signs in as `owner@sunrise.test` for the cross-clinic check. It runs in Chromium only
 and leaves a new "E2E Practice ..." clinic behind.
 
+`tests/e2e/services.spec.ts` only reads the services that `npm run db:seed:dev` creates since the backend's
+services catalog (run it again on an older database). `tests/e2e/service-management.spec.ts` adds, edits,
+deactivates and reactivates services in a new clinic, so it needs the same API setup as the platform admin spec
+below; it runs in Chromium only and leaves a new "E2E Services ..." clinic behind.
+
 **The platform admin spec** (`tests/e2e/platform-admin.spec.ts`) creates a clinic and an owner, then reads
 the owner's setup link from the API's emails. So the API must run with `MAIL_TRANSPORT=file` (it writes to
 its `var/mail`; with Docker: `MAIL_TRANSPORT=file docker compose up -d api`, and the e2e container reads the
