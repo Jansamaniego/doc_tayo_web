@@ -114,9 +114,8 @@ src/features/patients/
   list/         PatientsPage
   record/       PatientPage, PatientActions, ArchiveDialog, ArchivedBanner, PatientNotFound
   form/         RegisterPatientPage, EditPatientPage, PatientFields and use-patient-form.ts (shared),
-                DuplicateCandidates, VersionConflictNotice, opened-clinic.tsx (the clinic a form was
-                opened in and why a save failed), patient-form-values.ts (+ spec: values <-> request,
-                changed fields)
+                DuplicateCandidates, VersionConflictNotice, patient-form-values.ts (+ spec: values <->
+                request, changed fields)
   patient-name.ts, phone-display.ts (+ specs), birth-date.ts
 src/routes/_app/_clinic/patients.tsx            the patients.read gate
 src/routes/_app/_clinic/patients/  index.tsx, new.tsx, $patientId.tsx, $patientId_.edit.tsx
@@ -124,6 +123,8 @@ src/api/client.ts                               + X-Expected-Tenant-Id, requestH
 src/api/idempotency.ts                          createIdempotentAction() (6.0)
 src/lib/datetime/                               + todayInZone, ageOn
 src/lib/leave-guard.tsx                         "Leave without saving?" (6.3)
+src/lib/opened-clinic.tsx                       the clinic a form was opened in, and why a save failed
+                                                (in features/patients/form/ until Phase 7.0)
 tests/e2e/patients.spec.ts, patient-registration.spec.ts
 ```
 

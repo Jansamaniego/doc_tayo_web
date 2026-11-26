@@ -186,6 +186,22 @@ describe('NewClinicForm', () => {
     );
   });
 
+  it('the summary’s "Time zone" link moves focus to the picker', async () => {
+    server.use(
+      http.post(`${API}/admin/tenants`, () =>
+        errorBody(400, 'VALIDATION_FAILED', [
+          { field: 'timezone', code: 'INVALID_VALUE', message: 'x' },
+        ]),
+      ),
+    );
+    renderWithProviders(<NewClinicForm onCreated={() => undefined} />);
+    await fill();
+    await submit();
+    const summary = await screen.findByRole('alert');
+    await userEvent.click(within(summary).getByRole('link', { name: 'Time zone' }));
+    expect(screen.getByRole('combobox', { name: /Time zone/ })).toHaveFocus();
+  });
+
   it('shows other failures on the page with the request id, keeping what was typed', async () => {
     server.use(http.post(`${API}/admin/tenants`, () => errorBody(503, 'SERVICE_UNAVAILABLE')));
     renderWithProviders(<NewClinicForm onCreated={() => undefined} />);

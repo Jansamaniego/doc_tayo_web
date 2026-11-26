@@ -49,6 +49,7 @@ const signIn = (permissions: string[]): void => {
     activeTenantId: 'clinic-a',
     permissions,
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 };
 afterEach(() => {

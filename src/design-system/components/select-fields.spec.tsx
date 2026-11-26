@@ -15,6 +15,13 @@ const BRANCHES = [
 ];
 
 describe('SelectField (native select, for short lists)', () => {
+  it('carries a name, so a link in an error summary can focus it', () => {
+    renderWithProviders(
+      <SelectField label="Branch" name="branch" options={[]} value="" onChange={() => undefined} />,
+    );
+    expect(screen.getByLabelText('Branch')).toHaveAttribute('name', 'branch');
+  });
+
   it('is a real select with a visible label and all options', () => {
     renderWithProviders(
       <SelectField label="Branch" options={BRANCHES} value="" onChange={() => undefined} />,
@@ -99,6 +106,13 @@ function ComboboxHarness({ onChange = () => undefined }: { onChange?: (value: st
 }
 
 describe('Combobox (searchable list, for long lists)', () => {
+  it('carries a name, so a link in an error summary can focus it', () => {
+    renderWithProviders(
+      <Combobox label="Person" name="person" options={[]} value="" onChange={() => undefined} />,
+    );
+    expect(screen.getByRole('combobox', { name: 'Person' })).toHaveAttribute('name', 'person');
+  });
+
   it('is a labelled button that says whether the list is open', async () => {
     renderWithProviders(<ComboboxHarness />);
     const trigger = screen.getByRole('combobox', { name: /Doctor/ });

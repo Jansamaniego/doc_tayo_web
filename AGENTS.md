@@ -65,7 +65,7 @@ tests/e2e/          Playwright, <feature>.spec.ts
   positional. Component props are always an object. No placeholder arguments; no parameter nothing reads.
 - **Data fetching:** only in a feature's `api/` hooks (TanStack Query), never inside design-system components.
   Query keys for clinic data start with the active clinic id (`useActiveTenantId()`; a list that keeps the previous page while loading must do so only within the same clinic); platform admin data (`/admin/*`) starts with `'admin'`. All API failures are thrown as `ApiError`. A `4xx` is not retried.
-  The client sends `X-Expected-Tenant-Id` itself. A form that saves clinic data passes the clinic it was opened in (`headers: requestHeaders({ tenantId })`), and a creating request goes through `createIdempotentAction()` (`src/api/idempotency.ts`, one instance per open form) with `requestHeaders({ idempotencyKey })`.
+  The client sends `X-Expected-Tenant-Id` itself. A form on its own page keeps what it first read in state, so a clinic switch in another tab (which reloads the queries) neither removes it nor mixes in the other clinic's data. A form that saves clinic data passes the clinic it was opened in (`useOpenedClinic()` from `src/lib/opened-clinic.tsx`, then `headers: requestHeaders({ tenantId })`), and a creating request goes through `createIdempotentAction()` (`src/api/idempotency.ts`, one instance per open form) with `requestHeaders({ idempotencyKey })`.
   Branch on `error.code`, never on `error.message`; user text comes from `src/api/error-messages.ts`.
 - **Time and money:** the API speaks UTC. Convert only through `src/lib/datetime`; the time zone is always an
   explicit argument, never the computer's. Never write an amount as a float.

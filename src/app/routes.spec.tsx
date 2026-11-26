@@ -36,6 +36,7 @@ const signedIn = (
     activeTenantId: 'a',
     permissions: ['tenant.read', 'branches.read'],
     platformRole: 'none',
+    practitionerProfileId: null,
     ...overrides,
   });
 };
@@ -253,6 +254,7 @@ describe('platform admin tabs', () => {
   const adminOnly = (): void => {
     signedIn({
       platformRole: 'platform_admin',
+      practitionerProfileId: null,
       memberships: [],
       activeTenantId: null,
       permissions: [],
@@ -960,6 +962,266 @@ describe('patient pages', () => {
   it('sends a signed-out visitor to sign-in', async () => {
     sessionStore.set({ status: 'signed-out' });
     renderAt('/patients');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument();
+  });
+});
+
+describe('practitioner pages', () => {
+  const API = 'http://localhost:3000/api/v1';
+  const BRANCH = 'a0000000-0000-4000-8000-000000000001';
+  let requests: URL[] = [];
+  beforeEach(() => {
+    requests = [];
+    const empty = { data: [], meta: { page: 1, pageSize: 100, totalItems: 0, totalPages: 0 } };
+    server.use(
+      http.get(`${API}/directory`, ({ request }) => {
+        requests.push(new URL(request.url));
+        return HttpResponse.json(empty);
+      }),
+      http.get(`${API}/branches`, () => HttpResponse.json(empty)),
+    );
+  });
+  const reader = (): void => {
+    signedIn({ permissions: ['tenant.read', 'patients.read', 'directory.read', 'branches.read'] });
+  };
+
+  it('shows Practitioners after Patients to a person who may read the directory, and opens the list', async () => {
+    reader();
+    renderAt('/practitioners');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Practitioners' }),
+    ).toBeInTheDocument();
+    const links = within(screen.getByRole('navigation', { name: 'Main' })).getAllByRole('link');
+    expect(links.slice(0, 3).map((link) => link.textContent)).toEqual([
+      'Home',
+      'Patients',
+      'Practitioners',
+    ]);
+    expect(links[2]).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows a person without directory.read no item, and "no access" for a typed address, asking for nothing', async () => {
+    signedIn({ permissions: ['tenant.read'] });
+    renderAt('/practitioners');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Practitioners' })).not.toBeInTheDocument();
+    expect(requests).toEqual([]);
+  });
+
+  it('reads the branch and the page from the address, and ignores a branch that is not an id', async () => {
+    reader();
+    const first = renderAt(`/practitioners?branch=${BRANCH}&page=2`);
+    await screen.findByText('No practitioner works at this branch');
+    expect(requests[0]?.searchParams.get('branchId')).toBe(BRANCH);
+    first.unmount();
+    requests = [];
+    reader();
+    renderAt('/practitioners?branch=all');
+    await screen.findByText('No practitioners yet');
+    expect(requests[0]?.searchParams.has('branchId')).toBe(false);
+  });
+
+  const serveProfile = () => {
+    server.use(
+      http.get(`${API}/practitioners/pr1`, () => {
+        requests.push(new URL(`${API}/practitioners/pr1`));
+        return HttpResponse.json({
+          data: {
+            id: 'pr1',
+            membershipId: 'm1',
+            displayName: 'Dr. Dan Doctor',
+            specialization: null,
+            prcLicenseNumber: null,
+            ptrNumber: null,
+            isActive: false,
+            schedule: [],
+          },
+        });
+      }),
+      http.get(`${API}/tenant`, () => HttpResponse.json({ data: { timezone: 'Asia/Manila' } })),
+    );
+  };
+  const nav = () => within(screen.getByRole('navigation', { name: 'Main' }));
+
+  it('opens a practitioner, with Practitioners still the current item', async () => {
+    reader();
+    serveProfile();
+    renderAt('/practitioners/pr1');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Dr. Dan Doctor' }),
+    ).toBeInTheDocument();
+    expect(nav().getByRole('link', { name: 'Practitioners' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('shows "no access" for a practitioner address without directory.read, asking for nothing', async () => {
+    signedIn({ permissions: ['tenant.read'] });
+    serveProfile();
+    renderAt('/practitioners/pr1');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(requests).toEqual([]);
+  });
+
+  it('shows no "My schedule" to a person who is not a practitioner', async () => {
+    reader();
+    renderAt('/practitioners');
+    await screen.findByRole('heading', { level: 1, name: 'Practitioners' });
+    expect(screen.queryByRole('link', { name: 'My schedule' })).not.toBeInTheDocument();
+  });
+
+  it('shows a practitioner "My schedule", which opens their own page and is then the current item', async () => {
+    signedIn({
+      permissions: ['tenant.read', 'directory.read', 'branches.read'],
+      practitionerProfileId: 'pr1',
+    });
+    serveProfile();
+    const { router } = renderAt('/practitioners');
+    await screen.findByRole('heading', { level: 1, name: 'Practitioners' });
+    const mine = nav().getByRole('link', { name: 'My schedule' });
+    expect(mine).toHaveAttribute('href', '/practitioners/pr1');
+    await userEvent.click(mine);
+    await screen.findByRole('heading', { level: 1, name: 'Dr. Dan Doctor' });
+    expect(router.state.location.pathname).toBe('/practitioners/pr1');
+    expect(nav().getByRole('link', { name: 'My schedule' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(nav().getByRole('link', { name: 'Practitioners' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('drops "My schedule" when the clinic has no profile for the person', async () => {
+    signedIn({ permissions: ['directory.read', 'branches.read'], practitionerProfileId: 'pr1' });
+    renderAt('/practitioners');
+    await screen.findByRole('link', { name: 'My schedule' });
+    act(() => {
+      signedIn({ permissions: ['directory.read', 'branches.read'], practitionerProfileId: null });
+    });
+    expect(screen.queryByRole('link', { name: 'My schedule' })).not.toBeInTheDocument();
+  });
+
+  const manager = (): void => {
+    signedIn({
+      permissions: ['tenant.read', 'branches.read', 'directory.read', 'practitioners.manage'],
+    });
+  };
+
+  it('opens the add form for a manager, not the practitioner page "new"', async () => {
+    manager();
+    renderAt('/practitioners/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Add a practitioner' }),
+    ).toBeInTheDocument();
+  });
+
+  it.each(['/practitioners/new', '/practitioners/pr1/edit', '/practitioners/pr1/schedule'])(
+    'shows "no access" for %s without practitioners.manage',
+    async (path) => {
+      reader();
+      serveProfile();
+      renderAt(path);
+      expect(
+        await screen.findByRole('heading', {
+          level: 1,
+          name: "You don't have access to this page",
+        }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it('asks before leaving the edit form with changes', async () => {
+    manager();
+    serveProfile();
+    renderAt('/practitioners/pr1/edit');
+    await userEvent.type(await screen.findByLabelText(/^Specialization/), 'Heart');
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent('Leave without saving?');
+  });
+
+  it('goes back to the practitioner after saving, without asking', async () => {
+    manager();
+    serveProfile();
+    server.use(
+      http.patch(`${API}/practitioners/pr1`, () => HttpResponse.json({ data: { id: 'pr1' } })),
+    );
+    const { router } = renderAt('/practitioners/pr1/edit');
+    await userEvent.type(await screen.findByLabelText(/^Specialization/), 'Heart');
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByRole('heading', { level: 1, name: 'Dr. Dan Doctor' });
+    expect(router.state.location.pathname).toBe('/practitioners/pr1');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  const serveWeek = () => {
+    serveProfile();
+    server.use(
+      http.get(`${API}/branches`, () =>
+        HttpResponse.json({
+          data: [{ id: BRANCH, name: 'Main', timezone: null, isActive: true }],
+          meta: { page: 1, pageSize: 100, totalItems: 1, totalPages: 1 },
+        }),
+      ),
+    );
+  };
+
+  it('asks before leaving the schedule editor with changes', async () => {
+    manager();
+    serveWeek();
+    renderAt('/practitioners/pr1/schedule');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add hours on Monday' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent('Leave without saving?');
+  });
+
+  it('goes back to the practitioner after saving the week, without asking', async () => {
+    manager();
+    serveWeek();
+    server.use(
+      http.put(`${API}/practitioners/pr1/schedule`, () =>
+        HttpResponse.json({
+          data: {
+            id: 'pr1',
+            membershipId: 'm1',
+            displayName: 'Dr. Dan Doctor',
+            specialization: null,
+            prcLicenseNumber: null,
+            ptrNumber: null,
+            isActive: true,
+            schedule: [{ branchId: BRANCH, weekday: 1, startsAt: '09:00', endsAt: '24:00' }],
+          },
+        }),
+      ),
+    );
+    const { router } = renderAt('/practitioners/pr1/schedule');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add hours on Monday' }));
+    const start = within(screen.getByRole('group', { name: 'Monday, hours 1: start' }));
+    await userEvent.selectOptions(start.getByLabelText('Hour'), '9');
+    await userEvent.selectOptions(start.getByLabelText('Minute'), '00');
+    await userEvent.selectOptions(start.getByLabelText('AM or PM'), 'AM');
+    await userEvent.click(
+      screen.getByRole('checkbox', { name: 'Monday, hours 1: until midnight' }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Save schedule' }));
+    await screen.findByRole('heading', { level: 1, name: 'Dr. Dan Doctor' });
+    expect(router.state.location.pathname).toBe('/practitioners/pr1');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('sends a signed-in person with no clinic chosen to the clinic picker', async () => {
+    signedIn({ activeTenantId: null, permissions: [] });
+    const { router } = renderAt('/practitioners');
+    await screen.findByRole('heading', { level: 1, name: 'Choose a clinic' });
+    expect(router.state.location.pathname).toBe('/select-clinic');
+  });
+
+  it('sends a signed-out visitor to sign-in', async () => {
+    sessionStore.set({ status: 'signed-out' });
+    renderAt('/practitioners');
     expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument();
   });
 });

@@ -36,6 +36,7 @@ function signedIn(activeTenantId: string | null): SessionState {
     memberships: [...MEMBERSHIPS],
     activeTenantId,
     platformRole: 'none',
+    practitionerProfileId: null,
     permissions: ['tenant.read'],
   };
 }
@@ -79,6 +80,7 @@ describe('updateSignedInUser', () => {
       activeTenantId: 'a',
       permissions: ['tenant.read'],
       platformRole: 'none',
+      practitionerProfileId: null,
     });
     updateSignedInUser({ fullName: 'Ana Maria Cruz' });
     expect(sessionStore.get()).toEqual({
@@ -88,6 +90,7 @@ describe('updateSignedInUser', () => {
       activeTenantId: 'a',
       permissions: ['tenant.read'],
       platformRole: 'none',
+      practitionerProfileId: null,
     });
   });
 

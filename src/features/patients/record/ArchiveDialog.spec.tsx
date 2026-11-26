@@ -26,6 +26,7 @@ function signIn(activeTenantId = 'clinic-a') {
     activeTenantId,
     permissions: ['patients.read', 'patients.manage'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 }
 const patient = {

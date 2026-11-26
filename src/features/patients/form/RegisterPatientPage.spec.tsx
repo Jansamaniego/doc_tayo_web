@@ -27,6 +27,7 @@ function signIn(activeTenantId = 'clinic-a') {
     activeTenantId,
     permissions: ['tenant.read', 'patients.read', 'patients.manage'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 }
 const created = {

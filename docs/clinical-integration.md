@@ -5,7 +5,8 @@ For the people (or AI agent) building the DocTayo web app. It covers the clinica
 | Sub-phase | Screens it unblocks | State |
 |---|---|---|
 | [5.1 Patients](#51-patients) | Frontend Phase 6: patient list, search, registration, edit, archive | **Available** |
-| 5.2 Practitioners, directory, services | Pickers for appointments | Not available yet |
+| [5.2 Practitioners and directory](#52-practitioners-and-directory) | Doctor and staff pickers, doctor profiles and weekly schedules | **Available** |
+| 5.2 Services catalog (`/services`) | Service picker | Not available yet |
 | 5.3 Appointments | Frontend Phase 7 | Not available yet |
 | 5.4 Consultations, 5.5 Prescriptions | Frontend Phase 8 | Not available yet |
 
@@ -81,3 +82,44 @@ Patients are never deleted. `POST .../archive` with `reason` (required, up to 20
 | `IDEMPOTENCY_KEY_REUSED` / `_IN_USE` / `_INVALID` | See the rules above | Fix the client; these are programming errors except `_IN_USE` |
 | `TENANT_MISMATCH` | Another tab switched clinics | Reload |
 | `FORBIDDEN` | The role lacks `patients.read` or `.manage` | Hide the control; this should not happen for the five default roles |
+
+## 5.2 Practitioners and directory
+
+Who sees what: `directory.read` (all five default roles) covers the directory, profiles and availability; `practitioners.manage` (owner, clinic admin) creates and edits profiles and schedules. Hide the management controls from everyone else.
+
+| Screen | Call |
+|---|---|
+| Any staff or doctor picker | `GET /directory?practitionersOnly=&branchId=&page=&pageSize=` |
+| Doctor profile | `GET /practitioners/:profileId` |
+| Make a member a doctor | `POST /practitioners` (`membershipId`, `displayName`, optional `specialization`, `prcLicenseNumber`, `ptrNumber`) |
+| Edit, deactivate, reactivate | `PATCH /practitioners/:profileId` (`isActive`) |
+| Edit the weekly schedule | `PUT /practitioners/:profileId/schedule` (`blocks`) |
+| Free hours of a day | `GET /practitioners/:profileId/availability?branchId=&date=` |
+| "My schedule" | `GET /me` → `practitionerProfileId` |
+
+### Directory
+
+Active staff only, by name: `membershipId`, `fullName`, `jobTitle`, `roles` (`key`, `name`) and `practitioner` (`profileId`, `displayName`, `specialization`, `isActive`) or `null`. No e-mail addresses (use `GET /members` on the staff screens, which needs `members.read`). It is paginated (`pageSize` up to 100) and never cached.
+
+- `practitionersOnly=true`: only members with an **active** profile. Use it for doctor pickers.
+- `branchId=`: only active practitioners who have a schedule block at that branch.
+- Without either, a deactivated profile still shows with `isActive: false`, so an admin can find it and reactivate it. Never offer it for booking.
+
+### Profiles
+
+`displayName` is how the doctor is printed ("Dra. Ana Cruz, MD"), separate from the account name. Only an active member can get a profile (`409 CONFLICT` otherwise), and only one per member (`409 CONFLICT_UNIQUE`). A role does not make a profile: giving someone the Doctor role does not create one. Profiles are never deleted; deactivate them. A patch sends only the fields that change (`null` clears an optional one); there is no `version`.
+
+### Weekly schedule
+
+`PUT` sends the **whole week**: `{ "blocks": [{ "branchId", "weekday", "startsAt", "endsAt" }] }`. `weekday` is 1 (Monday) to 7 (Sunday); times are `HH:mm` in the branch's wall clock, `endsAt` may be `24:00`; up to 50 blocks; `[]` clears the week. Blocks of the same weekday must not overlap, even at different branches; back-to-back is fine. A bad block is `400 VALIDATION_FAILED` with `details[].field` such as `blocks[1].startsAt`; an inactive branch is reported at `blocks[i].branchId`; an unknown branch is `404`. The response is the profile with the saved week. If two people save at once, the later save wins completely.
+
+### Availability
+
+`date` is `YYYY-MM-DD`, a day in the **branch's** zone. The answer is `{ date, timeZone, intervals: [{ startsAt, endsAt }] }` with UTC instants; show them in `timeZone`. It is **informational**: booking outside these hours is allowed. **Booked appointments are not subtracted yet** (they arrive with 5.3), so do not present the intervals as free slots. A deactivated profile or a suspended member has no intervals.
+
+### `GET /me`
+
+`practitionerProfileId` is your own active profile in the active clinic, or `null` (no active clinic, no profile, or a deactivated one). Read it again after switching clinics.
+
+**Seeded data:** `doctor@sunrise.test` is a practitioner (Mon–Fri 09:00–12:00 and 13:00–17:00 at Main, Saturday morning at the annex); in Lakeside, `multi@doctayo.test` is one (Mon, Wed, Fri). The Sunrise owner and admin have no profile.
+

@@ -256,3 +256,7 @@ Known issues:
 - **The activity block is static on purpose** (backend request D-31, question Q21); nothing in it comes from the API.
 - Each e2e run leaves a deactivated "E2E Clinic ..." and an "E2E Owner" user in the database (no delete endpoints).
 - The admin sign-in has no second factor yet (Q18, D-28).
+
+### Fix: the time zone's error link (2026-11-26)
+
+On the new clinic form, the error summary's **Time zone** link did not move focus: the `Combobox` had no `name`. It has `name="timezone"` now (`NewClinicForm.spec.tsx`).

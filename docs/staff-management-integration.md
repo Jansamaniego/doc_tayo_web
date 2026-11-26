@@ -24,7 +24,7 @@ Decide from `GET /me` → `permissions` (the active clinic only), never from rol
 | `members.manage` | owner, clinic admin | Edit, suspend, reactivate and remove members |
 | `members.invite` | owner, clinic admin | Invite, resend and revoke invitations |
 
-Doctors, nurses and receptionists hold none of them: hide the Staff tab for them. A staff directory for clinical screens is Phase 5.
+Doctors, nurses and receptionists hold none of them: hide the Staff tab for them. The staff directory for clinical screens is `GET /directory` ([clinical-integration.md](clinical-integration.md)).
 
 **Owner vs clinic admin.** Both have the same permissions. The difference is one rule on top: only an **owner** may give or take the Owner role, or suspend, reactivate or remove someone who holds it. To know whether the signed-in user is an owner in the active clinic, find the entry in `GET /me/memberships` whose `tenantId` equals `activeTenantId`, and check `roles` for `key === 'owner'`. (`GET /roles` gives the same answer: the `owner` role has `assignable: true` only for owners.)
 

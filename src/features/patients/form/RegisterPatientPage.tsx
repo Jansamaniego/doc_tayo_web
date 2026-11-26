@@ -16,7 +16,7 @@ import { usePageTitle } from '@/lib/use-page-title.ts';
 import { useRegisterPatient, type Patient } from '../api/patients.ts';
 import { patientFullName } from '../patient-name.ts';
 import { DuplicateCandidates } from './DuplicateCandidates.tsx';
-import { SaveFailure, useOpenedClinic } from './opened-clinic.tsx';
+import { SaveFailure, useOpenedClinic } from '@/lib/opened-clinic.tsx';
 import { PatientFields } from './PatientFields.tsx';
 import { EMPTY_PATIENT, toCreateRequest } from './patient-form-values.ts';
 import { usePatientForm } from './use-patient-form.ts';

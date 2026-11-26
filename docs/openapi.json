@@ -1408,6 +1408,479 @@
         ]
       }
     },
+    "/api/v1/practitioners": {
+      "post": {
+        "operationId": "PractitionersController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePractitionerProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PractitionerProfileEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's record).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONFLICT_UNIQUE: the member already has a profile. CONFLICT: the member is not active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Make an active member a practitioner",
+        "tags": [
+          "practitioners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/practitioners/{profileId}": {
+      "get": {
+        "operationId": "PractitionersController_get_v1",
+        "parameters": [
+          {
+            "name": "profileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PractitionerProfileEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's record).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "A practitioner profile and its weekly schedule",
+        "tags": [
+          "practitioners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "PractitionersController_update_v1",
+        "parameters": [
+          {
+            "name": "profileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePractitionerProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PractitionerProfileEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's record).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Edit, deactivate or reactivate a profile",
+        "tags": [
+          "practitioners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/practitioners/{profileId}/schedule": {
+      "put": {
+        "operationId": "PractitionersController_replaceSchedule_v1",
+        "parameters": [
+          {
+            "name": "profileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PractitionerProfileEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's record).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Replace the whole weekly schedule",
+        "tags": [
+          "practitioners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/practitioners/{profileId}/availability": {
+      "get": {
+        "description": "Informational: booking outside these hours is allowed. Booked appointments are not subtracted yet.",
+        "operationId": "PractitionersController_availability_v1",
+        "parameters": [
+          {
+            "name": "profileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "A calendar day in the branch's time zone.",
+            "schema": {
+              "example": "2026-12-07",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilityEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND (also for another clinic's record).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Scheduled hours of one date at one branch",
+        "tags": [
+          "practitioners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/directory": {
+      "get": {
+        "description": "By name. No e-mail addresses. Responses are never cached.",
+        "operationId": "DirectoryController_list_v1",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "description": "Only active practitioners with a schedule at this branch.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "practitionersOnly",
+            "required": false,
+            "in": "query",
+            "description": "Only members with an active practitioner profile.",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectoryListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Active staff, for pickers",
+        "tags": [
+          "directory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "operationId": "MeController_get_v1",
@@ -4266,6 +4739,324 @@
           "version"
         ]
       },
+      "CreatePractitionerProfileDto": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "An active member of this clinic (`GET /directory`)."
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 160,
+            "example": "Dra. Ana Cruz, MD"
+          },
+          "specialization": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "prcLicenseNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          },
+          "ptrNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          }
+        },
+        "required": [
+          "membershipId",
+          "displayName"
+        ]
+      },
+      "ScheduleBlockDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "ISO weekday: 1 = Monday ... 7 = Sunday."
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "09:00",
+            "description": "HH:mm, wall clock of the branch's time zone."
+          },
+          "endsAt": {
+            "type": "string",
+            "example": "17:00",
+            "description": "HH:mm; may be 24:00."
+          }
+        },
+        "required": [
+          "branchId",
+          "weekday",
+          "startsAt",
+          "endsAt"
+        ]
+      },
+      "PractitionerProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "membershipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "specialization": {
+            "type": "string",
+            "nullable": true
+          },
+          "prcLicenseNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "ptrNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "schedule": {
+            "description": "By weekday, then start time.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleBlockDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "membershipId",
+          "displayName",
+          "specialization",
+          "prcLicenseNumber",
+          "ptrNumber",
+          "isActive",
+          "schedule"
+        ]
+      },
+      "PractitionerProfileEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PractitionerProfileResponse"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UpdatePractitionerProfileDto": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "specialization": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "prcLicenseNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          },
+          "ptrNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "`false` hides them from booking; nothing is deleted."
+          }
+        }
+      },
+      "ReplaceScheduleDto": {
+        "type": "object",
+        "properties": {
+          "blocks": {
+            "maxItems": 50,
+            "description": "The whole week; it replaces the previous one. Blocks of the same weekday must not overlap, whatever the branch. An empty list clears the week.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleBlockDto"
+            }
+          }
+        },
+        "required": [
+          "blocks"
+        ]
+      },
+      "AvailabilityIntervalResponse": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt"
+        ]
+      },
+      "AvailabilityResponse": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-12-07"
+          },
+          "timeZone": {
+            "type": "string",
+            "example": "Asia/Manila"
+          },
+          "intervals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AvailabilityIntervalResponse"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "timeZone",
+          "intervals"
+        ]
+      },
+      "AvailabilityEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AvailabilityResponse"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "DirectoryPractitionerResponse": {
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "specialization": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Offer only active practitioners for booking."
+          }
+        },
+        "required": [
+          "profileId",
+          "displayName",
+          "specialization",
+          "isActive"
+        ]
+      },
+      "DirectoryRoleResponse": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "doctor"
+          },
+          "name": {
+            "type": "string",
+            "example": "Doctor"
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ]
+      },
+      "DirectoryEntryResponse": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectoryRoleResponse"
+            }
+          },
+          "practitioner": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DirectoryPractitionerResponse"
+              }
+            ]
+          }
+        },
+        "required": [
+          "membershipId",
+          "fullName",
+          "jobTitle",
+          "roles",
+          "practitioner"
+        ]
+      },
+      "DirectoryListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectoryEntryResponse"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMetaResponse"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "MeProfileData": {
         "type": "object",
         "properties": {
@@ -4312,6 +5103,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "practitionerProfileId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "Your own practitioner profile in the active clinic (\"my schedule\"); null without an active clinic or an active profile."
           }
         },
         "required": [
@@ -4322,7 +5119,8 @@
           "passwordChangedAt",
           "platformRole",
           "activeTenantId",
-          "permissions"
+          "permissions",
+          "practitionerProfileId"
         ]
       },
       "MeProfileEnvelope": {

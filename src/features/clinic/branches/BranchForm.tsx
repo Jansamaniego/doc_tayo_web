@@ -182,6 +182,7 @@ export function BranchForm({
       />
       <Combobox
         label={labels.timezone}
+        name="timezone"
         optional
         hint={
           clinicTimeZone

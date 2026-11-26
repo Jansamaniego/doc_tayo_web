@@ -444,3 +444,7 @@ Checked from scratch after 5.5 and 5.6 were built in another session: lint, form
 **M7 items not covered by any e2e yet:** the invitation acceptance chain for a clinic admin, and the admin's limits seen as that new person (items 2, 3); **suspension, role change and removal seen in the affected person's open browser** (items 4, 5, 7: the notice on the picker, Staff disappearing, the focus refetch), which is the only real-API check of 5.5; the old and new invitation link after Resend and Revoke (item 6); a member id from another clinic opened in Sunrise (item 9); and the 360 px and axe pass on the invitations page. 5.5 is therefore verified by unit specs only.
 
 Startup JavaScript: 206.1 kB gzip against the 170 kB budget (200.6 kB at 5.4); the budget decision is still open.
+
+### Fix: the time zone's error link (2026-11-26)
+
+On the branch form and the clinic profile form, the error summary's **Time zone** link did not move focus: the `Combobox` had no `name`. Both have `name="timezone"` now (`NewBranchPage.spec.tsx`, `ClinicProfilePage.spec.tsx`). A refused time zone is still explained in the summary only, not under the field.

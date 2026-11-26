@@ -54,6 +54,7 @@ beforeEach(() => {
     activeTenantId: 'clinic-a',
     permissions: ['patients.read', 'patients.manage'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 });
 afterEach(() => {

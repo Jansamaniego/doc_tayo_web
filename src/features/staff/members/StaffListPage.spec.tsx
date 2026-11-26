@@ -47,6 +47,7 @@ function signIn(tenantId = 'clinic-a', userId = 'me') {
     activeTenantId: tenantId,
     permissions: ['tenant.read', 'members.read'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 }
 

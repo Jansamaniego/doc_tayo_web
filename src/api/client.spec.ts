@@ -229,6 +229,7 @@ describe('getApiClient (the app’s client)', () => {
       activeTenantId: 'clinic-z',
       permissions: [],
       platformRole: 'none',
+      practitionerProfileId: null,
     });
     await getApiClient().GET('/api/v1/tenant');
     sessionStore.set({ status: 'signed-out' });

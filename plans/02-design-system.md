@@ -571,4 +571,5 @@ Built 2026-11-21. 53 Vitest files with 749 specs; 19 story files with 99 stories
 
 - `AppShell` returned a different tree for desktop, tablet and phone widths, so a change of width rebuilt the page inside it and erased typed input. It is now one tree whose navigation changes around a page that stays in place (`app-shell.spec.tsx`).
 - `DateField` gained `onIncompleteChange`, true while something is typed that is not a real date.
+- `DatePicker`'s calendar day buttons are named with the number they show ("Wednesday, November 25, 2026"); the library's default ("November 25th") failed WCAG 2.5.3 on the first real page that used it (Phase 7.2).
 

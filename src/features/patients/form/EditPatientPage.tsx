@@ -16,7 +16,7 @@ import { fetchPatient, usePatient, useUpdatePatient, type Patient } from '../api
 import { patientFullName } from '../patient-name.ts';
 import { ArchivedBanner } from '../record/ArchivedBanner.tsx';
 import { isPatientNotFound, PatientNotFound } from '../record/PatientNotFound.tsx';
-import { SaveFailure, useOpenedClinic } from './opened-clinic.tsx';
+import { SaveFailure, useOpenedClinic } from '@/lib/opened-clinic.tsx';
 import { PatientFields } from './PatientFields.tsx';
 import { PATIENT_FIELDS, toChanges, toFormValues } from './patient-form-values.ts';
 import { usePatientForm } from './use-patient-form.ts';

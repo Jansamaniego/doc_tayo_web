@@ -25,6 +25,7 @@ beforeEach(() => {
     activeTenantId: null,
     permissions: [],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 });
 afterEach(() => {
@@ -47,6 +48,7 @@ function setup(reply?: () => Response) {
               emailVerifiedAt: null,
               passwordChangedAt: null,
               platformRole: 'none',
+              practitionerProfileId: null,
               activeTenantId: null,
               permissions: [],
             },

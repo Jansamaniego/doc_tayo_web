@@ -73,6 +73,7 @@ describe('VerifyEmailForm', () => {
       activeTenantId: null,
       permissions: [],
       platformRole: 'none',
+      practitionerProfileId: null,
     });
     setup({ reply: () => errorBody(400, 'TOKEN_INVALID') });
     await confirm();

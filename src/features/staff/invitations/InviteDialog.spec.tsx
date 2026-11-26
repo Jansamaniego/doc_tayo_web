@@ -40,6 +40,7 @@ beforeEach(() => {
     activeTenantId: 'clinic-a',
     permissions: ['members.read', 'members.invite'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
   server.use(http.get(`${API}/roles`, () => HttpResponse.json({ data: ROLES })));
 });

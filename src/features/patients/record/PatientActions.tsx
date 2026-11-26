@@ -9,7 +9,7 @@ import { notify } from '@/design-system/components/toast.tsx';
 import { AppButtonLink } from '@/lib/app-link.tsx';
 
 import { useRestorePatient, type Patient } from '../api/patients.ts';
-import { SaveFailure, useOpenedClinic } from '../form/opened-clinic.tsx';
+import { SaveFailure, useOpenedClinic } from '@/lib/opened-clinic.tsx';
 import { patientFullName } from '../patient-name.ts';
 import { ArchiveDialog } from './ArchiveDialog.tsx';
 

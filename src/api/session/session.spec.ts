@@ -48,6 +48,7 @@ function happyApi(
     memberships?: unknown[];
     permissions?: string[];
     platformRole?: 'none' | 'platform_admin';
+    practitionerProfileId?: string | null;
   } = {},
 ) {
   const calls: string[] = [];
@@ -64,6 +65,7 @@ function happyApi(
           emailVerifiedAt: null,
           passwordChangedAt: null,
           platformRole: overrides.platformRole ?? 'none',
+          practitionerProfileId: overrides.practitionerProfileId ?? null,
           activeTenantId: overrides.activeTenantId === undefined ? 'a' : overrides.activeTenantId,
           permissions: overrides.permissions ?? OWNER_PERMISSIONS,
         },
@@ -155,12 +157,14 @@ describe('boot (the first thing the app does)', () => {
       activeTenantId: 'a',
       permissions: OWNER_PERMISSIONS,
       platformRole: 'none',
+      practitionerProfileId: null,
     });
   });
 
   it('knows a platform admin, who may have no clinic at all', async () => {
     happyApi({
       platformRole: 'platform_admin',
+      practitionerProfileId: null,
       activeTenantId: null,
       memberships: [],
       permissions: [],
@@ -170,6 +174,7 @@ describe('boot (the first thing the app does)', () => {
     expect(store.get()).toMatchObject({
       status: 'signed-in',
       platformRole: 'platform_admin',
+      practitionerProfileId: null,
       activeTenantId: null,
       memberships: [],
     });
@@ -414,6 +419,7 @@ describe('switchClinic', () => {
   it('is kept when the person switches clinic', async () => {
     happyApi({
       platformRole: 'platform_admin',
+      practitionerProfileId: null,
       activeTenantId: null,
       memberships: [SUNRISE, HARBOR],
       permissions: [],
@@ -511,6 +517,7 @@ describe('a tab that is not signed in (a second window left on the sign-in page)
                 emailVerifiedAt: null,
                 passwordChangedAt: null,
                 platformRole: 'none',
+                practitionerProfileId: null,
                 activeTenantId: 'b',
                 permissions: ['tenant.read'],
               },
@@ -546,7 +553,8 @@ describe('a tab that is not signed in (a second window left on the sign-in page)
     expect(signedInTab.store.get()).toMatchObject({ status: 'signed-in', activeTenantId: 'b' });
     expect(signedInTab.tokens.get()).not.toBeNull();
     expect(signedOutTab.store.get()).toEqual({ status: 'signed-out' });
-    expect(calls).toEqual([]);
+    // The tab that switched reads who it is again (with its token); the signed-out one never asks.
+    expect(calls).not.toContain('me:none');
   });
 
   it('being told its session ended changes nothing and tells nobody', async () => {
@@ -562,6 +570,124 @@ describe('a tab that is not signed in (a second window left on the sign-in page)
 
     expect(signedOutTab.store.get()).toEqual({ status: 'signed-out' });
     expect(signedInTab.store.get().status).toBe('signed-in');
+  });
+});
+
+describe('practitionerProfileId ("my schedule")', () => {
+  const switchTo = (profile: string | null, over: { fail?: boolean } = {}) => {
+    const calls: string[] = [];
+    server.use(
+      http.post(`${API}/auth/switch-tenant`, () => {
+        calls.push('switch');
+        // From now on /me answers for the new clinic.
+        server.use(
+          http.get(`${API}/me`, () => {
+            calls.push('me');
+            return over.fail
+              ? error(500, 'INTERNAL_ERROR')
+              : HttpResponse.json({
+                  data: {
+                    ...OWNER,
+                    emailVerifiedAt: null,
+                    passwordChangedAt: null,
+                    platformRole: 'none',
+                    activeTenantId: 'b',
+                    permissions: ['directory.read'],
+                    practitionerProfileId: profile,
+                  },
+                });
+          }),
+        );
+        return HttpResponse.json({
+          data: {
+            activeTenantId: 'b',
+            tenant: { id: 'b', name: 'Harbor Clinic', status: 'active' },
+            permissions: ['directory.read'],
+          },
+        });
+      }),
+    );
+    return calls;
+  };
+
+  it('is read when the app starts', async () => {
+    happyApi({ practitionerProfileId: 'profile-a' });
+    const { controller, store } = makeTab();
+    await controller.boot();
+    expect(store.get()).toMatchObject({ practitionerProfileId: 'profile-a' });
+  });
+
+  it('is read at sign-in, and is null for a person who is not a practitioner', async () => {
+    happyApi();
+    server.use(
+      http.post(`${API}/auth/login`, () =>
+        HttpResponse.json({ data: { accessToken: 'tok', expiresIn: 900 } }),
+      ),
+    );
+    const { controller, store } = makeTab();
+    await controller.signIn({ email: 'a@b.test', password: 'x', sharedComputer: false });
+    expect(store.get()).toMatchObject({ status: 'signed-in', practitionerProfileId: null });
+  });
+
+  it('is read again when the session is reloaded', async () => {
+    happyApi();
+    const { controller, store } = makeTab();
+    await controller.boot();
+    happyApi({ practitionerProfileId: 'profile-new' });
+    await controller.refreshPermissions();
+    expect(store.get()).toMatchObject({ practitionerProfileId: 'profile-new' });
+  });
+
+  it('is read again after a clinic switch, which does not carry it', async () => {
+    happyApi({ practitionerProfileId: 'profile-a', memberships: [SUNRISE, HARBOR] });
+    const { controller, store } = makeTab();
+    await controller.boot();
+    const calls = switchTo('profile-b');
+    await controller.switchClinic('b');
+    expect(calls).toEqual(['switch', 'me']);
+    expect(store.get()).toMatchObject({ activeTenantId: 'b', practitionerProfileId: 'profile-b' });
+  });
+
+  it('is null in a clinic where the person is not a practitioner (never the previous one)', async () => {
+    happyApi({ practitionerProfileId: 'profile-a', memberships: [SUNRISE, HARBOR] });
+    const { controller, store } = makeTab();
+    await controller.boot();
+    switchTo(null);
+    await controller.switchClinic('b');
+    expect(store.get()).toMatchObject({ activeTenantId: 'b', practitionerProfileId: null });
+  });
+
+  it('keeps the switch, with no profile, when reading it again fails', async () => {
+    happyApi({ practitionerProfileId: 'profile-a', memberships: [SUNRISE, HARBOR] });
+    const { controller, store } = makeTab();
+    await controller.boot();
+    switchTo('profile-b', { fail: true });
+    await expect(controller.switchClinic('b')).resolves.toBeUndefined();
+    expect(store.get()).toMatchObject({
+      status: 'signed-in',
+      activeTenantId: 'b',
+      permissions: ['directory.read'],
+      practitionerProfileId: null,
+    });
+  });
+
+  it('is cleared at once when the switch happens, before the new value arrives', async () => {
+    happyApi({ practitionerProfileId: 'profile-a', memberships: [SUNRISE, HARBOR] });
+    const { controller, store, events } = makeTab();
+    await controller.boot();
+    switchTo('profile-b');
+    const seen: unknown[] = [];
+    store.subscribe(() => {
+      const state = store.get();
+      if (state.status === 'signed-in') {
+        seen.push([state.activeTenantId, state.practitionerProfileId]);
+      }
+    });
+    await controller.switchClinic('b');
+    expect(seen[0]).toEqual(['b', null]);
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'clinic-changed', fromOtherTab: false }),
+    );
   });
 });
 
@@ -619,6 +745,7 @@ describe('losing the active clinic (suspended or removed by an admin, plan 05 §
             emailVerifiedAt: null,
             passwordChangedAt: null,
             platformRole: 'none',
+            practitionerProfileId: null,
             activeTenantId: null,
             permissions: [],
           },

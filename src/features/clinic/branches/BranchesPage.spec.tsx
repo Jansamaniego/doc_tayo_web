@@ -47,6 +47,7 @@ const signIn = (permissions: string[], activeTenantId = 'clinic-a'): void => {
     activeTenantId,
     permissions,
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 };
 mockWideScreen();

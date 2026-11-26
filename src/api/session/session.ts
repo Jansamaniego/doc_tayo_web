@@ -67,6 +67,7 @@ export function createSessionController({
     ]);
     if (!me.data || !memberships.data) throw networkError(new Error('Empty answer.'));
     const { id, email, fullName, activeTenantId, permissions, platformRole } = me.data.data;
+    const { practitionerProfileId } = me.data.data;
 
     // The server clears the active clinic when an admin suspends or removes the person (their next
     // request says so), so a clinic that was open and now is not means it was taken away.
@@ -87,6 +88,7 @@ export function createSessionController({
       activeTenantId,
       permissions,
       platformRole,
+      practitionerProfileId,
       ...(lostClinicName !== undefined && { lostClinicName }),
     });
     if (isClinicLost) emit({ type: 'clinic-lost' });
@@ -206,10 +208,29 @@ export function createSessionController({
         activeTenantId,
         permissions,
         platformRole: state.platformRole,
+        // The old clinic's profile must never be offered in the new one.
+        practitionerProfileId: null,
       });
     }
     emit({ type: 'clinic-changed', fromOtherTab: false, tenantName: tenant.name });
     tabSync.post({ type: 'clinic-switched', tenantId });
+    await readPractitionerProfile(tenantId);
+  }
+
+  /**
+   * The switch answer does not say whether the person is a practitioner in the new clinic, so
+   * `GET /me` is read again (docs/clinical-integration.md, "GET /me"). The switch stands either way:
+   * if this read fails, there is simply no "My schedule" until the next session reload.
+   */
+  async function readPractitionerProfile(tenantId: string): Promise<void> {
+    try {
+      const me = await client.GET('/api/v1/me');
+      const state = store.get();
+      if (!me.data || state.status !== 'signed-in' || state.activeTenantId !== tenantId) return;
+      store.set({ ...state, practitionerProfileId: me.data.data.practitionerProfileId });
+    } catch {
+      // Offline or a server error: see above. A session that ended is handled by the client.
+    }
   }
 
   async function refreshPermissions(): Promise<void> {

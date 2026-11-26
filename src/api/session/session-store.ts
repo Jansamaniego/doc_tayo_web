@@ -31,6 +31,11 @@ export type SessionState =
       permissions: string[];
       /** `platform_admin` shows the Clinics and Users tabs. It grants no access to any clinic's data. */
       platformRole: 'none' | 'platform_admin';
+      /**
+       * The person's own active practitioner profile in the active clinic ("My schedule"), from
+       * `GET /me`; null without one, and until it is read again after a clinic switch.
+       */
+      practitionerProfileId: string | null;
       /** Set when an admin took the active clinic away from this person; the picker says so until a clinic is chosen. */
       lostClinicName?: string;
     };

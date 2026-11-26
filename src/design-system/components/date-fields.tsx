@@ -242,10 +242,30 @@ export function DateField({
 
 export type DatePickerProps = DateFieldProps;
 
+const DAY_NAME = new Intl.DateTimeFormat('en-US', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
 /** The typed DateField plus an optional calendar. The calendar is a convenience, never the only way. */
 export function DatePicker(props: DatePickerProps) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
+  // A day button shows "25", so its name must say "25" too ("25th" would not match what is seen, and
+  // voice control could not press it): "Wednesday, November 25, 2026".
+  function dayName(
+    date: Date,
+    { today, selected }: { today?: boolean; selected?: boolean },
+  ): string {
+    const day = DAY_NAME.format(
+      new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())),
+    );
+    const named = today ? t`Today, ${day}` : day;
+    return selected ? t`${named}, selected` : named;
+  }
   const selected = parsePlainDate(props.value) ? plainDateToLocalDate(props.value) : undefined;
   return (
     <DateField
@@ -270,6 +290,7 @@ export function DatePicker(props: DatePickerProps) {
             >
               <DayPicker
                 mode="single"
+                labels={{ labelDayButton: dayName }}
                 {...(selected && { selected, defaultMonth: selected })}
                 onSelect={(date) => {
                   if (date) {
@@ -296,6 +317,8 @@ export interface TimeFieldProps extends PartsChrome {
   onChange: (value: string) => void;
   /** Minutes are offered in steps of this many (default 5). A minute already set is always kept. */
   minuteStep?: number | undefined;
+  /** Put on the hour, so that a link in a form's error summary can focus the field. */
+  name?: string | undefined;
 }
 
 interface TimeParts {
@@ -331,6 +354,7 @@ export function TimeField({
   value,
   onChange,
   minuteStep = 5,
+  name,
 }: TimeFieldProps) {
   const { t } = useLingui();
   const [parts, setParts] = useState<TimeParts>(() => timePartsOf(value));
@@ -358,9 +382,11 @@ export function TimeField({
     invalid: true | undefined,
     describedBy: string | undefined,
     options: ReactNode,
+    fieldName?: string,
   ): ReactNode => (
     <select
       id={id}
+      name={fieldName}
       disabled={disabled}
       aria-describedby={describedBy}
       aria-invalid={invalid}
@@ -394,6 +420,7 @@ export function TimeField({
                     {index + 1}
                   </option>
                 )),
+                name,
               )
             }
           </Part>

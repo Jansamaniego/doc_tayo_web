@@ -23,7 +23,7 @@ Source of truth for how people sign in. Design and decisions: [plans/02-authenti
 | `POST /auth/account/setup` | public (token) | `204`; activates an onboarded `pending` owner. |
 | `POST /auth/email/verify` | public (token) | `204`; the address from `POST /me/email` becomes the account's (verified); **every** session revoked (`email_changed`); a notice to the old address. `409 CONFLICT_UNIQUE` if it got taken meanwhile. |
 | `POST /invitations/accept` | public (token) | `204`; joins the clinic. No automatic sign-in. |
-| `GET /me`, `/me/memberships`, `/me/sessions` | signed in | Profile, `platformRole` and permissions in the active tenant / memberships / active sessions. |
+| `GET /me`, `/me/memberships`, `/me/sessions` | signed in | Profile, `platformRole`, permissions and `practitionerProfileId` in the active tenant / memberships / active sessions. |
 | `PATCH /me` | signed in | `200`; `{ fullName }` only (a phone field is `TODO-LATER L-01`). |
 | `POST /me/email` | signed in | `{ newEmail, currentPassword }`. Wrong password `400 PASSWORD_INCORRECT`; otherwise **always** `202`: a 30-minute single-use link goes to the new address only if it is free (no enumeration). |
 | `DELETE /me/sessions/:id` | signed in | `204`; another user's session id is `404`. |

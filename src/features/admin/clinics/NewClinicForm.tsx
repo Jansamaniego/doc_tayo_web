@@ -156,6 +156,7 @@ export function NewClinicForm({
       />
       <Combobox
         label={t`Time zone`}
+        name="timezone"
         options={timeZoneOptions()}
         value={timezone}
         onChange={setTimezone}

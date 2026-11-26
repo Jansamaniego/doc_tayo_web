@@ -50,6 +50,7 @@ const signIn = (permissions: string[]): void => {
     activeTenantId: 'clinic-a',
     permissions,
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 };
 afterEach(() => {
@@ -304,6 +305,24 @@ describe('ClinicProfilePage: changing the time zone', () => {
     );
     expect(state.bodies).toEqual([]);
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+  });
+
+  it('after the API refuses the zone, the summary’s link moves focus to the picker', async () => {
+    await open(MANAGER, {
+      reply: () =>
+        errorBody(400, 'VALIDATION_FAILED', [
+          { field: 'timezone', code: 'INVALID_VALUE', message: 'x' },
+        ]),
+    });
+    await chooseTokyo();
+    await userEvent.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Change time zone',
+      }),
+    );
+    const summary = await screen.findByRole('alert');
+    await userEvent.click(within(summary).getByRole('link', { name: 'Time zone' }));
+    expect(screen.getByRole('combobox', { name: /Time zone/ })).toHaveFocus();
   });
 
   it('sends the new zone once confirmed, and shows it', async () => {

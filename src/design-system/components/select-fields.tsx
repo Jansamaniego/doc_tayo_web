@@ -21,6 +21,8 @@ export interface SelectFieldProps extends FieldChrome {
   /** An explicit first choice such as "Choose a branch" (used instead of a placeholder). */
   emptyOption?: string;
   disabled?: boolean;
+  /** Lets a link in a form's error summary focus the control. */
+  name?: string;
 }
 
 /**
@@ -37,6 +39,7 @@ export function SelectField({
   onChange,
   emptyOption,
   disabled,
+  name,
 }: SelectFieldProps) {
   return (
     <Field label={label} hint={hint} error={error} optional={optional}>
@@ -44,6 +47,7 @@ export function SelectField({
         <div className="relative">
           <select
             {...control}
+            name={name}
             value={value}
             disabled={disabled}
             onChange={(event) => {
@@ -73,6 +77,8 @@ export interface ComboboxProps extends FieldChrome {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  /** Lets a link in a form's error summary focus the control. */
+  name?: string;
 }
 
 /**
@@ -89,6 +95,7 @@ export function Combobox({
   value,
   onChange,
   disabled,
+  name,
 }: ComboboxProps) {
   const { t } = useLingui();
   const listId = useId();
@@ -146,6 +153,7 @@ export function Combobox({
               {...control}
               type="button"
               role="combobox"
+              name={name}
               aria-haspopup="listbox"
               aria-expanded={open}
               aria-controls={listId}

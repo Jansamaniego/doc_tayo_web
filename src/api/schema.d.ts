@@ -305,6 +305,98 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/practitioners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Make an active member a practitioner */
+        post: operations["PractitionersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/practitioners/{profileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A practitioner profile and its weekly schedule */
+        get: operations["PractitionersController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit, deactivate or reactivate a profile */
+        patch: operations["PractitionersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/practitioners/{profileId}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace the whole weekly schedule */
+        put: operations["PractitionersController_replaceSchedule_v1"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/practitioners/{profileId}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Scheduled hours of one date at one branch
+         * @description Informational: booking outside these hours is allowed. Booked appointments are not subtracted yet.
+         */
+        get: operations["PractitionersController_availability_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/directory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Active staff, for pickers
+         * @description By name. No e-mail addresses. Responses are never cached.
+         */
+        get: operations["DirectoryController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -1004,6 +1096,104 @@ export interface components {
         UnarchivePatientDto: {
             version: number;
         };
+        CreatePractitionerProfileDto: {
+            /**
+             * Format: uuid
+             * @description An active member of this clinic (`GET /directory`).
+             */
+            membershipId: string;
+            /** @example Dra. Ana Cruz, MD */
+            displayName: string;
+            specialization?: string | null;
+            prcLicenseNumber?: string | null;
+            ptrNumber?: string | null;
+        };
+        ScheduleBlockDto: {
+            /** Format: uuid */
+            branchId: string;
+            /** @description ISO weekday: 1 = Monday ... 7 = Sunday. */
+            weekday: number;
+            /**
+             * @description HH:mm, wall clock of the branch's time zone.
+             * @example 09:00
+             */
+            startsAt: string;
+            /**
+             * @description HH:mm; may be 24:00.
+             * @example 17:00
+             */
+            endsAt: string;
+        };
+        PractitionerProfileResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            membershipId: string;
+            displayName: string;
+            specialization: string | null;
+            prcLicenseNumber: string | null;
+            ptrNumber: string | null;
+            isActive: boolean;
+            /** @description By weekday, then start time. */
+            schedule: components["schemas"]["ScheduleBlockDto"][];
+        };
+        PractitionerProfileEnvelope: {
+            data: components["schemas"]["PractitionerProfileResponse"];
+        };
+        UpdatePractitionerProfileDto: {
+            displayName?: string;
+            specialization?: string | null;
+            prcLicenseNumber?: string | null;
+            ptrNumber?: string | null;
+            /** @description `false` hides them from booking; nothing is deleted. */
+            isActive?: boolean;
+        };
+        ReplaceScheduleDto: {
+            /** @description The whole week; it replaces the previous one. Blocks of the same weekday must not overlap, whatever the branch. An empty list clears the week. */
+            blocks: components["schemas"]["ScheduleBlockDto"][];
+        };
+        AvailabilityIntervalResponse: {
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+        };
+        AvailabilityResponse: {
+            /** @example 2026-12-07 */
+            date: string;
+            /** @example Asia/Manila */
+            timeZone: string;
+            intervals: components["schemas"]["AvailabilityIntervalResponse"][];
+        };
+        AvailabilityEnvelope: {
+            data: components["schemas"]["AvailabilityResponse"];
+        };
+        DirectoryPractitionerResponse: {
+            /** Format: uuid */
+            profileId: string;
+            displayName: string;
+            specialization: string | null;
+            /** @description Offer only active practitioners for booking. */
+            isActive: boolean;
+        };
+        DirectoryRoleResponse: {
+            /** @example doctor */
+            key: string;
+            /** @example Doctor */
+            name: string;
+        };
+        DirectoryEntryResponse: {
+            /** Format: uuid */
+            membershipId: string;
+            fullName: string;
+            jobTitle: string | null;
+            roles: components["schemas"]["DirectoryRoleResponse"][];
+            practitioner: components["schemas"]["DirectoryPractitionerResponse"] | null;
+        };
+        DirectoryListEnvelope: {
+            data: components["schemas"]["DirectoryEntryResponse"][];
+            meta: components["schemas"]["PageMetaResponse"];
+        };
         MeProfileData: {
             /** Format: uuid */
             id: string;
@@ -1028,6 +1218,11 @@ export interface components {
              *     ]
              */
             permissions: string[];
+            /**
+             * Format: uuid
+             * @description Your own practitioner profile in the active clinic ("my schedule"); null without an active clinic or an active profile.
+             */
+            practitionerProfileId: string | null;
         };
         MeProfileEnvelope: {
             data: components["schemas"]["MeProfileData"];
@@ -2353,6 +2548,313 @@ export interface operations {
             };
             /** @description CONFLICT: not archived. VERSION_CONFLICT: someone saved first; reload the patient and try again. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PractitionersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePractitionerProfileDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PractitionerProfileEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's record). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT_UNIQUE: the member already has a profile. CONFLICT: the member is not active. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PractitionersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PractitionerProfileEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's record). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PractitionersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePractitionerProfileDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PractitionerProfileEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's record). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PractitionersController_replaceSchedule_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceScheduleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PractitionerProfileEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's record). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PractitionersController_availability_v1: {
+        parameters: {
+            query: {
+                branchId: string;
+                /** @description A calendar day in the branch's time zone. */
+                date: string;
+            };
+            header?: never;
+            path: {
+                profileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailabilityEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's record). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    DirectoryController_list_v1: {
+        parameters: {
+            query?: {
+                /** @description Only active practitioners with a schedule at this branch. */
+                branchId?: string;
+                /** @description Only members with an active practitioner profile. */
+                practitionersOnly?: boolean;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DirectoryListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

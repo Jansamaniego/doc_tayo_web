@@ -17,6 +17,7 @@ const user = (over: Record<string, unknown> = {}) => ({
   fullName: 'Ana Cruz',
   status: 'active',
   platformRole: 'none',
+  practitionerProfileId: null,
   membershipCount: 2,
   ...over,
 });
@@ -34,6 +35,7 @@ function signInAs(id: string) {
     activeTenantId: null,
     permissions: [],
     platformRole: 'platform_admin',
+    practitionerProfileId: null,
   });
 }
 afterEach(() => {

@@ -20,6 +20,11 @@ msgstr "(you)"
 msgid "{0, plural, one {# patient found} other {# patients found}}"
 msgstr "{0, plural, one {# patient found} other {# patients found}}"
 
+#. placeholder {0}: listed.length
+#: src/features/practitioners/list/PractitionersPage.tsx
+msgid "{0, plural, one {# practitioner found} other {# practitioners found}}"
+msgstr "{0, plural, one {# practitioner found} other {# practitioners found}}"
+
 #. placeholder {0}: formatDate({ iso: joinedAt, timeZone, style: 'medium' })
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "{0} ({timeZone})"
@@ -73,6 +78,19 @@ msgstr "{count, plural, one {# possible matching record} other {# possible match
 msgid "{count, plural, one {# thing needs fixing} other {# things need fixing}}"
 msgstr "{count, plural, one {# thing needs fixing} other {# things need fixing}}"
 
+#: src/features/practitioners/schedule/DayHours.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "{day}, hours {number}"
+msgstr "{day}, hours {number}"
+
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "{days} already has hours. They will be replaced."
+msgstr "{days} already has hours. They will be replaced."
+
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "{days} already have hours. They will be replaced."
+msgstr "{days} already have hours. They will be replaced."
+
 #: src/features/admin/users/UserDetailPage.tsx
 msgid "{fullName} can sign in again."
 msgstr "{fullName} can sign in again."
@@ -113,6 +131,18 @@ msgstr "{fullName} will lose access to {clinicName} on their next request. Their
 msgid "{fullName} will lose access to {clinicName} on their next request. You cannot undo this here: to bring them back, invite them again."
 msgstr "{fullName} will lose access to {clinicName} on their next request. You cannot undo this here: to bring them back, invite them again."
 
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "{hours}: branch"
+msgstr "{hours}: branch"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "{hours}: end"
+msgstr "{hours}: end"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "{hours}: start"
+msgstr "{hours}: start"
+
 #: src/design-system/components/text-fields.tsx
 msgid "{length} of {maxLength} characters"
 msgstr "{length} of {maxLength} characters"
@@ -121,7 +151,12 @@ msgstr "{length} of {maxLength} characters"
 msgid "{minutes, plural, one {# minute} other {# minutes}}"
 msgstr "{minutes, plural, one {# minute} other {# minutes}}"
 
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "{name} · Has hours"
+msgstr "{name} · Has hours"
+
 #: src/features/admin/clinics/ClinicDetailPage.tsx
+#: src/features/practitioners/record/PractitionerActions.tsx
 msgid "{name} is active again."
 msgstr "{name} is active again."
 
@@ -130,8 +165,13 @@ msgid "{name} is archived."
 msgstr "{name} is archived."
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
+#: src/features/practitioners/record/PractitionerActions.tsx
 msgid "{name} is deactivated."
 msgstr "{name} is deactivated."
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "{name} is now a practitioner at {clinicName}."
+msgstr "{name} is now a practitioner at {clinicName}."
 
 #. placeholder {0}: patient.patientNumber
 #: src/features/patients/form/RegisterPatientPage.tsx
@@ -146,6 +186,38 @@ msgstr "{name} is restored."
 msgid "{name} is suspended."
 msgstr "{name} is suspended."
 
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "{name} will have no working hours."
+msgstr "{name} will have no working hours."
+
+#: src/features/practitioners/record/PractitionerActions.tsx
+msgid "{name} will no longer be offered when booking. Nothing is deleted."
+msgstr "{name} will no longer be offered when booking. Nothing is deleted."
+
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "{name}: branch"
+msgstr "{name}: branch"
+
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "{name}: end"
+msgstr "{name}: end"
+
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "{name}: start"
+msgstr "{name}: start"
+
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "{name}: until midnight"
+msgstr "{name}: until midnight"
+
+#: src/design-system/components/date-fields.tsx
+msgid "{named}, selected"
+msgstr "{named}, selected"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "{ownName} (no longer active)"
+msgstr "{ownName} (no longer active)"
+
 #: src/features/auth/countdown.ts
 msgid "{seconds, plural, one {# second} other {# seconds}}"
 msgstr "{seconds, plural, one {# second} other {# seconds}}"
@@ -153,6 +225,10 @@ msgstr "{seconds, plural, one {# second} other {# seconds}}"
 #: src/design-system/components/inactivity-warning.tsx
 msgid "{secondsLeft, plural, one {# second} other {# seconds}}"
 msgstr "{secondsLeft, plural, one {# second} other {# seconds}}"
+
+#: src/features/practitioners/record/WeeklySchedule.tsx
+msgid "{start} to {end} at {branch}"
+msgstr "{start} to {end} at {branch}"
 
 #: src/features/patients/birth-date.ts
 msgid "{value, plural, one {# month} other {# months}}"
@@ -175,6 +251,10 @@ msgstr "+{more} more"
 msgid "10 to 128 characters"
 msgstr "10 to 128 characters"
 
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "A branch in this schedule no longer exists. Check the branches and save again."
+msgstr "A branch in this schedule no longer exists. Check the branches and save again."
+
 #: src/api/error-messages.ts
 msgid "A clinic must always have at least one owner."
 msgstr "A clinic must always have at least one owner."
@@ -194,6 +274,10 @@ msgstr "A new link was sent. The old link no longer works."
 #: src/features/patients/record/ArchiveDialog.tsx
 msgid "A reason can have at most 200 characters."
 msgstr "A reason can have at most 200 characters."
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "A week can have at most {most} blocks of hours. This one has {count}."
+msgstr "A week can have at most {most} blocks of hours. This one has {count}."
 
 #: src/features/auth/accept-invitation-form.tsx
 msgid "Accept invitation"
@@ -226,6 +310,7 @@ msgstr "Actions"
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/clinic/branches/BranchStatusPill.tsx
 #: src/features/patients/list/PatientsPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
 #: src/features/staff/members/MemberStatusPill.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Active"
@@ -237,6 +322,10 @@ msgstr "Active"
 msgid "Active members"
 msgstr "Active members"
 
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Active staff without a practitioner profile. Giving someone the Doctor role does not make them a practitioner."
+msgstr "Active staff without a practitioner profile. Giving someone the Doctor role does not make them a practitioner."
+
 #: src/features/admin/overview/SampleActivity.tsx
 msgid "Activity across clinics"
 msgstr "Activity across clinics"
@@ -245,10 +334,27 @@ msgstr "Activity across clinics"
 msgid "Add a branch"
 msgstr "Add a branch"
 
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
+msgid "Add a practitioner"
+msgstr "Add a practitioner"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Add an active branch before adding hours."
+msgstr "Add an active branch before adding hours."
+
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/clinic/branches/NewBranchPage.tsx
 msgid "Add branch"
 msgstr "Add branch"
+
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "Add hours on {day}"
+msgstr "Add hours on {day}"
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Add practitioner"
+msgstr "Add practitioner"
 
 #: src/features/home/HomePage.tsx
 msgid "Add your branches"
@@ -278,6 +384,7 @@ msgstr "All accounts"
 
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/clinic/branches/NewBranchPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
 msgid "All branches"
 msgstr "All branches"
 
@@ -294,6 +401,10 @@ msgstr "All clinics on DocTayo"
 #: src/features/patients/record/PatientNotFound.tsx
 msgid "All patients"
 msgstr "All patients"
+
+#: src/features/practitioners/record/PractitionerNotFound.tsx
+msgid "All practitioners"
+msgstr "All practitioners"
 
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "All staff"
@@ -400,8 +511,14 @@ msgstr "Back to sign in"
 msgid "Birth date"
 msgstr "Birth date"
 
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "Booked appointments are not counted yet."
+msgstr "Booked appointments are not counted yet."
+
 #: src/design-system/patterns/clinic-switcher.tsx
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/practitioners/record/WorkingHours.tsx
 msgid "Branch"
 msgstr "Branch"
 
@@ -432,6 +549,10 @@ msgstr "Busiest clinics today (sample)"
 #: src/features/patients/form/EditPatientPage.tsx
 #: src/features/patients/form/RegisterPatientPage.tsx
 #: src/features/patients/record/ArchiveDialog.tsx
+#: src/features/practitioners/form/EditPractitionerPage.tsx
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 #: src/features/staff/invitations/InviteDialog.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Cancel"
@@ -455,6 +576,7 @@ msgid "Change time zone"
 msgstr "Change time zone"
 
 #: src/features/patients/form/EditPatientPage.tsx
+#: src/features/practitioners/form/EditPractitionerPage.tsx
 msgid "Changes saved."
 msgstr "Changes saved."
 
@@ -492,6 +614,10 @@ msgstr "Choose 1 to 5 roles."
 msgid "Choose 1 to 5 roles. To hand over the clinic, give another member the Owner role; they can then remove it from you."
 msgstr "Choose 1 to 5 roles. To hand over the clinic, give another member the Owner role; they can then remove it from you."
 
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "Choose a branch"
+msgstr "Choose a branch"
+
 #: src/features/auth/auth-pages.tsx
 #: src/features/auth/select-clinic.tsx
 msgid "Choose a clinic"
@@ -509,6 +635,10 @@ msgstr "Choose a date on or after {limit}."
 msgid "Choose a date on or before {limit}."
 msgstr "Choose a date on or before {limit}."
 
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "Choose a day."
+msgstr "Choose a day."
+
 #: src/features/auth/auth-pages.tsx
 msgid "Choose a new password"
 msgstr "Choose a new password"
@@ -521,6 +651,10 @@ msgstr "Choose a role."
 msgid "Choose an option"
 msgstr "Choose an option"
 
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "Choose at least one day."
+msgstr "Choose at least one day."
+
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Choose at least one role."
 msgstr "Choose at least one role."
@@ -532,6 +666,22 @@ msgstr "Choose at most 5 roles."
 #: src/design-system/components/date-fields.tsx
 msgid "Choose on calendar"
 msgstr "Choose on calendar"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Choose the branch."
+msgstr "Choose the branch."
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Choose the end time."
+msgstr "Choose the end time."
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Choose the person."
+msgstr "Choose the person."
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Choose the start time."
+msgstr "Choose the start time."
 
 #: src/features/auth/login-form.tsx
 msgid "Choose this on a computer other people also use. You will be signed out after 10 minutes without use."
@@ -665,9 +815,25 @@ msgstr "Copied"
 msgid "Copy"
 msgstr "Copy"
 
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "Copy {day}'s hours to other days"
+msgstr "Copy {day}'s hours to other days"
+
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "Copy {source}'s hours"
+msgstr "Copy {source}'s hours"
+
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "Copy hours"
+msgstr "Copy hours"
+
 #: src/features/patients/record/PatientPage.tsx
 msgid "Copy number"
 msgstr "Copy number"
+
+#: src/features/practitioners/schedule/CopyHoursDialog.tsx
+msgid "Copy to"
+msgstr "Copy to"
 
 #: src/features/auth/accept-invitation-form.tsx
 msgid "Create account and accept"
@@ -713,12 +879,14 @@ msgid "Dates are shown in {timeZone}."
 msgstr "Dates are shown in {timeZone}."
 
 #: src/design-system/components/date-fields.tsx
+#: src/features/practitioners/record/WorkingHours.tsx
 msgid "Day"
 msgstr "Day"
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 #: src/features/admin/users/UserDetailPage.tsx
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/practitioners/record/PractitionerActions.tsx
 msgid "Deactivate"
 msgstr "Deactivate"
 
@@ -732,6 +900,7 @@ msgid "Deactivate {fullName}?"
 msgstr "Deactivate {fullName}?"
 
 #: src/features/admin/clinics/ClinicDetailPage.tsx
+#: src/features/practitioners/record/PractitionerActions.tsx
 msgid "Deactivate {name}?"
 msgstr "Deactivate {name}?"
 
@@ -758,6 +927,10 @@ msgstr "Details for support"
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Details saved."
 msgstr "Details saved."
+
+#: src/features/practitioners/form/use-practitioner-form.ts
+msgid "Display name"
+msgstr "Display name"
 
 #: src/features/home/HomePage.tsx
 msgid "Doctors and front-desk staff each get their own sign-in."
@@ -793,6 +966,19 @@ msgstr "Edit job title"
 #: src/features/patients/form/EditPatientPage.tsx
 msgid "Edit patient"
 msgstr "Edit patient"
+
+#: src/features/practitioners/form/EditPractitionerPage.tsx
+msgid "Edit practitioner"
+msgstr "Edit practitioner"
+
+#: src/features/practitioners/record/PractitionerActions.tsx
+msgid "Edit profile"
+msgstr "Edit profile"
+
+#: src/features/practitioners/record/PractitionerPage.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Edit weekly schedule"
+msgstr "Edit weekly schedule"
 
 #: src/features/account/AccountPage.tsx
 #: src/features/admin/users/UserDetailPage.tsx
@@ -837,6 +1023,10 @@ msgstr "Enter a web address name (for example bayview-clinic)."
 #: src/design-system/components/text-fields.tsx
 msgid "Enter an amount, for example 1,250.50."
 msgstr "Enter an amount, for example 1,250.50."
+
+#: src/features/practitioners/form/use-practitioner-form.ts
+msgid "Enter how the name is printed."
+msgstr "Enter how the name is printed."
 
 #: src/features/clinic/branches/BranchForm.tsx
 msgid "Enter the branch name."
@@ -921,6 +1111,10 @@ msgstr "Everyone at {name} loses access permanently."
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 msgid "Everyone at {name} loses access until you reactivate it."
 msgstr "Everyone at {name} loses access until you reactivate it."
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Everyone on your staff is already a practitioner."
+msgstr "Everyone on your staff is already a practitioner."
 
 #: src/features/staff/invitations/InvitationsPage.tsx
 #: src/features/staff/invitations/InvitationStatusPill.tsx
@@ -1023,6 +1217,10 @@ msgstr "Home · {clinicName}"
 msgid "Hour"
 msgstr "Hour"
 
+#: src/features/practitioners/form/PractitionerFields.tsx
+msgid "How it is printed, for example Dra. Ana Cruz, MD"
+msgstr "How it is printed, for example Dra. Ana Cruz, MD"
+
 #: src/features/account/change-email-form.tsx
 msgid "If {sentTo} can be used, we sent a link to it. Open it within 30 minutes. Your email does not change until you do."
 msgstr "If {sentTo} can be used, we sent a link to it. Open it within 30 minutes. Your email does not change until you do."
@@ -1033,6 +1231,7 @@ msgstr "If there is an account for {sentTo}, we have sent a link to reset the pa
 
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/clinic/branches/BranchStatusPill.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
 msgid "Inactive"
 msgstr "Inactive"
 
@@ -1137,6 +1336,10 @@ msgstr "Loading invitations…"
 msgid "Loading patients…"
 msgstr "Loading patients…"
 
+#: src/features/practitioners/list/PractitionersPage.tsx
+msgid "Loading practitioners…"
+msgstr "Loading practitioners…"
+
 #: src/features/staff/invitations/InviteDialog.tsx
 #: src/features/staff/members/RolesReference.tsx
 msgid "Loading roles…"
@@ -1155,10 +1358,28 @@ msgstr "Loading the account…"
 msgid "Loading the clinic…"
 msgstr "Loading the clinic…"
 
+#: src/features/practitioners/record/PractitionerPage.tsx
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "Loading the hours…"
+msgstr "Loading the hours…"
+
 #: src/features/patients/form/EditPatientPage.tsx
 #: src/features/patients/record/PatientPage.tsx
 msgid "Loading the patient…"
 msgstr "Loading the patient…"
+
+#: src/features/practitioners/form/EditPractitionerPage.tsx
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "Loading the practitioner…"
+msgstr "Loading the practitioner…"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Loading the schedule…"
+msgstr "Loading the schedule…"
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Loading the staff…"
+msgstr "Loading the staff…"
 
 #: src/features/clinic/branches/BranchPage.tsx
 msgid "Loading this branch…"
@@ -1203,6 +1424,10 @@ msgstr "Menu"
 msgid "Middle name"
 msgstr "Middle name"
 
+#: src/lib/datetime/wall-time.ts
+msgid "midnight"
+msgstr "midnight"
+
 #: src/design-system/components/date-fields.tsx
 msgid "Minute"
 msgstr "Minute"
@@ -1224,11 +1449,16 @@ msgstr "More actions"
 msgid "My account"
 msgstr "My account"
 
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "My schedule"
+msgstr "My schedule"
+
 #: src/features/account/profile-name-form.tsx
 #: src/features/admin/users/UsersListPage.tsx
 #: src/features/clinic/branches/BranchesPage.tsx
 #: src/features/patients/list/PatientsPage.tsx
 #: src/features/patients/record/PatientPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
 msgid "Name"
 msgstr "Name"
@@ -1298,6 +1528,11 @@ msgstr "No expired invitations"
 msgid "No guardian recorded"
 msgstr "No guardian recorded"
 
+#: src/features/practitioners/record/WeeklySchedule.tsx
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "No hours"
+msgstr "No hours"
+
 #: src/features/clinic/branches/BranchesPage.tsx
 msgid "No inactive branches"
 msgstr "No inactive branches"
@@ -1327,6 +1562,14 @@ msgstr "No pending invitations"
 msgid "No permissions"
 msgstr "No permissions"
 
+#: src/features/practitioners/list/PractitionersPage.tsx
+msgid "No practitioner works at this branch"
+msgstr "No practitioner works at this branch"
+
+#: src/features/practitioners/list/PractitionersPage.tsx
+msgid "No practitioners yet"
+msgstr "No practitioners yet"
+
 #: src/design-system/components/select-fields.tsx
 msgid "No results"
 msgstr "No results"
@@ -1351,6 +1594,18 @@ msgstr "No users match your search"
 msgid "No users yet"
 msgstr "No users yet"
 
+#: src/features/practitioners/record/WeeklySchedule.tsx
+msgid "No weekly hours yet"
+msgstr "No weekly hours yet"
+
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "No working hours on this day"
+msgstr "No working hours on this day"
+
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "No working hours: this practitioner is inactive."
+msgstr "No working hours: this practitioner is inactive."
+
 #: src/features/admin/overview/OverviewBlocks.tsx
 msgid "Nobody is waiting."
 msgstr "Nobody is waiting."
@@ -1367,6 +1622,10 @@ msgstr "None of the fields below changed, but the record did (for example it was
 msgid "None recorded"
 msgstr "None recorded"
 
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "Not active staff at the moment"
+msgstr "Not active staff at the moment"
+
 #: src/features/auth/select-clinic.tsx
 msgid "Not available"
 msgstr "Not available"
@@ -1379,6 +1638,8 @@ msgstr "Not available yet"
 #: src/features/patients/form/VersionConflictNotice.tsx
 #: src/features/patients/list/PatientsPage.tsx
 #: src/features/patients/record/PatientPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/practitioners/record/PractitionerPage.tsx
 msgid "Not recorded"
 msgstr "Not recorded"
 
@@ -1398,6 +1659,8 @@ msgstr "Not yet"
 #: src/features/clinic/branches/BranchForm.tsx
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 #: src/features/patients/form/EditPatientPage.tsx
+#: src/features/practitioners/form/EditPractitionerPage.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Nothing to change."
 msgstr "Nothing to change."
@@ -1461,6 +1724,10 @@ msgstr "Open record"
 #: src/features/patients/form/DuplicateCandidates.tsx
 msgid "Open record of {name}"
 msgstr "Open record of {name}"
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Open their practitioner page"
+msgstr "Open their practitioner page"
 
 #. placeholder {0}: membership.tenantName
 #: src/features/auth/select-clinic.tsx
@@ -1540,6 +1807,10 @@ msgstr "People"
 msgid "Per page"
 msgstr "Per page"
 
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "Person"
+msgstr "Person"
+
 #: src/features/patients/form/use-patient-form.ts
 #: src/features/patients/list/PatientsPage.tsx
 #: src/features/patients/record/PatientPage.tsx
@@ -1591,6 +1862,16 @@ msgstr "Please wait {duration} before trying again."
 msgid "PM"
 msgstr "PM"
 
+#: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/shell/AuthenticatedShell.tsx
+msgid "Practitioners"
+msgstr "Practitioners"
+
+#: src/features/practitioners/form/use-practitioner-form.ts
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "PRC license number"
+msgstr "PRC license number"
+
 #: src/features/auth/verify-email-form.tsx
 msgid "Press the button to finish changing your email address. You will be signed out on every device and sign in again with the new address."
 msgstr "Press the button to finish changing your email address. You will be signed out on every device and sign in again with the new address."
@@ -1610,9 +1891,15 @@ msgstr "Profile"
 msgid "Province"
 msgstr "Province"
 
+#: src/features/practitioners/form/use-practitioner-form.ts
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "PTR number"
+msgstr "PTR number"
+
 #: src/features/admin/clinics/ClinicDetailPage.tsx
 #: src/features/admin/users/UserDetailPage.tsx
 #: src/features/clinic/branches/BranchPage.tsx
+#: src/features/practitioners/record/PractitionerActions.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Reactivate"
 msgstr "Reactivate"
@@ -1658,6 +1945,10 @@ msgstr "Remove"
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Remove {fullName} from {clinicName}?"
 msgstr "Remove {fullName} from {clinicName}?"
+
+#: src/features/practitioners/schedule/DayHours.tsx
+msgid "Remove {name}"
+msgstr "Remove {name}"
 
 #: src/features/staff/members/MemberStatusPill.tsx
 #: src/features/staff/members/StaffListPage.tsx
@@ -1730,9 +2021,18 @@ msgstr "Sample data"
 msgid "Save"
 msgstr "Save"
 
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Save an empty week?"
+msgstr "Save an empty week?"
+
 #: src/features/patients/form/EditPatientPage.tsx
+#: src/features/practitioners/form/EditPractitionerPage.tsx
 msgid "Save changes"
 msgstr "Save changes"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Save empty week"
+msgstr "Save empty week"
 
 #: src/features/account/profile-name-form.tsx
 msgid "Save name"
@@ -1741,6 +2041,10 @@ msgstr "Save name"
 #: src/features/auth/reset-password-form.tsx
 msgid "Save new password"
 msgstr "Save new password"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Save schedule"
+msgstr "Save schedule"
 
 #: src/features/account/change-password-form.tsx
 #: src/features/account/profile-name-form.tsx
@@ -1751,6 +2055,9 @@ msgstr "Save new password"
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 #: src/features/patients/form/EditPatientPage.tsx
 #: src/features/patients/form/RegisterPatientPage.tsx
+#: src/features/practitioners/form/EditPractitionerPage.tsx
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
 #: src/features/staff/members/EditMemberForm.tsx
 msgid "Saving…"
 msgstr "Saving…"
@@ -1833,6 +2140,10 @@ msgstr "Sex"
 #: src/features/clinic/branches/BranchesPage.tsx
 msgid "Show"
 msgstr "Show"
+
+#: src/features/practitioners/list/PractitionersPage.tsx
+msgid "Show all branches"
+msgstr "Show all branches"
 
 #: src/features/patients/list/PatientsPage.tsx
 msgid "Show archived"
@@ -1933,12 +2244,20 @@ msgstr "Sorted ascending"
 msgid "Sorted descending"
 msgstr "Sorted descending"
 
+#: src/features/practitioners/form/use-practitioner-form.ts
+#: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "Specialization"
+msgstr "Specialization"
+
 #: src/features/shell/AuthenticatedShell.tsx
 #: src/features/staff/members/StaffListPage.tsx
 #: src/features/staff/StaffTabs.tsx
 msgid "Staff"
 msgstr "Staff"
 
+#: src/features/practitioners/list/PractitionersPage.tsx
+#: src/features/practitioners/record/PractitionerPage.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 msgid "Staff member"
 msgstr "Staff member"
@@ -1956,6 +2275,7 @@ msgstr "Staff sections"
 #: src/features/clinic/branches/BranchPage.tsx
 #: src/features/clinic/profile/ClinicProfilePage.tsx
 #: src/features/patients/list/PatientsPage.tsx
+#: src/features/practitioners/list/PractitionersPage.tsx
 #: src/features/staff/invitations/InvitationsPage.tsx
 #: src/features/staff/members/MemberDetailPage.tsx
 #: src/features/staff/members/StaffListPage.tsx
@@ -2063,6 +2383,10 @@ msgstr "The email or password is incorrect."
 msgid "The end date must be on or after the start date."
 msgstr "The end date must be on or after the start date."
 
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "The end must be after the start."
+msgstr "The end must be after the start."
+
 #: src/api/error-messages.ts
 msgid "The information could not be read. Please try again."
 msgstr "The information could not be read. Please try again."
@@ -2112,9 +2436,17 @@ msgstr "The service is starting up. Please try again in a moment."
 msgid "The settings below are missing or not valid. Ask the person who installed the app to fix them."
 msgstr "The settings below are missing or not valid. Ask the person who installed the app to fix them."
 
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "There is no branch to show hours for."
+msgstr "There is no branch to show hours for."
+
 #: src/features/admin/overview/SampleActivity.tsx
 msgid "These figures are examples. Real numbers will appear here once the platform reports them."
 msgstr "These figures are examples. Real numbers will appear here once the platform reports them."
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "These hours overlap other hours on this day."
+msgstr "These hours overlap other hours on this day."
 
 #: src/features/home/HomePage.tsx
 msgid "These numbers appear here once appointments are being booked."
@@ -2148,11 +2480,16 @@ msgstr "This already exists."
 msgid "This app is misconfigured"
 msgstr "This app is misconfigured"
 
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "This branch is no longer active."
+msgstr "This branch is no longer active."
+
 #: src/features/clinic/branches/BranchesPage.tsx
 msgid "This branch is not in your clinic."
 msgstr "This branch is not in your clinic."
 
 #: src/features/patients/form/use-patient-form.ts
+#: src/features/practitioners/form/use-practitioner-form.ts
 msgid "This can have at most {limit} characters."
 msgstr "This can have at most {limit} characters."
 
@@ -2229,7 +2566,7 @@ msgstr "This link has expired, was already used, or a newer link was sent."
 msgid "This link is not valid or has expired. Please ask for a new one."
 msgstr "This link is not valid or has expired. Please ask for a new one."
 
-#: src/features/patients/form/opened-clinic.tsx
+#: src/lib/opened-clinic.tsx
 msgid "This page was opened for {opened}. You are now working in {now}. Nothing was saved."
 msgstr "This page was opened for {opened}. You are now working in {now}. Nothing was saved."
 
@@ -2253,9 +2590,17 @@ msgstr "This patient was already archived or restored by someone else."
 msgid "This person has not set a password yet. They activate their account from the link we emailed them."
 msgstr "This person has not set a password yet. They activate their account from the link we emailed them."
 
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "This person is already a practitioner here."
+msgstr "This person is already a practitioner here."
+
 #: src/features/staff/invitations/InviteDialog.tsx
 msgid "This person is already on your staff."
 msgstr "This person is already on your staff."
+
+#: src/features/practitioners/form/NewPractitionerPage.tsx
+msgid "This person is no longer an active member."
+msgstr "This person is no longer an active member."
 
 #: src/features/staff/members/StaffListPage.tsx
 msgid "This person is not on your staff."
@@ -2264,6 +2609,10 @@ msgstr "This person is not on your staff."
 #: src/features/staff/members/member-errors.ts
 msgid "This person was changed by someone else. Check their details and try again."
 msgstr "This person was changed by someone else. Check their details and try again."
+
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "This practitioner is inactive."
+msgstr "This practitioner is inactive."
 
 #: src/api/error-messages.ts
 msgid "This request was already sent with different details. Please start again."
@@ -2293,6 +2642,14 @@ msgstr "This web address name is already used. Choose another."
 msgid "Time zone"
 msgstr "Time zone"
 
+#: src/features/practitioners/record/WorkingHours.tsx
+msgid "Times are in {timeZone}."
+msgstr "Times are in {timeZone}."
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Times are the local time of each branch."
+msgstr "Times are the local time of each branch."
+
 #: src/design-system/components/date-fields.tsx
 msgid "To"
 msgstr "To"
@@ -2309,6 +2666,10 @@ msgstr "To change these details, the clinic's owner signs in and edits them."
 msgid "Today at a glance"
 msgstr "Today at a glance"
 
+#: src/design-system/components/date-fields.tsx
+msgid "Today, {day}"
+msgstr "Today, {day}"
+
 #: src/api/error-messages.ts
 msgid "Too many attempts. Please wait a moment and try again."
 msgstr "Too many attempts. Please wait a moment and try again."
@@ -2324,6 +2685,11 @@ msgstr "Type {typeToConfirm} exactly to continue."
 #: src/design-system/components/confirm-dialog.tsx
 msgid "Type {typeToConfirm} to confirm"
 msgstr "Type {typeToConfirm} to confirm"
+
+#: src/features/practitioners/record/PractitionerPage.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Unknown branch"
+msgstr "Unknown branch"
 
 #: src/design-system/tv/tv-display.tsx
 msgid "Updated {lastUpdated}"
@@ -2416,6 +2782,10 @@ msgstr "We could not find this page"
 msgid "We could not find this patient"
 msgstr "We could not find this patient"
 
+#: src/features/practitioners/record/PractitionerNotFound.tsx
+msgid "We could not find this practitioner"
+msgstr "We could not find this practitioner"
+
 #: src/api/error-messages.ts
 msgid "We could not find what you were looking for."
 msgstr "We could not find what you were looking for."
@@ -2443,6 +2813,15 @@ msgstr "We send a link to this address. Your email changes when you open it."
 msgid "Web address name"
 msgstr "Web address name"
 
+#: src/features/practitioners/record/PractitionerPage.tsx
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Weekly schedule"
+msgstr "Weekly schedule"
+
+#: src/features/practitioners/schedule/ScheduleEditorPage.tsx
+msgid "Weekly schedule saved."
+msgstr "Weekly schedule saved."
+
 #: src/features/home/HomePage.tsx
 msgid "Welcome, {firstName}"
 msgstr "Welcome, {firstName}"
@@ -2458,6 +2837,10 @@ msgstr "What you typed will be lost."
 #: src/features/clinic/profile/ClinicProfileForm.tsx
 msgid "With the country code, for example +639171234567. Spaces and dashes are fine."
 msgstr "With the country code, for example +639171234567. Spaces and dashes are fine."
+
+#: src/features/practitioners/record/PractitionerPage.tsx
+msgid "Working hours on a day"
+msgstr "Working hours on a day"
 
 #: src/design-system/components/date-fields.tsx
 msgid "Year"

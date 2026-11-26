@@ -1,6 +1,8 @@
 import { useLingui } from '@lingui/react/macro';
 import { Outlet, useRouter, useRouterState } from '@tanstack/react-router';
 import {
+  CalendarClock,
+  Stethoscope,
   ContactRound,
   Building2,
   Hospital,
@@ -76,6 +78,26 @@ export function AuthenticatedShell() {
             requires: 'patients.read',
           },
           {
+            id: 'practitioners',
+            label: t`Practitioners`,
+            icon: <Stethoscope aria-hidden="true" className="size-6" />,
+            href: '/practitioners',
+            requires: 'directory.read',
+          },
+          // Shown by who the person is, not by a permission (plan.md §5.5): the signed-in
+          // practitioner's own page.
+          ...(session.practitionerProfileId
+            ? [
+                {
+                  id: 'my-schedule',
+                  label: t`My schedule`,
+                  icon: <CalendarClock aria-hidden="true" className="size-6" />,
+                  href: `/practitioners/${session.practitionerProfileId}`,
+                  requires: 'directory.read',
+                },
+              ]
+            : []),
+          {
             id: 'staff',
             label: t`Staff`,
             icon: <UsersRound aria-hidden="true" className="size-6" />,
@@ -122,13 +144,18 @@ export function AuthenticatedShell() {
         ? 'admin-overview'
         : pathname.startsWith('/patients')
           ? 'patients'
-          : pathname.startsWith('/staff')
-            ? 'staff'
-            : pathname.startsWith('/clinic')
-              ? 'clinic'
-              : pathname === '/'
-                ? 'home'
-                : '';
+          : session.practitionerProfileId &&
+              pathname === `/practitioners/${session.practitionerProfileId}`
+            ? 'my-schedule'
+            : pathname.startsWith('/practitioners')
+              ? 'practitioners'
+              : pathname.startsWith('/staff')
+                ? 'staff'
+                : pathname.startsWith('/clinic')
+                  ? 'clinic'
+                  : pathname === '/'
+                    ? 'home'
+                    : '';
 
   return (
     <AppShell

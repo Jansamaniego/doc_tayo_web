@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -33,6 +33,7 @@ beforeEach(() => {
     activeTenantId: 'clinic-a',
     permissions: ['tenant.read', 'branches.read', 'branches.manage'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 });
 afterEach(() => {
@@ -178,6 +179,19 @@ describe('NewBranchPage', () => {
     await submit();
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.getByLabelText(/^City/)).toHaveValue('Pasig');
+  });
+
+  it('the summary’s "Time zone" link moves focus to the picker', async () => {
+    setup(() =>
+      errorBody(400, 'VALIDATION_FAILED', [
+        { field: 'timezone', code: 'INVALID_VALUE', message: 'x' },
+      ]),
+    );
+    await type('Branch name', 'Annex');
+    await submit();
+    const summary = await screen.findByRole('alert');
+    await userEvent.click(within(summary).getByRole('link', { name: 'Time zone' }));
+    expect(screen.getByRole('combobox', { name: /Time zone/ })).toHaveFocus();
   });
 
   it('has no accessibility violations', async () => {

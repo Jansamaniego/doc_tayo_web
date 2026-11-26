@@ -63,6 +63,7 @@ function signIn(
     activeTenantId: tenantId,
     permissions,
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 }
 

@@ -10,6 +10,8 @@ export const accounts = {
   lakesideOwner: { email: 'owner@lakeside.test', password },
   // One account in both clinics (clinic admin in Sunrise, doctor in Lakeside): it picks a clinic.
   multiClinic: { email: 'multi@doctayo.test', password },
+  // A practitioner (doctor) in Sunrise, once the backend seed has run since sub-phase 5.2.
+  doctor: { email: 'doctor@sunrise.test', password },
   // A platform admin: no clinic, reaches only /admin/* (docs/platform-admin-integration.md §1).
   admin: { email: 'admin@doctayo.test', password },
 } as const;

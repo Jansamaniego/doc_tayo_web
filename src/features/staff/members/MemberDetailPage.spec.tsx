@@ -93,6 +93,7 @@ beforeEach(() => {
     activeTenantId: 'clinic-a',
     permissions: ['tenant.read', 'members.read', 'members.manage'],
     platformRole: 'none',
+    practitionerProfileId: null,
   });
 });
 afterEach(() => {

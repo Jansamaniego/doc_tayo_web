@@ -112,6 +112,14 @@ registers, and signs in as `reception@sunrise.test` and `owner@lakeside.test`.
 `tests/e2e/patient-registration.spec.ts` registers, edits, archives and restores patients, and archives them afterwards (they cannot be
 deleted); it also signs in as `multi@doctayo.test` to switch clinics between two tabs.
 
+`tests/e2e/practitioners.spec.ts` reads the practitioners that `npm run db:seed:dev` creates since backend
+sub-phase 5.2 (run it again on an older database).
+
+`tests/e2e/practitioner-management.spec.ts` adds, edits, deactivates and reactivates a practitioner and edits
+their weekly schedule (with a second branch) in a new clinic, so it needs the same API setup as the platform admin spec below (`MAIL_TRANSPORT=file` and
+`admin@doctayo.test`); it signs in as `owner@sunrise.test` for the cross-clinic check. It runs in Chromium only
+and leaves a new "E2E Practice ..." clinic behind.
+
 **The platform admin spec** (`tests/e2e/platform-admin.spec.ts`) creates a clinic and an owner, then reads
 the owner's setup link from the API's emails. So the API must run with `MAIL_TRANSPORT=file` (it writes to
 its `var/mail`; with Docker: `MAIL_TRANSPORT=file docker compose up -d api`, and the e2e container reads the

@@ -13,7 +13,7 @@ import {
 import { applyApiErrors } from '@/lib/api-form-errors.ts';
 
 import { useArchivePatient, type Patient } from '../api/patients.ts';
-import { SaveFailure, useOpenedClinic } from '../form/opened-clinic.tsx';
+import { SaveFailure, useOpenedClinic } from '@/lib/opened-clinic.tsx';
 import { patientFullName } from '../patient-name.ts';
 
 const MAX_REASON = 200;

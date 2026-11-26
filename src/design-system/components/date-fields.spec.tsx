@@ -137,6 +137,22 @@ describe('DatePicker', () => {
     expect(button).toHaveAttribute('aria-haspopup', 'dialog');
   });
 
+  it('names each day with the number that is shown on it, as a word (voice control: "click 25")', async () => {
+    renderWithProviders(<Harness />);
+    await userEvent.click(screen.getByRole('button', { name: 'Choose on calendar' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Choose a date' });
+    const days = within(within(dialog).getByRole('grid')).getAllByRole('button');
+    expect(days.length).toBeGreaterThan(27);
+    for (const day of days) {
+      const shown = day.textContent;
+      expect(day.getAttribute('aria-label')).toMatch(new RegExp(`\\b${shown}\\b`));
+    }
+    // The chosen day still says it is chosen.
+    expect(
+      within(dialog).getByRole('button', { name: 'Friday, November 20, 2026, selected' }),
+    ).toBeInTheDocument();
+  });
+
   it('opens a calendar on the month of the value and picks a day', async () => {
     renderWithProviders(<Harness />);
     await userEvent.click(screen.getByRole('button', { name: 'Choose on calendar' }));
@@ -200,6 +216,13 @@ describe('TimeField', () => {
       />
     );
   }
+
+  it('names its first part, so a link in an error summary can focus it', () => {
+    const { container } = renderWithProviders(
+      <TimeField legend="Start time" name="start" value="" onChange={() => undefined} />,
+    );
+    expect(container.querySelector('[name="start"]')).toBe(screen.getByLabelText('Hour'));
+  });
 
   it('is a group with labelled hour, minute and AM/PM, on a 12-hour clock', () => {
     renderWithProviders(<Harness />);
