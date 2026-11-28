@@ -172,14 +172,14 @@ test.describe('the front desk', () => {
   test('shows the working hours of a chosen day, in the branch’s zone', async () => {
     await page.goto(sunriseDoctorPath);
     const hours = page.getByRole('region', { name: 'Working hours on a day' });
-    await expect(hours).toContainText('Booked appointments are not counted yet.');
+    await expect(hours).toContainText('Booked appointments are already taken out.');
     await page.getByLabel('Branch').selectOption({ index: 0 });
     await chooseDay(page, 1); // a Monday
     await expect(hours).toContainText('9:00 AM – 12:00 PM');
     await expect(hours).toContainText('1:00 PM – 5:00 PM');
     await expect(hours).toContainText('Times are in Asia/Manila.');
     await chooseDay(page, 7); // a Sunday
-    await expect(hours).toContainText('No working hours on this day');
+    await expect(hours).toContainText('No free working hours on this day');
     // The calendar opens (and breaks no content security policy).
     await page.getByRole('button', { name: 'Choose on calendar' }).click();
     await expect(page.getByRole('grid')).toBeVisible();

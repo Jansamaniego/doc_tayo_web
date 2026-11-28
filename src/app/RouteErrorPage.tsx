@@ -5,7 +5,7 @@ import { isApiError } from '@/api/errors.ts';
 import { getEnv } from '@/config/env.ts';
 import { ErrorState } from '@/design-system/components/state-views.tsx';
 
-// Seam for Phase 14 (error monitoring, plan.md Q14): the one place that reports an unexpected error.
+// Seam for Phase 15 (error monitoring, plan.md Q14): the one place that reports an unexpected error.
 // Never send bodies, form values, names or emails; only the user id and the API's requestId.
 function reportError({
   error,

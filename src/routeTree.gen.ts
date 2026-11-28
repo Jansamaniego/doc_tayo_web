@@ -22,11 +22,15 @@ import { Route as AppClinicRouteImport } from './routes/_app/_clinic'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppClinicIndexRouteImport } from './routes/_app/_clinic/index'
+import { Route as AppClinicAppointmentsRouteImport } from './routes/_app/_clinic/appointments'
 import { Route as AppClinicClinicRouteImport } from './routes/_app/_clinic/clinic'
 import { Route as AppClinicPatientsRouteImport } from './routes/_app/_clinic/patients'
 import { Route as AppClinicPractitionersRouteImport } from './routes/_app/_clinic/practitioners'
 import { Route as AppClinicStaffRouteImport } from './routes/_app/_clinic/staff'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
+import { Route as AppClinicAppointmentsIndexRouteImport } from './routes/_app/_clinic/appointments/index'
+import { Route as AppClinicAppointmentsAppointmentIdRouteImport } from './routes/_app/_clinic/appointments/$appointmentId'
+import { Route as AppClinicAppointmentsNewRouteImport } from './routes/_app/_clinic/appointments/new'
 import { Route as AppClinicClinicIndexRouteImport } from './routes/_app/_clinic/clinic/index'
 import { Route as AppClinicPatientsIndexRouteImport } from './routes/_app/_clinic/patients/index'
 import { Route as AppClinicPatientsPatientIdRouteImport } from './routes/_app/_clinic/patients/$patientId'
@@ -115,6 +119,11 @@ const AppClinicIndexRoute = AppClinicIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppClinicRoute,
 } as any)
+const AppClinicAppointmentsRoute = AppClinicAppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => AppClinicRoute,
+} as any)
 const AppClinicClinicRoute = AppClinicClinicRouteImport.update({
   id: '/clinic',
   path: '/clinic',
@@ -140,6 +149,24 @@ const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppClinicAppointmentsIndexRoute =
+  AppClinicAppointmentsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppClinicAppointmentsRoute,
+  } as any)
+const AppClinicAppointmentsAppointmentIdRoute =
+  AppClinicAppointmentsAppointmentIdRouteImport.update({
+    id: '/$appointmentId',
+    path: '/$appointmentId',
+    getParentRoute: () => AppClinicAppointmentsRoute,
+  } as any)
+const AppClinicAppointmentsNewRoute =
+  AppClinicAppointmentsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AppClinicAppointmentsRoute,
+  } as any)
 const AppClinicClinicIndexRoute = AppClinicClinicIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -288,11 +315,14 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRoute
   '/admin': typeof AppAdminRouteWithChildren
+  '/appointments': typeof AppClinicAppointmentsRouteWithChildren
   '/clinic': typeof AppClinicClinicRouteWithChildren
   '/patients': typeof AppClinicPatientsRouteWithChildren
   '/practitioners': typeof AppClinicPractitionersRouteWithChildren
   '/staff': typeof AppClinicStaffRouteWithChildren
   '/admin/': typeof AppAdminIndexRoute
+  '/appointments/$appointmentId': typeof AppClinicAppointmentsAppointmentIdRoute
+  '/appointments/new': typeof AppClinicAppointmentsNewRoute
   '/patients/$patientId': typeof AppClinicPatientsPatientIdRoute
   '/patients/new': typeof AppClinicPatientsNewRoute
   '/practitioners/$profileId': typeof AppClinicPractitionersProfileIdRoute
@@ -302,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/admin/clinics/$tenantId': typeof AppAdminClinicsTenantIdRoute
   '/admin/clinics/new': typeof AppAdminClinicsNewRoute
   '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
+  '/appointments/': typeof AppClinicAppointmentsIndexRoute
   '/clinic/': typeof AppClinicClinicIndexRoute
   '/patients/': typeof AppClinicPatientsIndexRoute
   '/practitioners/': typeof AppClinicPractitionersIndexRoute
@@ -330,6 +361,8 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRoute
   '/admin': typeof AppAdminIndexRoute
+  '/appointments/$appointmentId': typeof AppClinicAppointmentsAppointmentIdRoute
+  '/appointments/new': typeof AppClinicAppointmentsNewRoute
   '/patients/$patientId': typeof AppClinicPatientsPatientIdRoute
   '/patients/new': typeof AppClinicPatientsNewRoute
   '/practitioners/$profileId': typeof AppClinicPractitionersProfileIdRoute
@@ -339,6 +372,7 @@ export interface FileRoutesByTo {
   '/admin/clinics/$tenantId': typeof AppAdminClinicsTenantIdRoute
   '/admin/clinics/new': typeof AppAdminClinicsNewRoute
   '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
+  '/appointments': typeof AppClinicAppointmentsIndexRoute
   '/clinic': typeof AppClinicClinicIndexRoute
   '/patients': typeof AppClinicPatientsIndexRoute
   '/practitioners': typeof AppClinicPractitionersIndexRoute
@@ -369,12 +403,15 @@ export interface FileRoutesById {
   '/_app/_clinic': typeof AppClinicRouteWithChildren
   '/_app/account': typeof AppAccountRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
+  '/_app/_clinic/appointments': typeof AppClinicAppointmentsRouteWithChildren
   '/_app/_clinic/clinic': typeof AppClinicClinicRouteWithChildren
   '/_app/_clinic/patients': typeof AppClinicPatientsRouteWithChildren
   '/_app/_clinic/practitioners': typeof AppClinicPractitionersRouteWithChildren
   '/_app/_clinic/staff': typeof AppClinicStaffRouteWithChildren
   '/_app/_clinic/': typeof AppClinicIndexRoute
   '/_app/admin/': typeof AppAdminIndexRoute
+  '/_app/_clinic/appointments/$appointmentId': typeof AppClinicAppointmentsAppointmentIdRoute
+  '/_app/_clinic/appointments/new': typeof AppClinicAppointmentsNewRoute
   '/_app/_clinic/patients/$patientId': typeof AppClinicPatientsPatientIdRoute
   '/_app/_clinic/patients/new': typeof AppClinicPatientsNewRoute
   '/_app/_clinic/practitioners/$profileId': typeof AppClinicPractitionersProfileIdRoute
@@ -384,6 +421,7 @@ export interface FileRoutesById {
   '/_app/admin/clinics/$tenantId': typeof AppAdminClinicsTenantIdRoute
   '/_app/admin/clinics/new': typeof AppAdminClinicsNewRoute
   '/_app/admin/users/$userId': typeof AppAdminUsersUserIdRoute
+  '/_app/_clinic/appointments/': typeof AppClinicAppointmentsIndexRoute
   '/_app/_clinic/clinic/': typeof AppClinicClinicIndexRoute
   '/_app/_clinic/patients/': typeof AppClinicPatientsIndexRoute
   '/_app/_clinic/practitioners/': typeof AppClinicPractitionersIndexRoute
@@ -414,11 +452,14 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account'
     | '/admin'
+    | '/appointments'
     | '/clinic'
     | '/patients'
     | '/practitioners'
     | '/staff'
     | '/admin/'
+    | '/appointments/$appointmentId'
+    | '/appointments/new'
     | '/patients/$patientId'
     | '/patients/new'
     | '/practitioners/$profileId'
@@ -428,6 +469,7 @@ export interface FileRouteTypes {
     | '/admin/clinics/$tenantId'
     | '/admin/clinics/new'
     | '/admin/users/$userId'
+    | '/appointments/'
     | '/clinic/'
     | '/patients/'
     | '/practitioners/'
@@ -456,6 +498,8 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account'
     | '/admin'
+    | '/appointments/$appointmentId'
+    | '/appointments/new'
     | '/patients/$patientId'
     | '/patients/new'
     | '/practitioners/$profileId'
@@ -465,6 +509,7 @@ export interface FileRouteTypes {
     | '/admin/clinics/$tenantId'
     | '/admin/clinics/new'
     | '/admin/users/$userId'
+    | '/appointments'
     | '/clinic'
     | '/patients'
     | '/practitioners'
@@ -494,12 +539,15 @@ export interface FileRouteTypes {
     | '/_app/_clinic'
     | '/_app/account'
     | '/_app/admin'
+    | '/_app/_clinic/appointments'
     | '/_app/_clinic/clinic'
     | '/_app/_clinic/patients'
     | '/_app/_clinic/practitioners'
     | '/_app/_clinic/staff'
     | '/_app/_clinic/'
     | '/_app/admin/'
+    | '/_app/_clinic/appointments/$appointmentId'
+    | '/_app/_clinic/appointments/new'
     | '/_app/_clinic/patients/$patientId'
     | '/_app/_clinic/patients/new'
     | '/_app/_clinic/practitioners/$profileId'
@@ -509,6 +557,7 @@ export interface FileRouteTypes {
     | '/_app/admin/clinics/$tenantId'
     | '/_app/admin/clinics/new'
     | '/_app/admin/users/$userId'
+    | '/_app/_clinic/appointments/'
     | '/_app/_clinic/clinic/'
     | '/_app/_clinic/patients/'
     | '/_app/_clinic/practitioners/'
@@ -631,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClinicIndexRouteImport
       parentRoute: typeof AppClinicRoute
     }
+    '/_app/_clinic/appointments': {
+      id: '/_app/_clinic/appointments'
+      path: '/appointments'
+      fullPath: '/appointments'
+      preLoaderRoute: typeof AppClinicAppointmentsRouteImport
+      parentRoute: typeof AppClinicRoute
+    }
     '/_app/_clinic/clinic': {
       id: '/_app/_clinic/clinic'
       path: '/clinic'
@@ -665,6 +721,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AppAdminIndexRouteImport
       parentRoute: typeof AppAdminRoute
+    }
+    '/_app/_clinic/appointments/': {
+      id: '/_app/_clinic/appointments/'
+      path: '/'
+      fullPath: '/appointments/'
+      preLoaderRoute: typeof AppClinicAppointmentsIndexRouteImport
+      parentRoute: typeof AppClinicAppointmentsRoute
+    }
+    '/_app/_clinic/appointments/$appointmentId': {
+      id: '/_app/_clinic/appointments/$appointmentId'
+      path: '/$appointmentId'
+      fullPath: '/appointments/$appointmentId'
+      preLoaderRoute: typeof AppClinicAppointmentsAppointmentIdRouteImport
+      parentRoute: typeof AppClinicAppointmentsRoute
+    }
+    '/_app/_clinic/appointments/new': {
+      id: '/_app/_clinic/appointments/new'
+      path: '/new'
+      fullPath: '/appointments/new'
+      preLoaderRoute: typeof AppClinicAppointmentsNewRouteImport
+      parentRoute: typeof AppClinicAppointmentsRoute
     }
     '/_app/_clinic/clinic/': {
       id: '/_app/_clinic/clinic/'
@@ -837,6 +914,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppClinicAppointmentsRouteChildren {
+  AppClinicAppointmentsAppointmentIdRoute: typeof AppClinicAppointmentsAppointmentIdRoute
+  AppClinicAppointmentsNewRoute: typeof AppClinicAppointmentsNewRoute
+  AppClinicAppointmentsIndexRoute: typeof AppClinicAppointmentsIndexRoute
+}
+
+const AppClinicAppointmentsRouteChildren: AppClinicAppointmentsRouteChildren = {
+  AppClinicAppointmentsAppointmentIdRoute:
+    AppClinicAppointmentsAppointmentIdRoute,
+  AppClinicAppointmentsNewRoute: AppClinicAppointmentsNewRoute,
+  AppClinicAppointmentsIndexRoute: AppClinicAppointmentsIndexRoute,
+}
+
+const AppClinicAppointmentsRouteWithChildren =
+  AppClinicAppointmentsRoute._addFileChildren(
+    AppClinicAppointmentsRouteChildren,
+  )
+
 interface AppClinicClinicRouteChildren {
   AppClinicClinicIndexRoute: typeof AppClinicClinicIndexRoute
   AppClinicClinicBranchesBranchIdRoute: typeof AppClinicClinicBranchesBranchIdRoute
@@ -919,6 +1014,7 @@ const AppClinicStaffRouteWithChildren = AppClinicStaffRoute._addFileChildren(
 )
 
 interface AppClinicRouteChildren {
+  AppClinicAppointmentsRoute: typeof AppClinicAppointmentsRouteWithChildren
   AppClinicClinicRoute: typeof AppClinicClinicRouteWithChildren
   AppClinicPatientsRoute: typeof AppClinicPatientsRouteWithChildren
   AppClinicPractitionersRoute: typeof AppClinicPractitionersRouteWithChildren
@@ -927,6 +1023,7 @@ interface AppClinicRouteChildren {
 }
 
 const AppClinicRouteChildren: AppClinicRouteChildren = {
+  AppClinicAppointmentsRoute: AppClinicAppointmentsRouteWithChildren,
   AppClinicClinicRoute: AppClinicClinicRouteWithChildren,
   AppClinicPatientsRoute: AppClinicPatientsRouteWithChildren,
   AppClinicPractitionersRoute: AppClinicPractitionersRouteWithChildren,

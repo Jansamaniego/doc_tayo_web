@@ -7,7 +7,7 @@ import { useSession } from '@/api/session/session-store.ts';
 import { Alert } from '@/design-system/components/alert.tsx';
 import { ErrorState, LoadingState } from '@/design-system/components/state-views.tsx';
 import { DetailRow } from '@/design-system/patterns/detail-row.tsx';
-import { useBranches } from '@/features/clinic/api/branches.ts';
+import { branchTimeZone, useBranches } from '@/features/clinic/api/branches.ts';
 import { useClinicTimeZone } from '@/features/staff/api/clinic-time-zone.ts';
 import { AppButtonLink } from '@/lib/app-link.tsx';
 import { can } from '@/lib/permissions.ts';
@@ -123,7 +123,7 @@ function Profile({ practitioner }: { practitioner: Practitioner }) {
             branches={offered.map((branch) => ({
               id: branch.id,
               name: branch.name,
-              timeZone: branch.timezone ?? clinicZone,
+              timeZone: branchTimeZone({ branch, clinicZone }),
             }))}
           />
         ) : (

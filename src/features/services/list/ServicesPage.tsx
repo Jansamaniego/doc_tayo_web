@@ -15,7 +15,7 @@ import { can } from '@/lib/permissions.ts';
 import { usePageTitle } from '@/lib/use-page-title.ts';
 
 import { useServices, type Service } from '../api/services.ts';
-import { formatDuration } from '../duration.ts';
+import { formatDuration } from '@/lib/duration.ts';
 import { ServicePrice } from '../ServicePrice.tsx';
 
 /** What the address keeps: the page, its size and whether inactive services are shown. */

@@ -13,7 +13,7 @@ const DEV_STYLE_NONCE = 'doctayo-dev-only-nonce';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   const apiOrigin = env.VITE_API_ORIGIN ?? 'http://localhost:3000';
-  // Report-only until Phase 14 (plan.md §11). Violations fail the e2e tests (tests/e2e/fixtures).
+  // Report-only until Phase 15 (plan.md §11). Violations fail the e2e tests (tests/e2e/fixtures).
   const productionCsp = buildCsp({ apiOrigin });
 
   return {

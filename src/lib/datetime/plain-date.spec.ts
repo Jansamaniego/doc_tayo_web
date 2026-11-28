@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  addDays,
   ageOn,
   comparePlainDates,
   daysInMonth,
@@ -8,6 +9,7 @@ import {
   localDateToPlainDate,
   parsePlainDate,
   plainDateToLocalDate,
+  startOfWeek,
   toPlainDate,
 } from './plain-date.ts';
 
@@ -122,5 +124,55 @@ describe('ageOn (from plain dates only: no time zone is involved)', () => {
   it.each(['', '2020-02-30', '15/01/2020'])('refuses %j as a date', (bad) => {
     expect(() => age(bad, '2026-01-15')).toThrow(RangeError);
     expect(() => age('2020-01-15', bad)).toThrow(RangeError);
+  });
+});
+
+describe('addDays', () => {
+  it.each([
+    ['2026-12-07', 1, '2026-12-08'],
+    ['2026-12-07', -1, '2026-12-06'],
+    ['2026-12-07', 0, '2026-12-07'],
+    ['2026-11-30', 1, '2026-12-01'],
+    ['2026-12-01', -1, '2026-11-30'],
+    ['2026-12-31', 1, '2027-01-01'],
+    ['2027-01-01', -1, '2026-12-31'],
+    ['2028-02-28', 1, '2028-02-29'],
+    ['2028-03-01', -1, '2028-02-29'],
+    ['2026-02-28', 1, '2026-03-01'],
+    // Days on which New York (the runner) changes its clocks.
+    ['2026-03-07', 1, '2026-03-08'],
+    ['2026-10-31', 2, '2026-11-02'],
+    ['2026-12-07', 366, '2027-12-08'],
+  ])('%s %i days is %s', (date, days, expected) => {
+    expect(addDays({ date, days })).toBe(expected);
+  });
+
+  it('refuses a date that is not real, and part of a day', () => {
+    expect(() => addDays({ date: '2026-02-30', days: 1 })).toThrow(RangeError);
+    expect(() => addDays({ date: '2026-12-07', days: 1.5 })).toThrow(RangeError);
+  });
+});
+
+describe('startOfWeek (a week starts on Monday)', () => {
+  // 7 to 13 December 2026 is Monday to Sunday.
+  it.each([
+    '2026-12-07',
+    '2026-12-08',
+    '2026-12-09',
+    '2026-12-10',
+    '2026-12-11',
+    '2026-12-12',
+    '2026-12-13',
+  ])('%s belongs to the week of 7 December', (date) => {
+    expect(startOfWeek(date)).toBe('2026-12-07');
+  });
+
+  it('crosses a month and a year', () => {
+    expect(startOfWeek('2027-01-03')).toBe('2026-12-28');
+    expect(startOfWeek('2026-12-06')).toBe('2026-11-30');
+  });
+
+  it('refuses a date that is not real', () => {
+    expect(() => startOfWeek('2026-13-01')).toThrow(RangeError);
   });
 });

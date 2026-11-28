@@ -72,6 +72,35 @@ describe('SelectField (native select, for short lists)', () => {
     expect(select.className).toContain('min-h-control-md');
   });
 
+  it('lists options under their group headings, ungrouped ones first', async () => {
+    const { container } = renderWithProviders(
+      <SelectField
+        label="Practitioner"
+        value=""
+        onChange={() => undefined}
+        emptyOption="Choose a practitioner"
+        options={[]}
+        groups={[
+          { label: 'Works at Main', options: [{ value: '1', label: 'Dr. Ana' }] },
+          { label: 'Nobody here', options: [] },
+          { label: 'Other practitioners', options: [{ value: '2', label: 'Dr. Ben' }] },
+        ]}
+      />,
+    );
+    const select = screen.getByRole('combobox', { name: 'Practitioner' });
+    expect(
+      within(select)
+        .getAllByRole('group')
+        .map((group) => group.getAttribute('label')),
+    ).toEqual(['Works at Main', 'Other practitioners']);
+    expect(
+      within(select)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['Choose a practitioner', 'Dr. Ana', 'Dr. Ben']);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = renderWithProviders(
       <SelectField
@@ -130,6 +159,13 @@ describe('Combobox (searchable list, for long lists)', () => {
     expect(screen.getByText('2 results')).toBeInTheDocument();
   });
 
+  it('counts a single result in the singular', async () => {
+    renderWithProviders(<ComboboxHarness />);
+    await userEvent.click(screen.getByRole('combobox', { name: /Doctor/ }));
+    await userEvent.type(await screen.findByRole('searchbox', { name: 'Search' }), 'ben');
+    expect(screen.getByText('1 result')).toBeInTheDocument();
+  });
+
   it('says so plainly when nothing matches', async () => {
     renderWithProviders(<ComboboxHarness />);
     await userEvent.click(screen.getByRole('combobox', { name: /Doctor/ }));
@@ -181,5 +217,110 @@ describe('Combobox (searchable list, for long lists)', () => {
     expect(
       await axe(document.body, { rules: { region: { enabled: false } } }),
     ).toHaveNoViolations();
+  });
+});
+
+const PEOPLE = [
+  { value: 'p1', label: 'Dela Cruz, Juan' },
+  { value: 'p2', label: 'Santos, Maria' },
+];
+
+function ServerSearchHarness({
+  loading = false,
+  options = PEOPLE,
+  selectedLabel,
+  onQueryChange = () => undefined,
+  onChange = () => undefined,
+}: {
+  loading?: boolean;
+  options?: typeof PEOPLE;
+  selectedLabel?: string;
+  onQueryChange?: (query: string) => void;
+  onChange?: (value: string) => void;
+}) {
+  const [value, setValue] = useState(selectedLabel ? 'elsewhere' : '');
+  return (
+    <Combobox
+      label="Patient"
+      options={options}
+      value={value}
+      onChange={(next) => {
+        setValue(next);
+        onChange(next);
+      }}
+      search={{ onQueryChange, loading, selectedLabel, empty: <a href="/new">Add them</a> }}
+    />
+  );
+}
+
+describe('Combobox searched by the server', () => {
+  const open = async () => {
+    await userEvent.click(screen.getByRole('combobox', { name: /Patient/ }));
+    return screen.findByRole('searchbox', { name: 'Search' });
+  };
+
+  it('does no filtering of its own and reports what is typed', async () => {
+    const onQueryChange = vi.fn();
+    renderWithProviders(<ServerSearchHarness onQueryChange={onQueryChange} />);
+    await userEvent.type(await open(), 'zzz');
+    expect(screen.getAllByRole('option')).toHaveLength(2);
+    expect(onQueryChange).toHaveBeenLastCalledWith('zzz');
+  });
+
+  it('starts each opening with an empty search', async () => {
+    const onQueryChange = vi.fn();
+    renderWithProviders(<ServerSearchHarness onQueryChange={onQueryChange} />);
+    await userEvent.type(await open(), 'ab');
+    await userEvent.keyboard('{Escape}');
+    expect(await open()).toHaveValue('');
+    expect(onQueryChange).toHaveBeenLastCalledWith('');
+  });
+
+  it('announces that it is searching, and shows no old results meanwhile', async () => {
+    renderWithProviders(<ServerSearchHarness loading />);
+    await open();
+    expect(screen.getByText('Searching…')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
+    expect(screen.queryByRole('link', { name: 'Add them' })).not.toBeInTheDocument();
+  });
+
+  it('announces how many results there are', async () => {
+    renderWithProviders(<ServerSearchHarness />);
+    await open();
+    expect(screen.getByText('2 results')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.queryByRole('link', { name: 'Add them' })).not.toBeInTheDocument();
+  });
+
+  it('offers what the caller gives when nothing is found', async () => {
+    renderWithProviders(<ServerSearchHarness options={[]} />);
+    await open();
+    expect(screen.getByText('No results')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Add them' })).toBeInTheDocument();
+  });
+
+  it('names the choice on the button even when the results no longer hold it', () => {
+    renderWithProviders(<ServerSearchHarness selectedLabel="Reyes, Angela" />);
+    expect(screen.getByRole('combobox', { name: /Patient/ })).toHaveTextContent('Reyes, Angela');
+  });
+
+  it('works from the keyboard alone', async () => {
+    const onChange = vi.fn();
+    renderWithProviders(<ServerSearchHarness onChange={onChange} />);
+    const trigger = screen.getByRole('combobox', { name: /Patient/ });
+    await userEvent.tab();
+    await userEvent.keyboard('{Enter}');
+    await screen.findByRole('searchbox', { name: 'Search' });
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    expect(onChange).toHaveBeenCalledWith('p2');
+    expect(trigger).toHaveFocus();
+  });
+
+  it('has no accessibility violations when open, with and without results', async () => {
+    const { rerender } = renderWithProviders(<ServerSearchHarness />);
+    await open();
+    const rules = { rules: { region: { enabled: false } } };
+    expect(await axe(document.body, rules)).toHaveNoViolations();
+    rerender(<ServerSearchHarness options={[]} />);
+    expect(await axe(document.body, rules)).toHaveNoViolations();
   });
 });

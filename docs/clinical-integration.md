@@ -7,7 +7,7 @@ For the people (or AI agent) building the DocTayo web app. It covers the clinica
 | [5.1 Patients](#51-patients) | Frontend Phase 6: patient list, search, registration, edit, archive | **Available** |
 | [5.2 Practitioners and directory](#52-practitioners-and-directory) | Doctor and staff pickers, doctor profiles and weekly schedules | **Available** |
 | [5.2 Services catalog](#52-services-catalog) | Service picker, price list settings | **Available** |
-| 5.3 Appointments | Frontend Phase 7 | Not available yet |
+| [5.3 Appointments](appointments-integration.md) | Frontend Phase 7: day and week views, booking, walk-ins, check-in, cancel, no-show | **Available** |
 | 5.4 Consultations, 5.5 Prescriptions | Frontend Phase 8 | Not available yet |
 
 **Test accounts** (after `npm run db:seed:dev`, password `dev-password-change-me-123`): in Sunrise Clinic, `reception@sunrise.test`, `doctor@sunrise.test` and `owner@sunrise.test` can all read and manage patients; `multi@doctayo.test` sees a different patient list in each clinic after switching. The seed registers 8 patients in Sunrise (accents, a child with a guardian, a likely duplicate pair with the same phone, one archived) and 2 in Lakeside.
@@ -115,7 +115,7 @@ Active staff only, by name: `membershipId`, `fullName`, `jobTitle`, `roles` (`ke
 
 ### Availability
 
-`date` is `YYYY-MM-DD`, a day in the **branch's** zone. The answer is `{ date, timeZone, intervals: [{ startsAt, endsAt }] }` with UTC instants; show them in `timeZone`. It is **informational**: booking outside these hours is allowed. **Booked appointments are not subtracted yet** (they arrive with 5.3), so do not present the intervals as free slots. A deactivated profile or a suspended member has no intervals.
+`date` is `YYYY-MM-DD`, a day in the **branch's** zone. The answer is `{ date, timeZone, intervals: [{ startsAt, endsAt }] }` with UTC instants; show them in `timeZone`. The intervals are the working hours at that branch **minus the doctor's booked appointments at any branch** (see [appointments-integration.md](appointments-integration.md)); walk-ins are not subtracted. It is **informational**: booking outside these hours is allowed. A deactivated profile or a suspended member has no intervals.
 
 ### `GET /me`
 
@@ -148,3 +148,6 @@ Who sees what: `services.read` (all five default roles) lists and views; `servic
 
 **Seeded data:** Sunrise has General consultation (no price), Follow-up, Pediatric check-up, Wound dressing and an inactive Medical certificate; Lakeside has General consultation and Vaccination.
 
+## 5.3 Appointments
+
+**Detailed in [appointments-integration.md](appointments-integration.md)**: the day and week views, booking and walk-ins, check-in, cancel and no-show, rescheduling, a patient's visits, every error and what to show, and the seeded appointments. In short: all five default roles hold `appointments.read` and `appointments.manage`; dates are days in the branch's time zone; booking sends an `Idempotency-Key` and every change sends `version`; the database refuses double booking (`409 APPOINTMENT_OVERLAP`); the visit reason is the purpose of the visit, never symptoms.

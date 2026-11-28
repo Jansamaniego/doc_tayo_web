@@ -58,3 +58,45 @@ export const SearchableCombobox: Story = {
     );
   },
 };
+
+export const GroupedSelect: Story = {
+  render: function Render() {
+    const [value, setValue] = useState('');
+    return (
+      <SelectField
+        label="Practitioner"
+        options={[]}
+        groups={[
+          { label: 'Works at Main', options: [{ value: '1', label: 'Dr. Ana Reyes' }] },
+          { label: 'Other practitioners', options: [{ value: '2', label: 'Dr. Ben Lim' }] },
+        ]}
+        value={value}
+        onChange={setValue}
+        emptyOption="Choose a practitioner"
+      />
+    );
+  },
+};
+function SearchedByServer({ loading = false, found = true }) {
+  const [value, setValue] = useState('');
+  return (
+    <Combobox
+      label="Patient"
+      options={found ? DOCTORS.slice(0, 5) : []}
+      value={value}
+      onChange={setValue}
+      search={{
+        onQueryChange: () => undefined,
+        loading,
+        empty: <p>No patient found</p>,
+      }}
+    />
+  );
+}
+export const ServerSearchedCombobox: Story = { render: () => <SearchedByServer /> };
+export const ServerSearchedComboboxSearching: Story = {
+  render: () => <SearchedByServer loading />,
+};
+export const ServerSearchedComboboxNothingFound: Story = {
+  render: () => <SearchedByServer found={false} />,
+};

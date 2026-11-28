@@ -9,7 +9,8 @@
  * (medical records) are held by doctors and nurses only, never by an admin by default.
  * Routes require directory.read (the directory and reading practitioners), practitioners.manage
  * (changing them), services.read (the services list and pages) and services.manage (changing them)
- * since backend 5.2.
+ * since backend 5.2, and appointments.read (the day view and appointment pages) and
+ * appointments.manage (booking) since backend 5.3.
  */
 export function can(permissions: readonly string[], required: string | undefined): boolean {
   return required === undefined || permissions.includes(required);

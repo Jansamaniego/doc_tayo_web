@@ -366,7 +366,7 @@ export interface paths {
         };
         /**
          * Scheduled hours of one date at one branch
-         * @description Informational: booking outside these hours is allowed. Booked appointments are not subtracted yet.
+         * @description Working hours minus booked appointments at any branch (walk-ins take no slot). Informational: booking outside these hours is allowed.
          */
         get: operations["PractitionersController_availability_v1"];
         put?: never;
@@ -434,6 +434,130 @@ export interface paths {
         head?: never;
         /** Edit, deactivate or reactivate a service */
         patch: operations["ServicesController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A branch's appointments for a day or a range of days
+         * @description Dates are days in the branch's time zone; an appointment belongs to the day it starts on. Ordered by start time. Responses are never cached.
+         */
+        get: operations["AppointmentsController_list_v1"];
+        put?: never;
+        /**
+         * Book an appointment or register a walk-in
+         * @description A practitioner is never double-booked. Booking outside their working hours is allowed. Send an `Idempotency-Key` so a double tap does not book twice.
+         */
+        post: operations["AppointmentsController_book_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/appointments/{appointmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AppointmentsController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Move or edit a booked appointment
+         * @description Only while `scheduled`. The patient and branch cannot change: cancel and book again.
+         */
+        patch: operations["AppointmentsController_reschedule_v1"];
+        trace?: never;
+    };
+    "/api/v1/appointments/{appointmentId}/check-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The patient has arrived
+         * @description From `scheduled`, only on the appointment's own day in the branch's zone.
+         */
+        post: operations["AppointmentsController_checkIn_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/appointments/{appointmentId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel an appointment and free its slot
+         * @description From `scheduled` or `checked_in`. It cannot be undone.
+         */
+        post: operations["AppointmentsController_cancel_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/appointments/{appointmentId}/no-show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The patient did not come
+         * @description From `scheduled`, once the start time has passed.
+         */
+        post: operations["AppointmentsController_markNoShow_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/patients/{patientId}/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A patient's past and upcoming appointments
+         * @description Every branch, newest start first. Also for an archived patient.
+         */
+        get: operations["PatientAppointmentsController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/me": {
@@ -1280,6 +1404,129 @@ export interface components {
             /** @description `false` hides it from pickers; nothing is deleted. */
             isActive?: boolean;
         };
+        AppointmentServiceResponse: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        AppointmentPatientResponse: {
+            /** Format: uuid */
+            id: string;
+            /** @example P-000123 */
+            patientNumber: string;
+            firstName: string;
+            lastName: string;
+        };
+        AppointmentPractitionerResponse: {
+            /** Format: uuid */
+            membershipId: string;
+            /** Format: uuid */
+            profileId: string;
+            /** @example Dra. Ana Cruz, MD */
+            displayName: string;
+        };
+        AppointmentResponse: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "scheduled" | "walk_in";
+            /** @enum {string} */
+            status: "scheduled" | "checked_in" | "completed" | "cancelled" | "no_show";
+            /** Format: uuid */
+            branchId: string;
+            patient: components["schemas"]["AppointmentPatientResponse"];
+            practitioner: components["schemas"]["AppointmentPractitionerResponse"];
+            service: components["schemas"]["AppointmentServiceResponse"] | null;
+            /** Format: date-time */
+            startsAt: string;
+            /**
+             * Format: date-time
+             * @description An estimate for a walk-in.
+             */
+            endsAt: string;
+            reason: string | null;
+            /** Format: date-time */
+            checkedInAt: string | null;
+            /** Format: date-time */
+            cancelledAt: string | null;
+            cancelReason: string | null;
+            /** @description Send it back with every change (optimistic locking). */
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AppointmentListEnvelope: {
+            data: components["schemas"]["AppointmentResponse"][];
+            meta: components["schemas"]["PageMetaResponse"];
+        };
+        BookAppointmentDto: {
+            /**
+             * @description `walk_in`: the patient is here now. It is created checked in, starts now, ends at an estimate and never blocks a slot.
+             * @enum {string}
+             */
+            kind: "scheduled" | "walk_in";
+            /** Format: uuid */
+            branchId: string;
+            /** Format: uuid */
+            patientId: string;
+            /**
+             * Format: uuid
+             * @description A member with an active practitioner profile (`GET /directory?practitionersOnly=true`).
+             */
+            practitionerMembershipId: string;
+            /** Format: uuid */
+            serviceId?: string | null;
+            /**
+             * Format: date-time
+             * @description Required for `scheduled`, refused for `walk_in`. ISO 8601 with `Z` or an offset, to the whole minute, e.g. `2026-12-07T09:00:00+08:00`.
+             */
+            startsAt?: string;
+            /**
+             * Format: date-time
+             * @description Required for `scheduled`, refused for `walk_in`. At most 8 hours after the start. ISO 8601 with `Z` or an offset, to the whole minute, e.g. `2026-12-07T09:00:00+08:00`.
+             */
+            endsAt?: string;
+            /** @description The purpose of the visit, never symptoms: every role can read it. */
+            reason?: string | null;
+        };
+        AppointmentEnvelope: {
+            data: components["schemas"]["AppointmentResponse"];
+        };
+        RescheduleAppointmentDto: {
+            /** @description The version you read. A stale one is 409 VERSION_CONFLICT. */
+            version: number;
+            /**
+             * Format: date-time
+             * @description ISO 8601 with `Z` or an offset, to the whole minute, e.g. `2026-12-07T09:00:00+08:00`.
+             */
+            startsAt?: string;
+            /**
+             * Format: date-time
+             * @description ISO 8601 with `Z` or an offset, to the whole minute, e.g. `2026-12-07T09:00:00+08:00`.
+             */
+            endsAt?: string;
+            /** Format: uuid */
+            practitionerMembershipId?: string;
+            /** Format: uuid */
+            serviceId?: string | null;
+            /** @description The purpose of the visit, never symptoms: every role can read it. */
+            reason?: string | null;
+        };
+        AppointmentVersionDto: {
+            /** @description The version you read. A stale one is 409 VERSION_CONFLICT. */
+            version: number;
+        };
+        CancelAppointmentDto: {
+            /** @description The version you read. A stale one is 409 VERSION_CONFLICT. */
+            version: number;
+            /**
+             * @description Shown to staff. Never symptoms.
+             * @example The patient called to cancel
+             */
+            reason: string;
+        };
         MeProfileData: {
             /** Format: uuid */
             id: string;
@@ -1576,7 +1823,7 @@ export interface components {
             status: "active" | "deactivated";
         };
         /** @enum {string} */
-        ErrorCode: "VALIDATION_FAILED" | "BAD_REQUEST" | "MALFORMED_JSON" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ROUTE_NOT_FOUND" | "NOT_FOUND" | "CONFLICT_UNIQUE" | "CONFLICT_REFERENCE" | "NOT_READY" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "TENANT_NOT_SELECTED" | "TENANT_SUSPENDED" | "TENANT_DEACTIVATED" | "TENANT_ACCESS_DENIED" | "INVALID_CREDENTIALS" | "ACCESS_TOKEN_EXPIRED" | "TOKEN_INVALID" | "ROLE_NOT_ASSIGNABLE" | "LAST_OWNER" | "OWNER_REQUIRED" | "SELF_ACTION_FORBIDDEN" | "VERSION_CONFLICT" | "TENANT_MISMATCH" | "IDEMPOTENCY_KEY_REUSED" | "IDEMPOTENCY_KEY_IN_USE" | "IDEMPOTENCY_KEY_INVALID" | "CONFLICT" | "METHOD_NOT_ALLOWED" | "RATE_LIMITED";
+        ErrorCode: "VALIDATION_FAILED" | "BAD_REQUEST" | "MALFORMED_JSON" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ROUTE_NOT_FOUND" | "NOT_FOUND" | "CONFLICT_UNIQUE" | "CONFLICT_REFERENCE" | "NOT_READY" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "TENANT_NOT_SELECTED" | "TENANT_SUSPENDED" | "TENANT_DEACTIVATED" | "TENANT_ACCESS_DENIED" | "INVALID_CREDENTIALS" | "ACCESS_TOKEN_EXPIRED" | "TOKEN_INVALID" | "ROLE_NOT_ASSIGNABLE" | "LAST_OWNER" | "OWNER_REQUIRED" | "SELF_ACTION_FORBIDDEN" | "VERSION_CONFLICT" | "TENANT_MISMATCH" | "IDEMPOTENCY_KEY_REUSED" | "IDEMPOTENCY_KEY_IN_USE" | "IDEMPOTENCY_KEY_INVALID" | "APPOINTMENT_OVERLAP" | "PATIENT_ARCHIVED" | "NOT_A_PRACTITIONER" | "CONFLICT" | "METHOD_NOT_ALLOWED" | "RATE_LIMITED";
         /** @enum {string} */
         FieldErrorCode: "REQUIRED" | "INVALID_FORMAT" | "INVALID_TYPE" | "INVALID_VALUE" | "OUT_OF_RANGE" | "TOO_SHORT" | "TOO_LONG" | "UNKNOWN_FIELD" | "PASSWORD_TOO_COMMON" | "PASSWORD_CONTAINS_EMAIL" | "PASSWORD_INCORRECT";
         FieldErrorBody: {
@@ -3141,6 +3388,499 @@ export interface operations {
             };
             /** @description CONFLICT_UNIQUE: the clinic already has a service with this name, ignoring case. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_list_v1: {
+        parameters: {
+            query: {
+                /** @description Comma-separated: scheduled, checked_in, completed, cancelled, no_show. */
+                status?: string;
+                page?: number;
+                pageSize?: number;
+                /** @description Whose appointments; dates are days in this branch's zone. */
+                branchId: string;
+                /** @description One day. Today when `date`, `from` and `to` are all absent. */
+                date?: string;
+                /** @description First day of a range; needs `to`, excludes `date`. */
+                from?: string;
+                /** @description Last day of the range, included. At most 31 days. */
+                to?: string;
+                practitionerMembershipId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND: unknown or another clinic's branch. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_book_v1: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional unique value (a UUID is ideal, 1 to 255 printable ASCII characters). Send the same key when retrying this request after a timeout or a double tap: it is carried out once and the first answer is repeated for 24 hours. The same key with a different body is refused (422 IDEMPOTENCY_KEY_REUSED); while the first request is still running a retry is refused (409 IDEMPOTENCY_KEY_IN_USE, see Retry-After). Only successful requests are remembered. */
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookAppointmentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND: unknown or another clinic's branch, patient, practitioner or service. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description APPOINTMENT_OVERLAP, PATIENT_ARCHIVED, or IDEMPOTENCY_KEY_IN_USE.
+             *
+             *     IDEMPOTENCY_KEY_IN_USE: the first request with this key is still running.
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description NOT_A_PRACTITIONER or IDEMPOTENCY_KEY_REUSED.
+             *
+             *     IDEMPOTENCY_KEY_REUSED: this key was already used with a different request.
+             */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's appointment). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_reschedule_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RescheduleAppointmentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's appointment). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description APPOINTMENT_OVERLAP or PATIENT_ARCHIVED. VERSION_CONFLICT: someone saved first; reload and try again. CONFLICT: the appointment’s state does not allow this. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_A_PRACTITIONER. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_checkIn_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentVersionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's appointment). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description VERSION_CONFLICT: someone saved first; reload and try again. CONFLICT: the appointment’s state does not allow this. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_cancel_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelAppointmentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's appointment). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description VERSION_CONFLICT: someone saved first; reload and try again. CONFLICT: the appointment’s state does not allow this. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AppointmentsController_markNoShow_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentVersionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's appointment). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description VERSION_CONFLICT: someone saved first; reload and try again. CONFLICT: the appointment’s state does not allow this. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PatientAppointmentsController_list_v1: {
+        parameters: {
+            query?: {
+                /** @description Comma-separated: scheduled, checked_in, completed, cancelled, no_show. */
+                status?: string;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                patientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentListEnvelope"];
+                };
+            };
+            /** @description UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN, TENANT_NOT_SELECTED, TENANT_SUSPENDED, TENANT_DEACTIVATED or TENANT_ACCESS_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description NOT_FOUND (also for another clinic's patient). */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

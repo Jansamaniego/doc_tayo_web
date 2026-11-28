@@ -10,7 +10,7 @@ No product features in this phase. It ends with an empty but complete, tested, l
 2. Make the **contract the only way to call the API**: generated types, one HTTP client, one error type.
 3. Put every quality gate in place on day one: lint, format, type-check, unit, component, e2e, accessibility, bundle size, CI.
 4. Write this repository's `AGENTS.md` (imported by `CLAUDE.md`) with the coding conventions, so later work follows them automatically.
-5. Set up i18n from day one: every string in Lingui message files (English catalogue plus a stretched pseudo-locale), with no hard-coded text. Filipino ships after launch (Phase 15, plan.md Q4a).
+5. Set up i18n from day one: every string in Lingui message files (English catalogue plus a stretched pseudo-locale), with no hard-coded text. Filipino ships after launch (Phase 16, plan.md Q4a).
 6. Deploy the static build from GitHub Actions to S3 + CloudFront on a merge to `main` (plan.md Q2b).
 
 ## 2. Deliverables
@@ -50,7 +50,7 @@ src/
     datetime/               the only UTC <-> clinic-time conversion + date/time formatting, with specs
     money.ts                peso formatting
   i18n/
-    lingui config; catalogue en; pseudo-locale for layout tests (fil added in Phase 15)
+    lingui config; catalogue en; pseudo-locale for layout tests (fil added in Phase 16)
   config/
     env.ts                  Zod-validated config
     csp.ts                  the content security policy (one source for CloudFront, preview and dev)
@@ -125,7 +125,7 @@ Both runners use `.spec.ts`, so they are separated by folder: Vitest `include: [
 - The error code types come from the **generated** `ErrorCode` and `FieldErrorCode` enums.
 - The client adds one code of its own, `NETWORK_ERROR`, kept in a separate union so it can never be confused with a server code.
 - `messageFor(error)` returns a Lingui message keyed by `code`. English texts are drafted from the "Do this" column of the integration guide §6. The API's `message` is used only for a code the generated enum does not know.
-- A unit test checks that every enum value has a message in the English catalogue (Phase 15 extends it to Filipino).
+- A unit test checks that every enum value has a message in the English catalogue (Phase 16 extends it to Filipino).
 
 ### 2.7 Routing skeleton
 
@@ -176,7 +176,7 @@ Both runners use `.spec.ts`, so they are separated by folder: Vitest `include: [
 | `npm run size`                         | bundle-size budget (size-limit): sign-in route entry ≤ 170 KB gzip (plan.md §11)                                                                                                        |
 | `npm run i18n:extract`                 | Lingui extraction; CI fails if catalogues are stale or a hard-coded string is found                                                                                                     |
 
-`localStorage` and `sessionStorage` are banned by lint outside an allow-listed `lib/preferences.ts`. That module holds non-sensitive device preferences only ("this is a shared computer", last-used branch id, and the language from Phase 15). This enforces the privacy rule.
+`localStorage` and `sessionStorage` are banned by lint outside an allow-listed `lib/preferences.ts`. That module holds non-sensitive device preferences only ("this is a shared computer", last-used branch id, and the language from Phase 16). This enforces the privacy rule.
 
 ### 2.11 CI and deployment (GitHub Actions, as the backend; Q2b)
 
@@ -222,7 +222,7 @@ Jobs (the owner's list, plus the gates this plan adds):
 
 - **One source of truth:** `src/config/csp.ts` builds the policy string. It is used by the CloudFront response headers policy (documented value), by `vite preview` (`preview.headers`) and by the dev server, so tests check the policy production will send:
   `default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self' <API origin>; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`
-- **Report-only first.** It is sent as `Content-Security-Policy-Report-Only` until Phase 14 enforces it. `frame-ancestors` only works as a header, which CloudFront sets.
+- **Report-only first.** It is sent as `Content-Security-Policy-Report-Only` until Phase 15 enforces it. `frame-ancestors` only works as a header, which CloudFront sets.
 - **Violations fail the tests:**
   - A Playwright fixture adds an init script that records every `securitypolicyviolation` event on the page, and fails the test after each run if any were recorded.
   - Every e2e spec uses the fixture, so every e2e run is a CSP test against the production build served by `vite preview`.
@@ -233,7 +233,7 @@ Jobs (the owner's list, plus the gates this plan adds):
 - Inline `style` attributes set from JavaScript (CSSOM) are not blocked by `style-src`.
 - The Inter font files are self-hosted, so no font CDN is allowed.
 - No `dangerouslySetInnerHTML` (lint rule).
-- **Error monitoring** is not added now (Phase 14, Q14). Phase 1 adds only a `reportError({ error, requestId })` seam that logs to the console in development.
+- **Error monitoring** is not added now (Phase 15, Q14). Phase 1 adds only a `reportError({ error, requestId })` seam that logs to the console in development.
 
 ### 2.13 Documentation
 
@@ -303,7 +303,7 @@ Built 2026-11-20. Test files: 19 spec files with 146 specs (Vitest), plus `tests
 3. **Zod runs `jitless`** through `src/lib/zod.ts` (lint forbids importing `zod` directly). Found by the CSP detector: Zod's default probes `new Function`, which the policy reports as a `script-src` violation. This module is not in the plan.
 4. **MSW 3** renamed the option: `onUnhandledFrame: 'error'` (the old name is silently ignored). Unexpected requests fail the tests.
 5. **Pseudo-locale is accented, not stretched.** Lingui's pseudo-localisation changes letters but keeps the length, so the plan's "stretched text" length stress is **not met**. It still exposes hard-coded text. Phase 2 must add the length stress (for example a Storybook decorator, or a generated catalogue that pads strings).
-6. **`formatPeso({ centavos })` and `formatDate`/`formatTime` take no `locale`** (English only until Phase 15). `formatDate` styles: `medium`, `weekday`.
+6. **`formatPeso({ centavos })` and `formatDate`/`formatTime` take no `locale`** (English only until Phase 16). `formatDate` styles: `medium`, `weekday`.
 7. **Scripts are TypeScript** run by Node 24's type stripping (`scripts/openapi.ts`, `api-sync.ts`, `api-check.ts`), not `.mjs`. Their spec lives in `scripts/openapi.spec.ts`, so Vitest also includes `scripts/**/*.spec.ts`.
 8. **Files differ from the sketch:** the boot sequence is in `src/main.tsx` (no `boot.ts`); `RootErrorBoundary` is `RouteErrorPage`, used as the router's `errorComponent`; not-found is the router's `notFoundComponent` (no `$.tsx`); the health hook is `src/app/useApiHealth.ts`; the placeholder pages are in `src/app/`. `reportError` is inside `RouteErrorPage` (a single user; no separate file until a second one exists). `tests/e2e/fixtures/accounts.ts` exists but is unused until Phase 3. `src/features/` does not exist yet (no empty folders).
 9. **The shadcn CLI was not run.** `components.json` and `src/design-system/components/button.tsx` were written by hand in shadcn's pattern (and already changed to our sizes: 48 px high, 18 px text, no icon-only size). `src/index.css` holds a **placeholder** theme; Phase 2 replaces it with generated tokens.

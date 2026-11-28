@@ -38,6 +38,22 @@ describe('error messages', () => {
     expect(text).not.toBe(code);
   });
 
+  it.each(['APPOINTMENT_OVERLAP', 'PATIENT_ARCHIVED', 'NOT_A_PRACTITIONER'])(
+    'words %s for the app: a practitioner, never a doctor',
+    (code) => {
+      expect(errorCodes).toContain(code);
+      expect(messageForError(apiError(code))).not.toMatch(/doctor/i);
+    },
+  );
+
+  it.each([
+    ['APPOINTMENT_OVERLAP', /practitioner already has an appointment/i],
+    ['PATIENT_ARCHIVED', /patient record is archived/i],
+    ['NOT_A_PRACTITIONER', /cannot be booked/i],
+  ])('explains %s', (code, expected) => {
+    expect(messageForError(apiError(code))).toMatch(expected);
+  });
+
   it('has a message for the client-only NETWORK_ERROR', () => {
     expect(messageForError(apiError('NETWORK_ERROR')).toLowerCase()).toContain('connect');
   });

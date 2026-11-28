@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Outlet, useRouter, useRouterState } from '@tanstack/react-router';
 import {
   CalendarClock,
+  CalendarDays,
   Stethoscope,
   ContactRound,
   Building2,
@@ -69,6 +70,13 @@ export function AuthenticatedShell() {
             label: t`Home`,
             icon: <House aria-hidden="true" className="size-6" />,
             href: '/',
+          },
+          {
+            id: 'appointments',
+            label: t`Appointments`,
+            icon: <CalendarDays aria-hidden="true" className="size-6" />,
+            href: '/appointments',
+            requires: 'appointments.read',
           },
           {
             id: 'patients',
@@ -142,20 +150,22 @@ export function AuthenticatedShell() {
       ? 'admin-clinics'
       : pathname.startsWith('/admin')
         ? 'admin-overview'
-        : pathname.startsWith('/patients')
-          ? 'patients'
-          : session.practitionerProfileId &&
-              pathname === `/practitioners/${session.practitionerProfileId}`
-            ? 'my-schedule'
-            : pathname.startsWith('/practitioners')
-              ? 'practitioners'
-              : pathname.startsWith('/staff')
-                ? 'staff'
-                : pathname.startsWith('/clinic')
-                  ? 'clinic'
-                  : pathname === '/'
-                    ? 'home'
-                    : '';
+        : pathname.startsWith('/appointments')
+          ? 'appointments'
+          : pathname.startsWith('/patients')
+            ? 'patients'
+            : session.practitionerProfileId &&
+                pathname === `/practitioners/${session.practitionerProfileId}`
+              ? 'my-schedule'
+              : pathname.startsWith('/practitioners')
+                ? 'practitioners'
+                : pathname.startsWith('/staff')
+                  ? 'staff'
+                  : pathname.startsWith('/clinic')
+                    ? 'clinic'
+                    : pathname === '/'
+                      ? 'home'
+                      : '';
 
   return (
     <AppShell

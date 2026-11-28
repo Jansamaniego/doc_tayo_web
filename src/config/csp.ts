@@ -7,7 +7,7 @@ export interface CspOptions {
 /**
  * The one Content-Security-Policy: used by `vite preview` (and so by every e2e run) and
  * documented for the CloudFront response headers policy (docs/deployment.md).
- * Report-only until Phase 14. Never 'unsafe-inline': if a component injects styles, use a
+ * Report-only until Phase 15. Never 'unsafe-inline': if a component injects styles, use a
  * per-request nonce (plan.md Q17), not 'unsafe-inline'.
  */
 export function buildCsp({ apiOrigin, dev }: CspOptions): string {

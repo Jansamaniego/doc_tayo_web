@@ -68,6 +68,30 @@ export function fromClinicDateTime({
   ).toISOString();
 }
 
+/** The instant `minutes` later. Minutes are the same everywhere, so no time zone is involved. */
+export function addMinutes({ iso, minutes }: { iso: string; minutes: number }): string {
+  const instant = new Date(iso).getTime();
+  if (Number.isNaN(instant)) throw new RangeError('Invalid timestamp.');
+  if (!Number.isInteger(minutes)) throw new RangeError('Expected a whole number of minutes.');
+  return new Date(instant + minutes * 60_000).toISOString();
+}
+
+/** Whether two instants fall on the same calendar day in the given zone. */
+export function isSameDayInZone({
+  first,
+  second,
+  timeZone,
+}: {
+  first: string;
+  second: string;
+  timeZone: string;
+}): boolean {
+  return (
+    toClinicDateTime({ iso: first, timeZone }).date ===
+    toClinicDateTime({ iso: second, timeZone }).date
+  );
+}
+
 const LOCALE = 'en-PH';
 
 export type DateStyle = 'medium' | 'weekday';

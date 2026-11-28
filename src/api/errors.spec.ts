@@ -42,6 +42,17 @@ describe('parseErrorResponse', () => {
     expect(error.details).toEqual([]);
   });
 
+  it.each([
+    ['APPOINTMENT_OVERLAP', 409],
+    ['PATIENT_ARCHIVED', 409],
+    ['NOT_A_PRACTITIONER', 422],
+  ])('knows the appointment code %s', async (code, status) => {
+    const error = await parseErrorResponse(
+      json(status, { error: { status, code, message: 'x', requestId: 'r' } }),
+    );
+    expect(error.code).toBe(code);
+  });
+
   it('reads Retry-After on 429 as whole seconds', async () => {
     const error = await parseErrorResponse(
       json(

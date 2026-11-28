@@ -350,3 +350,12 @@ describe('DateField: telling the form about a date that is typed but not usable'
     expect(incomplete).toHaveBeenLastCalledWith(false);
   });
 });
+
+describe('DateField in an error summary', () => {
+  it('carries a name on its first part, so a summary link can focus it', () => {
+    renderWithProviders(
+      <DateField legend="Day of the visit" name="date" value="" onChange={() => undefined} />,
+    );
+    expect(screen.getByLabelText('Month')).toHaveAttribute('name', 'date');
+  });
+});

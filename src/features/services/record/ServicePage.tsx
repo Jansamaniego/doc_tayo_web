@@ -11,7 +11,7 @@ import { can } from '@/lib/permissions.ts';
 import { usePageTitle } from '@/lib/use-page-title.ts';
 
 import { useService, type Service } from '../api/services.ts';
-import { formatDuration } from '../duration.ts';
+import { formatDuration } from '@/lib/duration.ts';
 import { ServicePrice } from '../ServicePrice.tsx';
 import { EditService } from './EditService.tsx';
 import { ServiceActions } from './ServiceActions.tsx';

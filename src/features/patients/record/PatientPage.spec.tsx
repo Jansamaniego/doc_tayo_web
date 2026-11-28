@@ -487,3 +487,45 @@ describe('PatientPage: archive and restore', () => {
     expect(await screen.findByText(/req-z/)).toBeInTheDocument();
   });
 });
+
+describe('PatientPage: booking a visit', () => {
+  const booker = (permissions = ['patients.read', 'appointments.read', 'appointments.manage']) => {
+    sessionStore.set({
+      status: 'signed-in',
+      user: { id: 'me', email: 'me@example.com', fullName: 'Me Myself' },
+      memberships: [],
+      activeTenantId: 'clinic-a',
+      permissions: ['tenant.read', ...permissions],
+      platformRole: 'none',
+      practitionerProfileId: null,
+    });
+  };
+
+  it('opens the booking form with the patient, for someone who may book', async () => {
+    booker();
+    serve();
+    const { container } = render();
+    await heading();
+    expect(screen.getByRole('link', { name: 'Book a visit' })).toHaveAttribute(
+      'href',
+      '/appointments/new?patient=p1',
+    );
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('offers nothing to someone who may not book', async () => {
+    booker(['patients.read', 'appointments.read']);
+    serve();
+    render();
+    await heading();
+    expect(screen.queryByRole('link', { name: 'Book a visit' })).not.toBeInTheDocument();
+  });
+
+  it('offers nothing for an archived patient', async () => {
+    booker();
+    serve({ archivedAt: '2026-02-01T00:00:00.000Z', archiveReason: 'Moved away' });
+    render();
+    await heading();
+    expect(screen.queryByRole('link', { name: 'Book a visit' })).not.toBeInTheDocument();
+  });
+});

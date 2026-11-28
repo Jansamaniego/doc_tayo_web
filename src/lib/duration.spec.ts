@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { formatDuration } from './duration.ts';
 
-describe('formatDuration (a service length in words)', () => {
+describe('formatDuration (a length of time in words)', () => {
   it.each([
     [1, '1 minute'],
     [5, '5 minutes'],

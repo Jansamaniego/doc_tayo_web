@@ -113,7 +113,7 @@ describe('WorkingHours (the working hours of one day, not free appointment slots
     expect(requests).toHaveLength(1);
   });
 
-  it('shows the intervals in the zone of the answer, and that appointments are not counted', async () => {
+  it('shows the intervals in the zone of the answer, and that booked time is taken out', async () => {
     serve(
       [
         { startsAt: '2026-03-02T01:00:00.000Z', endsAt: '2026-03-02T04:00:00.000Z' },
@@ -126,14 +126,18 @@ describe('WorkingHours (the working hours of one day, not free appointment slots
     expect(await screen.findByText('9:00 AM – 12:00 PM')).toBeInTheDocument();
     expect(screen.getByText('8:00 PM – midnight')).toBeInTheDocument();
     expect(screen.getByText('Times are in Asia/Manila.')).toBeInTheDocument();
-    expect(screen.getByText('Booked appointments are not counted yet.')).toBeInTheDocument();
-    expect(document.body.textContent).not.toMatch(/free|available slot/i);
+    expect(
+      screen.getByText(
+        'Booked appointments are already taken out. Booking outside these hours is allowed.',
+      ),
+    ).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/not counted|free slot|available slot/i);
   });
 
-  it('says there are no working hours on the day', async () => {
+  it('says there are no free working hours on the day (none set, or all booked)', async () => {
     serve([]);
     render();
-    expect(await screen.findByText('No working hours on this day')).toBeInTheDocument();
+    expect(await screen.findByText('No free working hours on this day')).toBeInTheDocument();
   });
 
   it('says an inactive practitioner has no hours, asking for nothing', () => {
@@ -168,7 +172,7 @@ describe('WorkingHours (the working hours of one day, not free appointment slots
     expect(await screen.findByText(/req-h/)).toBeInTheDocument();
     failing = false;
     await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('No working hours on this day')).toBeInTheDocument();
+    expect(await screen.findByText('No free working hours on this day')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

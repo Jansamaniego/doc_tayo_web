@@ -65,6 +65,47 @@ export function usePatients(filters: PatientFilters) {
   });
 }
 
+/** How many matches a picker offers. */
+const PICKER_SIZE = 20;
+
+/**
+ * The patients a picker offers for what was typed, without archived ones. Asked in the clinic the form
+ * was opened in, so a clinic switched in another tab never offers its patients.
+ */
+export function usePatientSearch({
+  q,
+  tenantId,
+  enabled,
+}: {
+  q: string;
+  tenantId: string;
+  enabled: boolean;
+}) {
+  return useQuery({
+    queryKey: [tenantId, 'patients', 'search', q],
+    enabled,
+    gcTime: 0,
+    queryFn: async () => {
+      const result = await getApiClient().GET('/api/v1/patients', {
+        params: { query: { ...(q && { q }), pageSize: PICKER_SIZE } },
+        headers: requestHeaders({ tenantId }),
+      });
+      if (!result.data) throw networkError(new Error('Empty answer.'));
+      return result.data.data;
+    },
+  });
+}
+
+/** The patient a form was opened for, read in the form's clinic. `''` asks nothing. */
+export function usePatientOfForm({ patientId, tenantId }: { patientId: string; tenantId: string }) {
+  return useQuery({
+    queryKey: [tenantId, 'patients', 'detail', patientId],
+    enabled: patientId !== '',
+    gcTime: 0,
+    queryFn: () => fetchPatient({ patientId, tenantId }),
+  });
+}
+
 export type NewPatient = components['schemas']['CreatePatientDto'];
 
 /** What the possible-duplicate check may be asked with: only what is filled in. */

@@ -63,9 +63,17 @@ Every non-2xx response uses one shape:
 
 **Phase 5.0 codes.** `VERSION_CONFLICT`: a write carried an out-of-date `version` (optimistic locking, produced by every versioned resource from sub-phase 5.1); reload the record, merge, and send again. The body does not carry the current version. `TENANT_MISMATCH`: the optional `X-Expected-Tenant-Id` header named a clinic other than the session's active clinic (another tab switched clinics); nothing was done, reload the page. The three `IDEMPOTENCY_KEY_*` codes belong to the `Idempotency-Key` header (see [api-conventions.md](api-conventions.md)): `_REUSED` means the same key was used with a different request, `_IN_USE` means the first request with that key is still running (`Retry-After` says when to ask again), `_INVALID` means the key is not 1 to 255 printable ASCII characters. Only successful outcomes are remembered, so a request that failed is simply sent again with the same key and gets its real answer.
 
+**Phase 5.3 codes (appointments).** `APPOINTMENT_OVERLAP`: the practitioner already has an appointment that overlaps the requested time (the database refuses it, also when two people book at the same moment); offer another time. `PATIENT_ARCHIVED`: booking or rescheduling for an archived patient; restore the patient first. `NOT_A_PRACTITIONER`: the chosen member has no active practitioner profile or is not an active member. A transition that the appointment's state does not allow is `CONFLICT`.
+
+| Code | HTTP | Default message |
+|---|---|---|
+| `APPOINTMENT_OVERLAP` | 409 | The doctor already has an appointment at that time. Please choose another time. |
+| `PATIENT_ARCHIVED` | 409 | This patient record is archived. Restore it before booking a visit. |
+| `NOT_A_PRACTITIONER` | 422 | This staff member cannot be booked for appointments. |
+
 ## Reserved codes
 
-Cataloged so the contract is stable. `CONFLICT` is produced by `TenantLifecycleService` (invalid tenant status transition) and by invitations (inviting someone who is already a member; resending an accepted or revoked invitation). `METHOD_NOT_ALLOWED` is only mapped from framework 405 exceptions (`to-api-error.ts`). `RATE_LIMITED` comes from the throttler (mapped from its 429) and from account lockout (a `DomainError`); both send a `Retry-After` header. `UNAUTHENTICATED` and `FORBIDDEN` are active since Phase 2.
+Cataloged so the contract is stable. `CONFLICT` is produced by `TenantLifecycleService` (invalid tenant status transition), by invitations (inviting someone who is already a member; resending an accepted or revoked invitation) and by appointments (a transition or reschedule the current status does not allow). `METHOD_NOT_ALLOWED` is only mapped from framework 405 exceptions (`to-api-error.ts`). `RATE_LIMITED` comes from the throttler (mapped from its 429) and from account lockout (a `DomainError`); both send a `Retry-After` header. `UNAUTHENTICATED` and `FORBIDDEN` are active since Phase 2.
 
 | Code | HTTP | Default message |
 |---|---|---|

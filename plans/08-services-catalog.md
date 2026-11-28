@@ -2,7 +2,7 @@
 
 Status: **built** (8.0 to 8.2, 2026-11-27, see "As Built"); written 2026-11-27. The end-to-end items run on Chromium only. Backend: **available**. Backend Phase 5, the rest of sub-phase **5.2, "Services catalog"**, shipped: `GET /services`, `GET /services/:serviceId`, `POST /services`, `PATCH /services/:serviceId` ([docs/clinical-integration.md](../docs/clinical-integration.md) §5.2 Services catalog, [docs/api-conventions.md](../docs/api-conventions.md) "Money", `docs/openapi.json`, now **61 operations**). New clinics also start with a **General consultation** service ([docs/platform-admin-integration.md](../docs/platform-admin-integration.md), "New clinic"). Depends on Phase 5.6 (the Clinic tab and its branch pages, whose pattern this phase follows), Phase 6 (the opened-clinic rule P6-4, `LeaveGuard`, the form patterns) and Phase 7 (`src/lib/opened-clinic.tsx`).
 
-**Numbering.** "Phase 8" and "8.x" are the frontend's; "5.2" is the **backend's** sub-phase. Plan 07 first said services would be added to Phase 7 as 7.5; the product owner made them a phase of their own on 2026-11-27, and the later phases moved up by one (consultations are now Phase 9, Filipino Phase 15).
+**Numbering.** "Phase 8" and "8.x" are the frontend's; "5.2" is the **backend's** sub-phase. Plan 07 first said services would be added to Phase 7 as 7.5; the product owner made them a phase of their own on 2026-11-27, and the later phases moved down by one; appointments became Phase 9 the same day, moving them once more (consultations are now Phase 10, Filipino Phase 16).
 
 | Sub-phase | Milestone | Who uses it | What it adds |
 | --------- | --------- | ----------- | ------------ |
@@ -28,7 +28,7 @@ End-to-end runs for both are milestone M3.
 | P8-3 | **Money crosses the API boundary only as a decimal string** (D-12, now decided by the backend: `"500.00"`, two decimals in answers, up to two in requests, never a JSON number). Inside the app an amount stays **whole centavos** (`number`, a safe integer), as `formatPeso` and `MoneyField` already use. Two new helpers in `src/lib/money.ts`: `centavosFromApi('500.00')` → `50000` (string parsing, no `parseFloat`; refuses anything else) and `centavosToApi(50000)` → `"500.00"`. Nothing else converts money. | The integer-centavos design of Phase 1 stays correct; only the edge changes. No float on either side. |
 | P8-4 | **A price has three states, and the screens say which:** a fixed price ("₱500.00"), **Free** (`"0.00"`), and **No fixed price** (`null`, shown as "Price at the desk"). The form asks with a `RadioGroup` (**No fixed price**, **Free**, **Fixed price**) and shows `MoneyField` (**Amount**) only for Fixed price, which is last so that the amount is directly under it. A fixed price of ₱0 is refused with "Choose Free for a service without charge." | The guide: `null` is not the same as free. Three named choices are clearer than an empty field meaning something. |
 | P8-5 | **Price limits checked before sending:** at least ₱0.01 for Fixed price, at most two decimals, at most ₱9,999,999,999.99. Commas typed as thousands separators are accepted and never sent. The upper limit comes from the **backend's source** (`^\d{1,10}(\.\d{1,2})?$`, a `numeric(12,2)` column), not from the contract, which has no `pattern` or `maximum`: backend request **D-34**. If the API still answers `VALIDATION_FAILED` on `price`, it goes under the field. | Not saving what the API would refuse (objective 2); the limit must not be guessed silently. |
-| P8-6 | **Duration** is a whole number of minutes, 5 to 480, typed in a labelled field ("Usual length, in minutes", hint "5 to 480 minutes. A suggestion for the appointment length; it can be changed when booking.") and shown in words: "15 minutes", "1 hour", "1 hour 30 minutes" (a new `formatDuration` with ICU plurals, kept in the services feature until booking, its second user, moves it to `src/lib/`). New services start at 30 minutes. | The guide: "only a suggestion for the appointment length". Words read better than "90 min" for every user and screen reader. |
+| P8-6 | **Duration** is a whole number of minutes, 5 to 480, typed in a labelled field ("Usual length, in minutes", hint "5 to 480 minutes. A suggestion for the appointment length; it can be changed when booking.") and shown in words: "15 minutes", "1 hour", "1 hour 30 minutes" (a `formatDuration` with ICU plurals, in `src/lib/duration.ts` since booking, its second user, Phase 9.2). New services start at 30 minutes. | The guide: "only a suggestion for the appointment length". Words read better than "90 min" for every user and screen reader. |
 | P8-7 | **The list** shows name (and the description under it, when there is one), duration and price, ordered by name as the API sends it, paginated by the API (20, 50 or 100 a page; `page` and `pageSize` in the address). Query keys `[tenantId, 'services', filters]`; a list that keeps the previous page while loading does so only within the same clinic. | API pagination; the Phase 5 and 6 list rules. |
 | P8-8 | **Inactive services** are shown only to people with `services.manage`: a **Show inactive services** checkbox (`includeInactive=true`, `inactive=1` in the address), each marked **Inactive**. Everyone else sees active services only; a reader who opens an inactive service's address still sees it, marked Inactive (the API serves it by id so old records can show its name). | As P7-4: reception has no use for inactive services in the list; the API keeps them readable by id. |
 | P8-9 | **Add:** `POST /services` with `name`, `defaultDurationMinutes`, and `description` and `price` (`null` when not given). `201` → the service page, toast "{name} added." The contract has **no `Idempotency-Key`** for it: the button is disabled while saving. `409 CONFLICT_UNIQUE` → under **Name**: "This clinic already has a service with this name." and the list is read again (the guide: a retry that answers `409` may have saved the first time). | Guide "Services catalog". |
@@ -86,7 +86,6 @@ All text in the English catalogue; the list uses `DataTable` and `Pagination`; t
 src/features/services/
   api/          services.ts (useServices, useService, useFreshService, useCreateService,
                 useUpdateService)
-  duration.ts   formatDuration (P8-6)
   ServicePrice.tsx  the three price texts, with the amount in words for screen readers
   list/         ServicesPage
   record/       ServicePage, EditService, ServiceActions, ServiceNotFound
@@ -95,6 +94,7 @@ src/features/services/
 src/routes/_app/_clinic/clinic/services/  index.tsx, new.tsx, $serviceId.tsx
 src/features/clinic/ClinicTabs.tsx               + Services
 src/lib/money.ts                                 + centavosFromApi, centavosToApi
+src/lib/duration.ts                              formatDuration (P8-6; moved here in Phase 9.2)
 tests/e2e/services.spec.ts                       reads the seeded services; the refusals
 tests/e2e/service-management.spec.ts             changes, in a clinic the spec creates
 ```
@@ -171,7 +171,7 @@ Chromium, serial, in two files: `tests/e2e/services.spec.ts` only reads Sunrise'
 Decided by the product owner (2026-11-27):
 
 - **Q31:** Services is **a tab in Clinic**, not its own navigation item (P8-1).
-- **Q32:** Phase 11 ("Billing and payments") stays **unchanged until the backend plans its billing phase**; nothing in this phase takes a payment (P8-14).
+- **Q32:** Phase 12 ("Billing and payments") stays **unchanged until the backend plans its billing phase**; nothing in this phase takes a payment (P8-14).
 
 Still open: none for this phase. Backend request: **D-34** (P8-5).
 

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  addMinutes,
   formatDate,
   formatTime,
   fromClinicDateTime,
+  isSameDayInZone,
   timeZoneOptions,
   todayInZone,
   toClinicDateTime,
@@ -128,5 +130,64 @@ describe('todayInZone', () => {
 
   it('uses the current time by default', () => {
     expect(todayInZone({ timeZone: 'Asia/Manila' })).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('addMinutes (an instant, so no time zone is involved)', () => {
+  it.each([
+    ['2026-12-07T01:00:00.000Z', 30, '2026-12-07T01:30:00.000Z'],
+    ['2026-12-07T01:00:00.000Z', 480, '2026-12-07T09:00:00.000Z'],
+    // Across midnight UTC, and across midnight in Manila (16:00 UTC).
+    ['2026-12-07T23:45:00.000Z', 30, '2026-12-08T00:15:00.000Z'],
+    ['2026-12-07T15:45:00.000Z', 30, '2026-12-07T16:15:00.000Z'],
+    // The night New York changes its clocks: minutes stay minutes.
+    ['2026-03-08T06:45:00.000Z', 30, '2026-03-08T07:15:00.000Z'],
+    ['2026-12-07T09:00:00+08:00', 15, '2026-12-07T01:15:00.000Z'],
+  ])('%s plus %i minutes is %s', (iso, minutes, expected) => {
+    expect(addMinutes({ iso, minutes })).toBe(expected);
+  });
+
+  it('refuses an invalid timestamp and part of a minute', () => {
+    expect(() => addMinutes({ iso: 'soon', minutes: 5 })).toThrow(RangeError);
+    expect(() => addMinutes({ iso: '2026-12-07T01:00:00.000Z', minutes: 0.5 })).toThrow(RangeError);
+  });
+});
+
+describe('isSameDayInZone', () => {
+  it('compares the calendar day of the zone, not of the computer', () => {
+    // 15:59 and 16:00 UTC are either side of Manila midnight (the same New York day).
+    expect(
+      isSameDayInZone({
+        first: '2026-12-07T15:59:00.000Z',
+        second: '2026-12-07T16:00:00.000Z',
+        timeZone: MANILA,
+      }),
+    ).toBe(false);
+    // 23:00 UTC and the next day's 01:00 UTC are one Manila day (two New York days).
+    expect(
+      isSameDayInZone({
+        first: '2026-12-06T23:00:00.000Z',
+        second: '2026-12-07T15:30:00.000Z',
+        timeZone: MANILA,
+      }),
+    ).toBe(true);
+  });
+
+  it('needs a time zone', () => {
+    expect(() =>
+      isSameDayInZone({
+        first: '2026-12-07T01:00:00.000Z',
+        second: '2026-12-07T01:00:00.000Z',
+        timeZone: '',
+      }),
+    ).toThrow(RangeError);
+  });
+});
+
+describe('fromClinicDateTime (whole minutes, as the API requires)', () => {
+  it('sends no seconds or milliseconds', () => {
+    expect(fromClinicDateTime({ date: '2026-12-07', time: '09:05', timeZone: MANILA })).toBe(
+      '2026-12-07T01:05:00.000Z',
+    );
   });
 });

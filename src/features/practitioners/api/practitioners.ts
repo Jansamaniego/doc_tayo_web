@@ -19,7 +19,8 @@ function usePractitionerQuery(profileId: string) {
   const tenantId = useActiveTenantId();
   return {
     queryKey: detailKey({ tenantId, profileId }),
-    enabled: tenantId !== null,
+    // `''` while there is no profile to read.
+    enabled: tenantId !== null && profileId !== '',
     queryFn: async () => {
       const result = await getApiClient().GET('/api/v1/practitioners/{profileId}', {
         params: { path: { profileId } },
@@ -43,8 +44,9 @@ export function useFreshPractitioner(profileId: string) {
 }
 
 /**
- * The working hours of one day at one branch (`date` is a calendar day in the branch's zone). It is
- * information only: booked appointments are not subtracted.
+ * The working hours of one day at one branch (`date` is a calendar day in the branch's zone), minus
+ * the practitioner's booked appointments at any branch (walk-ins are not taken out). Information
+ * only: booking outside these hours is allowed.
  */
 export function useAvailability({
   profileId,

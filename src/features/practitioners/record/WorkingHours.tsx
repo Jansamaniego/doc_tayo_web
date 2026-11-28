@@ -44,7 +44,7 @@ function DayHours({
     );
   }
   const { intervals, timeZone } = hours.data;
-  if (intervals.length === 0) return <p>{t`No working hours on this day`}</p>;
+  if (intervals.length === 0) return <p>{t`No free working hours on this day`}</p>;
   // An interval that ends as the day does reads "midnight", not "12:00 AM".
   const end = (iso: string): string => {
     const time = formatTime({ iso, timeZone });
@@ -65,8 +65,9 @@ function DayHours({
 }
 
 /**
- * The working hours of a chosen day at a branch. It starts on today in the branch's zone. These are
- * working hours, never free appointment slots: booked appointments are not counted yet.
+ * The working hours of a chosen day at a branch, with booked appointments already taken out by the
+ * API. It starts on today in the branch's zone. The hours are not "the only free slots": booking
+ * outside them is allowed.
  */
 export function WorkingHours({
   profileId,
@@ -98,7 +99,9 @@ export function WorkingHours({
       </div>
       <DatePicker legend={t`Day`} value={date} onChange={setChosenDate} />
       <DayHours profileId={profileId} branchId={branch.id} date={date} />
-      <p className="text-ink-secondary">{t`Booked appointments are not counted yet.`}</p>
+      <p className="text-ink-secondary">
+        {t`Booked appointments are already taken out. Booking outside these hours is allowed.`}
+      </p>
     </div>
   );
 }

@@ -34,6 +34,31 @@ export function toPlainDate({ year, month, day }: PlainDateParts): string {
   return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
+/** The calendar day `days` after `date` (before it when negative). */
+export function addDays({ date, days }: { date: string; days: number }): string {
+  const parts = parsePlainDate(date);
+  if (!parts) throw new RangeError(`Not a valid date: ${date}`);
+  if (!Number.isInteger(days)) throw new RangeError('Expected a whole number of days.');
+  // UTC is only a container here (it has no clock changes), so every day is one day long.
+  const moved = new Date(0);
+  moved.setUTCFullYear(parts.year, parts.month - 1, parts.day + days);
+  return toPlainDate({
+    year: moved.getUTCFullYear(),
+    month: moved.getUTCMonth() + 1,
+    day: moved.getUTCDate(),
+  });
+}
+
+/** The Monday of the week that holds `date`. */
+export function startOfWeek(date: string): string {
+  const parts = parsePlainDate(date);
+  if (!parts) throw new RangeError(`Not a valid date: ${date}`);
+  const day = new Date(0);
+  day.setUTCFullYear(parts.year, parts.month - 1, parts.day);
+  // getUTCDay: 0 is Sunday.
+  return addDays({ date, days: -((day.getUTCDay() + 6) % 7) });
+}
+
 /**
  * How old someone born on `birthDate` is on `today` (both `YYYY-MM-DD`, in the same calendar): whole
  * months under 2 years, whole years from then on. A 29 February birthday falls on 1 March in a common

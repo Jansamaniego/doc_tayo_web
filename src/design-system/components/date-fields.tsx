@@ -97,6 +97,8 @@ export interface DateFieldProps extends PartsChrome {
   onIncompleteChange?: ((incomplete: boolean) => void) | undefined;
   /** Rendered after the parts (the DatePicker puts its calendar button here). */
   trailing?: ReactNode;
+  /** Put on the month, so that a link in a form's error summary can focus the field. */
+  name?: string | undefined;
 }
 
 interface DateParts {
@@ -134,6 +136,7 @@ export function DateField({
   max,
   onIncompleteChange,
   trailing,
+  name,
 }: DateFieldProps) {
   const { t } = useLingui();
   const [parts, setParts] = useState<DateParts>(() => partsOf(value));
@@ -173,6 +176,7 @@ export function DateField({
             {(id) => (
               <select
                 id={id}
+                name={name}
                 disabled={disabled}
                 aria-describedby={describedBy}
                 aria-invalid={invalid}

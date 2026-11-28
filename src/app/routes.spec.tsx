@@ -1392,3 +1392,216 @@ describe('practitioner pages', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument();
   });
 });
+
+describe('appointments (Phase 9.1)', () => {
+  const API = 'http://localhost:3000/api/v1';
+  let requests: string[] = [];
+  beforeEach(() => {
+    requests = [];
+    window.localStorage.clear();
+    const empty = { data: [], meta: { page: 1, pageSize: 100, totalItems: 0, totalPages: 0 } };
+    const main = {
+      id: 'a0000000-0000-4000-8000-000000000001',
+      name: 'Main',
+      timezone: null,
+      isActive: true,
+    };
+    server.use(
+      http.get(`${API}/appointments`, ({ request }) => {
+        requests.push(request.url);
+        return HttpResponse.json(empty);
+      }),
+      http.get(`${API}/appointments/:id`, ({ request }) => {
+        requests.push(request.url);
+        return HttpResponse.json(
+          { error: { status: 404, code: 'NOT_FOUND', message: 'No', requestId: 'r' } },
+          { status: 404 },
+        );
+      }),
+      http.get(`${API}/branches`, () => HttpResponse.json({ ...empty, data: [main] })),
+      http.get(`${API}/tenant`, () => HttpResponse.json({ data: { timezone: 'Asia/Manila' } })),
+      http.get(`${API}/directory`, () => HttpResponse.json(empty)),
+    );
+  });
+  const reader = (): void => {
+    signedIn({
+      permissions: [
+        'tenant.read',
+        'branches.read',
+        'appointments.read',
+        'patients.read',
+        'directory.read',
+      ],
+    });
+  };
+  const nav = () => within(screen.getByRole('navigation', { name: 'Main' }));
+
+  it('shows Appointments after Home, before Patients, and opens the day view', async () => {
+    reader();
+    renderAt('/appointments');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Appointments' }),
+    ).toBeInTheDocument();
+    const links = nav().getAllByRole('link');
+    expect(links.slice(0, 3).map((link) => link.textContent)).toEqual([
+      'Home',
+      'Appointments',
+      'Patients',
+    ]);
+    expect(links[1]).toHaveAttribute('aria-current', 'page');
+  });
+
+  it.each([
+    '/appointments',
+    '/appointments/week',
+    '/appointments/ap000000-0000-4000-8000-000000000001',
+  ])('shows "no access" for %s without appointments.read, asking for nothing', async (path) => {
+    signedIn({ permissions: ['tenant.read', 'patients.read'] });
+    renderAt(path);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Appointments' })).not.toBeInTheDocument();
+    expect(requests).toEqual([]);
+  });
+
+  it('reads the branch, day, practitioner and tab from the address', async () => {
+    reader();
+    renderAt(
+      '/appointments?branch=a0000000-0000-4000-8000-000000000001&date=2026-12-07&practitioner=b0000000-0000-4000-8000-000000000001&status=closed',
+    );
+    await screen.findByText('No appointments on this day');
+    const asked = new URL(requests[0] ?? '').searchParams;
+    expect(asked.get('date')).toBe('2026-12-07');
+    expect(asked.get('practitionerMembershipId')).toBe('b0000000-0000-4000-8000-000000000001');
+    expect(asked.get('status')).toBe('cancelled,no_show');
+    expect(screen.getByRole('tab', { name: 'Cancelled and no-show' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  it('drops values it cannot use, and never sends them', async () => {
+    reader();
+    renderAt('/appointments?branch=main&date=2026-02-30&practitioner=me&status=cancelled');
+    await screen.findByText('No appointments on this day');
+    const asked = new URL(requests[0] ?? '').searchParams;
+    expect(asked.get('branchId')).toBe('a0000000-0000-4000-8000-000000000001');
+    expect(asked.get('date')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(asked.get('date')).not.toBe('2026-02-30');
+    expect(asked.has('practitionerMembershipId')).toBe(false);
+    expect(asked.get('status')).toBe('scheduled,checked_in');
+  });
+
+  it('opens an appointment, with Appointments still the current item', async () => {
+    reader();
+    renderAt('/appointments/ap000000-0000-4000-8000-000000000001');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'We could not find this appointment' }),
+    ).toBeInTheDocument();
+    expect(nav().getByRole('link', { name: 'Appointments' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+});
+
+describe('booking (Phase 9.2)', () => {
+  const API = 'http://localhost:3000/api/v1';
+  let requests: string[] = [];
+  beforeEach(() => {
+    requests = [];
+    window.localStorage.clear();
+    const empty = { data: [], meta: { page: 1, pageSize: 100, totalItems: 0, totalPages: 0 } };
+    const main = {
+      id: 'a0000000-0000-4000-8000-000000000001',
+      name: 'Main',
+      timezone: null,
+      isActive: true,
+    };
+    const asked = (request: Request, body: Record<string, unknown>) => {
+      requests.push(request.url);
+      return HttpResponse.json(body);
+    };
+    server.use(
+      http.get(`${API}/branches`, ({ request }) => asked(request, { ...empty, data: [main] })),
+      http.get(`${API}/tenant`, () => HttpResponse.json({ data: { timezone: 'Asia/Manila' } })),
+      http.get(`${API}/directory`, ({ request }) => asked(request, empty)),
+      http.get(`${API}/services`, ({ request }) => asked(request, empty)),
+      http.get(`${API}/appointments`, ({ request }) => asked(request, empty)),
+      http.get(`${API}/patients`, ({ request }) => asked(request, empty)),
+      http.get(`${API}/patients/:id`, ({ request }) => {
+        requests.push(request.url);
+        return HttpResponse.json(
+          { error: { status: 404, code: 'NOT_FOUND', message: 'No', requestId: 'r' } },
+          { status: 404 },
+        );
+      }),
+    );
+  });
+  const booker = (): void => {
+    signedIn({
+      permissions: [
+        'tenant.read',
+        'branches.read',
+        'appointments.read',
+        'appointments.manage',
+        'patients.read',
+        'directory.read',
+        'services.read',
+      ],
+    });
+  };
+
+  it('opens the booking form, with Appointments the current item', async () => {
+    booker();
+    renderAt('/appointments/new?kind=walk_in');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Book an appointment' }),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole('radio', { name: 'Walk-in (here now)' })).toBeChecked();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', {
+        name: 'Appointments',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows "no access" without appointments.manage, asking for nothing', async () => {
+    signedIn({ permissions: ['tenant.read', 'appointments.read', 'patients.read'] });
+    renderAt('/appointments/new');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: "You don't have access to this page" }),
+    ).toBeInTheDocument();
+    expect(requests).toEqual([]);
+  });
+
+  it('drops address values it cannot use', async () => {
+    booker();
+    renderAt('/appointments/new?branch=main&date=soon&patient=juan&kind=other');
+    expect(await screen.findByRole('radio', { name: 'Booked time' })).toBeChecked();
+    expect(requests.some((url) => url.includes('/patients/juan'))).toBe(false);
+  });
+
+  it('asks before typed input is lost', async () => {
+    booker();
+    const { router } = renderAt('/appointments/new');
+    await userEvent.type(
+      await screen.findByRole('textbox', { name: /Purpose of visit/ }),
+      'Check-up',
+    );
+    await userEvent.click(screen.getByRole('link', { name: 'Cancel' }));
+    expect(await screen.findByText('Leave without saving?')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/appointments/new');
+  });
+
+  it('leaves an untouched form without asking', async () => {
+    booker();
+    const { router } = renderAt('/appointments/new');
+    await screen.findByRole('radio', { name: 'Booked time' });
+    await userEvent.click(await screen.findByRole('link', { name: 'Cancel' }));
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/appointments');
+    });
+  });
+});

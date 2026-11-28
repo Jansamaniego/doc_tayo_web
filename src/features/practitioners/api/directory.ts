@@ -40,11 +40,17 @@ async function fetchWholeDirectory(filters: DirectoryFilters): Promise<Directory
  * The active staff of the clinic, by name, read whole: the API has no search, and a picker must find
  * anyone (plans/07-appointments-and-scheduling.md, P7-3). It carries no e-mail addresses.
  */
-export function useDirectory(filters: DirectoryFilters = {}) {
+export function useDirectory({
+  enabled = true,
+  ...filters
+}: DirectoryFilters & {
+  /** `false` for a person who may not read the directory: nothing is asked. */
+  enabled?: boolean;
+} = {}) {
   const tenantId = useActiveTenantId();
   return useQuery({
     queryKey: [tenantId, 'directory', filters],
-    enabled: tenantId !== null,
+    enabled: enabled && tenantId !== null,
     // The API marks the directory as never cached: names are not kept once no screen shows them.
     gcTime: 0,
     queryFn: () => fetchWholeDirectory(filters),

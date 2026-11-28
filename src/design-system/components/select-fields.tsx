@@ -1,7 +1,8 @@
+import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Check, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { Popover } from 'radix-ui';
-import { useId, useMemo, useState, type KeyboardEvent } from 'react';
+import { useId, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
 
 import { cn } from '@/lib/cn.ts';
 
@@ -14,8 +15,15 @@ export interface Option {
 
 type FieldChrome = Pick<FieldProps, 'label' | 'hint' | 'error' | 'optional'>;
 
+export interface OptionGroup {
+  label: string;
+  options: Option[];
+}
+
 export interface SelectFieldProps extends FieldChrome {
   options: Option[];
+  /** Options under headings, after the ungrouped ones. An empty group is not shown. */
+  groups?: OptionGroup[];
   value: string;
   onChange: (value: string) => void;
   /** An explicit first choice such as "Choose a branch" (used instead of a placeholder). */
@@ -35,12 +43,18 @@ export function SelectField({
   error,
   optional,
   options,
+  groups = [],
   value,
   onChange,
   emptyOption,
   disabled,
   name,
 }: SelectFieldProps) {
+  const choice = (option: Option) => (
+    <option key={option.value} value={option.value}>
+      {option.label}
+    </option>
+  );
   return (
     <Field label={label} hint={hint} error={error} optional={optional}>
       {(control) => (
@@ -56,11 +70,14 @@ export function SelectField({
             className={cn(controlClass({ invalid: !!error }), 'appearance-none pr-12')}
           >
             {emptyOption !== undefined && <option value="">{emptyOption}</option>}
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+            {options.map(choice)}
+            {groups
+              .filter((group) => group.options.length > 0)
+              .map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map(choice)}
+                </optgroup>
+              ))}
           </select>
           <ChevronDown
             aria-hidden="true"
@@ -79,6 +96,19 @@ export interface ComboboxProps extends FieldChrome {
   disabled?: boolean;
   /** Lets a link in a form's error summary focus the control. */
   name?: string;
+  /**
+   * For a list too long to hold, searched by the server: the options are the results for what was
+   * typed, and nothing is filtered here.
+   */
+  search?: {
+    /** Told what is typed, and '' each time the list opens. */
+    onQueryChange: (query: string) => void;
+    loading: boolean;
+    /** Shown when there are no results, for example a way to add one. */
+    empty?: ReactNode;
+    /** The chosen option's label, which the current results may not hold. */
+    selectedLabel?: string | undefined;
+  };
 }
 
 /**
@@ -96,6 +126,7 @@ export function Combobox({
   onChange,
   disabled,
   name,
+  search,
 }: ComboboxProps) {
   const { t } = useLingui();
   const listId = useId();
@@ -103,13 +134,23 @@ export function Combobox({
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
 
+  const searched = search !== undefined;
+  const loading = search?.loading === true;
   const shown = useMemo(() => {
+    // Old results are not offered while the server looks for the new ones.
+    if (loading) return [];
     const needle = query.trim().toLowerCase();
-    return needle
+    return needle && !searched
       ? options.filter((option) => option.label.toLowerCase().includes(needle))
       : options;
-  }, [options, query]);
-  const selected = options.find((option) => option.value === value);
+  }, [options, query, searched, loading]);
+  const selectedLabel =
+    (value !== '' ? search?.selectedLabel : undefined) ??
+    options.find((option) => option.value === value)?.label;
+  const count =
+    shown.length === 0
+      ? t`No results`
+      : plural(shown.length, { one: '# result', other: '# results' });
 
   function choose(option: Option): void {
     onChange(option.value);
@@ -139,6 +180,7 @@ export function Combobox({
             setOpen(next);
             if (next) {
               setQuery('');
+              search?.onQueryChange('');
               setActive(
                 Math.max(
                   0,
@@ -163,7 +205,7 @@ export function Combobox({
                 'flex items-center justify-between gap-3 text-left',
               )}
             >
-              <span>{selected ? selected.label : t`Choose an option`}</span>
+              <span>{selectedLabel ?? t`Choose an option`}</span>
               <ChevronsUpDown aria-hidden="true" className="size-5 shrink-0" />
             </button>
           </Popover.Trigger>
@@ -185,14 +227,16 @@ export function Combobox({
                 value={query}
                 onChange={(event) => {
                   setQuery(event.target.value);
+                  search?.onQueryChange(event.target.value);
                   setActive(0);
                 }}
                 onKeyDown={handleKeyDown}
                 className={cn(controlClass(), '[&::-webkit-search-cancel-button]:hidden')}
               />
               <p aria-live="polite" className="text-small text-ink-muted">
-                {shown.length === 0 ? t`No results` : t`${shown.length} results`}
+                {loading ? t`Searching…` : count}
               </p>
+              {!loading && shown.length === 0 && search?.empty}
               <div
                 id={listId}
                 role="listbox"

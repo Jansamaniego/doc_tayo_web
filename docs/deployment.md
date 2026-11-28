@@ -46,7 +46,7 @@ Content-Security-Policy-Report-Only:
   base-uri 'none'; form-action 'self'
 ```
 
-It is **report-only until Phase 14**, which switches it to `Content-Security-Policy`. Also set
+It is **report-only until Phase 15**, which switches it to `Content-Security-Policy`. Also set
 `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff`, and a
 `Permissions-Policy` that turns off features the app does not use.
 

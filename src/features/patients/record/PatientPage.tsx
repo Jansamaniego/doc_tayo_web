@@ -11,6 +11,7 @@ import { DetailRow } from '@/design-system/patterns/detail-row.tsx';
 import { useClinicTimeZone } from '@/features/staff/api/clinic-time-zone.ts';
 import { todayInZone } from '@/lib/datetime/index.ts';
 import { ageOn } from '@/lib/datetime/plain-date.ts';
+import { AppButtonLink } from '@/lib/app-link.tsx';
 import { can } from '@/lib/permissions.ts';
 import { usePageTitle } from '@/lib/use-page-title.ts';
 
@@ -86,6 +87,7 @@ function PatientRecord({ patient }: { patient: Patient }) {
   const { birthDate, guardianName, guardianPhone } = patient;
   const session = useSession();
   const mayManage = session.status === 'signed-in' && can(session.permissions, 'patients.manage');
+  const mayBook = session.status === 'signed-in' && can(session.permissions, 'appointments.manage');
   const hasGuardian = guardianName !== null || guardianPhone !== null;
   const minor = birthDate !== null && today !== undefined && isMinor({ birthDate, today });
   const phone = (value: string | null) => (value ? displayPhone(value) : notRecorded);
@@ -105,6 +107,14 @@ function PatientRecord({ patient }: { patient: Patient }) {
           </DetailRow>
         </dl>
         {mayManage && <PatientActions patient={patient} />}
+        {/* An archived patient cannot be booked until restored. */}
+        {mayBook && patient.archivedAt === null && (
+          <div>
+            <AppButtonLink href={`/appointments/new?patient=${patient.id}`} variant="secondary">
+              {t`Book a visit`}
+            </AppButtonLink>
+          </div>
+        )}
       </section>
 
       {/* Allergies come first: staff check them before anything else. */}

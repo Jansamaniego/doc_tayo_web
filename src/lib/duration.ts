@@ -1,6 +1,6 @@
 import { plural, t } from '@lingui/core/macro';
 
-/** 90 → "1 hour 30 minutes": how long a service usually takes, in words. */
+/** 90 → "1 hour 30 minutes": a length of time in words. */
 export function formatDuration(minutes: number): string {
   if (!Number.isInteger(minutes) || minutes < 1) {
     throw new RangeError('Expected a whole number of minutes.');

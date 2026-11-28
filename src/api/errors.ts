@@ -51,6 +51,9 @@ const ERROR_CODES: Record<ErrorCode, true> = {
   IDEMPOTENCY_KEY_REUSED: true,
   IDEMPOTENCY_KEY_IN_USE: true,
   IDEMPOTENCY_KEY_INVALID: true,
+  APPOINTMENT_OVERLAP: true,
+  PATIENT_ARCHIVED: true,
+  NOT_A_PRACTITIONER: true,
 };
 
 const FIELD_ERROR_CODES: Record<FieldErrorCode, true> = {
